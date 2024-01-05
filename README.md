@@ -1,6 +1,7 @@
 # ReportDahboard [Version 3]
 
-	Maintained by: Naveen(naveen.mandagiri@moodle.com), Jahanvi, Sudharani
+	Maintained by: Naveen(naveen.mandagiri@moodle.com), Jahnavi(jahnavi.nanduri@moodle.com),
+					Sudharani(sudharani.sadula@moodle.com)
 	Copyright: Moodle India
 	License: http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 
