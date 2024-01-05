@@ -1,0 +1,46 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_reportdashboard/courseprofile/activityprogress
+
+    TODO describe template activityprogress
+
+    Example context (json):
+    {
+    }
+}}
+<h5 class="mb-3 pl-2">{{# str}}activityprogress, block_reportdashboard{{/ str}}</h5>
+<div class="activityprogress_card card ls-card">
+	<div class="p-2">
+		<div class = "reportdashboard_header">
+			<div id='plotreportcontainer{{reportinstance}}' class='plotreport_dashboard_container' data-reportid={{reportid}}
+            data-reporttype={{reportcontenttype}} data-blockinstance={{reportid}}>
+			</div>
+		</div>
+	</div>
+</div>
+{{#js}}
+    require(['block_learnerscript/report'], function(s) {
+		var params = {};
+        params.reportid = {{reportid}};
+		params.reporttype = '{{reporttype}}';
+		params.instanceid = {{reportid}};
+		params.reportdashboard = false;
+        params.filters = {filter_courses:{{courseid}}};
+        s.CourseprofileReportsdata(params);
+    });
+{{/js}}

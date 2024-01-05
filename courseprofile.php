@@ -1,0 +1,328 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Form for editing LearnerScript dashboard block instances.
+ * @package   block_reportdashboard
+ * @copyright 2023 Moodle India
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+require_once(dirname(__FILE__) . '/../../config.php');
+require_once($CFG->libdir . '/accesslib.php');
+$courseid = optional_param('filter_courses', SITEID, PARAM_INT);
+$contextlevel = optional_param('contextlevel', 10, PARAM_INT);
+$roleshortname = optional_param('role', '', PARAM_TEXT);
+
+use block_learnerscript\local\ls;
+use block_learnerscript\local\querylib;
+
+global $CFG, $SITE, $PAGE, $OUTPUT, $DB, $SESSION;
+
+$context = context_system::instance();
+$PAGE->set_pagetype('site-index');
+$PAGE->set_pagelayout('course');
+$context = context_system::instance();
+$PAGE->set_context($context);
+$PAGE->set_url('//blocks/reportdashboard/courseprofile.php');
+$PAGE->set_title(get_string('courseprofile', 'block_learnerscript'));
+
+require_login();
+
+$PAGE->requires->css('/blocks/reportdashboard/css/radios-to-slider.min.css');
+$PAGE->requires->css('/blocks/reportdashboard/css/flatpickr.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/fixedHeader.dataTables.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/responsive.dataTables.min.css');
+$PAGE->requires->jquery_plugin('ui-css');
+$PAGE->requires->css('/blocks/learnerscript/css/select2.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/jquery.dataTables.min.css');
+
+
+echo $OUTPUT->header();
+$PAGE->requires->js(new moodle_url('/blocks/learnerscript/js/highchart.js'));
+$SESSION->ls_contextlevel = $contextlevel;
+$SESSION->role = $roleshortname;
+$studentrole = ($roleshortname == 'student') ? $roleshortname : '';
+$siteadmin = is_siteadmin() || (new ls)->is_manager($USER->id, $SESSION->ls_contextlevel, $SESSION->role);
+
+$data = [];
+$dashboardcourse = (is_siteadmin() || (new ls)->is_manager($USER->id, $SESSION->ls_contextlevel, $SESSION->role)) ?
+        $DB->get_records_select('course' , 'id <> :id' , ['id' => SITEID] , '' ,
+    'id,fullname') : (new querylib)->get_rolecourses($USER->id, $SESSION->role, $SESSION->ls_contextlevel,
+    SITEID, '', '');
+foreach ($dashboardcourse as $selectedcourse) {
+    if ($selectedcourse->id == $courseid) {
+        $cpdashboard[] = ['id' => $selectedcourse->id, 'fullname' => $selectedcourse->fullname, 'selectedcourse' => 'selected'];
+    } else {
+        $cpdashboard[] = ['id' => $selectedcourse->id, 'fullname' => $selectedcourse->fullname, 'selectedcourse' => ''];
+    }
+}
+if (!empty($cpdashboard)) {
+    $data['courselist'] = array_values($cpdashboard);
+    $data['coursedashboard'] = 1;
+}
+
+$courseinfo = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+
+// Course details.
+$enrolmentsql = "SELECT DISTINCT ue.userid
+                  FROM {course} c
+                  JOIN {enrol} e ON e.courseid = c.id AND e.status = 0
+                  JOIN {user_enrolments} ue on ue.enrolid = e.id AND ue.status = 0
+                  JOIN {role_assignments}  ra ON ra.userid = ue.userid
+                  JOIN {role} r ON r.id = ra.roleid
+                  JOIN {context} ctx ON ctx.instanceid = c.id
+                  JOIN {user} u ON u.id = ra.userid AND u.confirmed = 1 AND u.deleted = 0
+                  AND u.suspended = 0
+                  WHERE ra.contextid = ctx.id AND ctx.contextlevel = 50 AND c.visible = 1
+                  AND c.id = :courseid";
+$enrollmentscount = $DB->get_records_sql($enrolmentsql, ['courseid' => $courseid]);
+$courseinfo->enrollmentscount = count($enrollmentscount);
+
+$studentcountsql = $enrolmentsql . "AND r.shortname = 'student'";
+$studentcount = $DB->get_records_sql($studentcountsql, ['courseid' => $courseid]);
+$courseinfo->studentcount = count($studentcount);
+
+$editingteachercountsql = $enrolmentsql . "AND r.shortname = 'editingteacher'";
+$editingteachercount = $DB->get_records_sql($editingteachercountsql, ['courseid' => $courseid]);
+$courseinfo->editingteachercount = count($editingteachercount);
+
+$courseinfo->otherenrolcount = $courseinfo->enrollmentscount -
+                    ($courseinfo->studentcount + $courseinfo->editingteachercount);
+$activitiescount = $DB->count_records('course_modules', ['course' => $courseid, 'visible' => 1,
+                'deletioninprogress' => 0]);
+$courseinfo->activitiescount = $activitiescount;
+
+$totaltimespent = $DB->get_record_sql("SELECT SUM(timespent) AS timespent FROM {block_ls_coursetimestats}
+                    WHERE 1 = 1 AND courseid = :courseid", ['courseid' => $courseid]);
+
+$timespent = !empty($totaltimespent->timespent) ? (new ls)->strtime($totaltimespent->timespent) : 0;
+$courseinfo->totaltimespent = preg_replace("/<img[^>]+>/i", "", $timespent);
+
+$avgtimespent = $DB->get_record_sql("SELECT AVG(timespent) AS timespent FROM {block_ls_coursetimestats}
+                    WHERE 1 = 1 AND courseid = :courseid", ['courseid' => $courseid]);
+
+$avgtime = !empty($avgtimespent->timespent) ? (new ls)->strtime($avgtimespent->timespent) : 0;
+$courseinfo->avgtimespent = preg_replace("/<img[^>]+>/i", "", $avgtime);
+
+$groups = $DB->get_records('groups', ['courseid' => $courseid]);
+$courseinfo->groups = count($groups);
+
+// Course progress.
+$completionsql = "SELECT DISTINCT ue.userid
+                FROM {course} c
+                JOIN {enrol} e ON e.courseid = c.id AND e.status = 0
+                JOIN {user_enrolments} ue on ue.enrolid = e.id AND ue.status = 0
+                JOIN {role_assignments}  ra ON ra.userid = ue.userid
+                JOIN {role} r ON r.id = ra.roleid AND r.shortname = 'student'
+                JOIN {context} ctx ON ctx.instanceid = c.id
+                JOIN {user} u ON u.id = ra.userid AND u.confirmed = 1 AND u.deleted = 0
+                AND u.suspended = 0
+                JOIN {course_completions} cc ON cc.course = c.id AND cc.userid = u.id
+                WHERE ra.contextid = ctx.id AND ctx.contextlevel = 50 AND c.visible = 1
+                AND c.id = :courseid AND cc.timecompleted IS NOT NULL";
+$completioncount = $DB->get_records_sql($completionsql, ['courseid' => $courseid]);
+$courseinfo->completioncount = count($completioncount);
+
+$courseinfo->inprogresscount = $courseinfo->studentcount - $courseinfo->completioncount;
+$courseinfo->progresspercent = !empty($courseinfo->studentcount) ?
+                round(($courseinfo->completioncount / $courseinfo->studentcount) * 100) : 0;
+
+// Course grades.
+$avggrade = $DB->get_record_sql("SELECT AVG(gg.finalgrade) as finalgrade FROM {grade_grades} gg
+                            JOIN {grade_items} gi ON gi.id = gg.itemid
+                            WHERE gi.itemtype = 'course' AND gi.courseid = :courseid", ['courseid' => $courseid]);
+$courseinfo->avggrade = !empty($avggrade->finalgrade) ? round($avggrade->finalgrade, 0) : 0;
+$highestgrade = $DB->get_field_sql("SELECT MAX(gg.finalgrade) as finalgrade FROM {grade_grades} gg
+                            JOIN {grade_items} gi ON gi.id = gg.itemid
+                            WHERE gi.itemtype = 'course' AND gi.courseid = :courseid", ['courseid' => $courseid]);
+$lowestgrade = $DB->get_field_sql("SELECT MIN(gg.finalgrade) as finalgrade FROM {grade_grades} gg
+                            JOIN {grade_items} gi ON gi.id = gg.itemid
+                            WHERE gi.itemtype = 'course' AND gi.courseid = :courseid", ['courseid' => $courseid]);
+$courseinfo->highestgrade = !empty($highestgrade->finalgrade) ? round($highestgrade->finalgrade, 2) : 0;
+$courseinfo->lowestgrade = !empty($lowestgrade->finalgrade) ? round($lowestgrade->finalgrade, 2) : 0;
+
+// Activities.
+$activitiescountsql = $DB->get_records_sql("SELECT cm.id FROM {course_modules} cm
+                        JOIN {modules} m ON m.id = cm.module
+                        WHERE 1 = 1 AND cm.course = :courseid
+                        AND cm.visible = :cmvisible AND cm.deletioninprogress = :deletioninprogress",
+                        ['courseid' => $courseid, 'cmvisible' => 1, 'deletioninprogress' => 0]);
+$e = 0;
+$f = 0;
+foreach ($activitiescountsql as $activitycountid) {
+    $activitycompletions = $DB->get_records('course_modules_completion', ['coursemoduleid' => $activitycountid->id]);
+    if ((count($activitycompletions) == $courseinfo->studentcount) && !empty($courseinfo->studentcount)) {
+        $e++;
+    } else {
+        $f++;
+    }
+}
+$courseinfo->activitycompleted = $e;
+$courseinfo->activityinprogress = $f;
+$courseinfo->activityprogress = !empty($courseinfo->activitiescount) ? round(($e / $courseinfo->activitiescount) * 100) : 0;
+
+// Assignments.
+$assignmentscountsql = $DB->get_records_sql("SELECT cm.id FROM {course_modules} cm
+                        JOIN {modules} m ON m.id = cm.module AND m.name = 'assign'
+                        WHERE 1 = 1 AND cm.course = :courseid
+                        AND cm.visible = :cmvisible AND cm.deletioninprogress = :deletioninprogress",
+                        ['courseid' => $courseid, 'cmvisible' => 1, 'deletioninprogress' => 0]);
+$courseinfo->assignmentscount = count($assignmentscountsql);
+$i = 0;
+$j = 0;
+foreach ($assignmentscountsql as $assigncountid) {
+    $assignmodulecompletions = $DB->get_records('course_modules_completion', ['coursemoduleid' => $assigncountid->id]);
+    if (count($assignmodulecompletions) == $courseinfo->studentcount && !empty($courseinfo->studentcount)) {
+        $i++;
+    } else {
+        $j++;
+    }
+}
+$courseinfo->assigncompleted = $i;
+$courseinfo->assigninprogress = $j;
+$courseinfo->assignmentprogress = !empty($courseinfo->assignmentscount) ? round(($i / $courseinfo->assignmentscount) * 100) : 0;
+// Quizzes.
+$quizzescountsql = $DB->get_records_sql("SELECT cm.id FROM {course_modules} cm
+                        JOIN {modules} m ON m.id = cm.module AND m.name = 'quiz'
+                        WHERE 1 = 1 AND cm.course = :courseid
+                        AND cm.visible = :cmvisible AND cm.deletioninprogress = :deletioninprogress",
+                        ['courseid' => $courseid, 'cmvisible' => 1, 'deletioninprogress' => 0]);
+$courseinfo->quizzescount = count($quizzescountsql);
+$a = 0;
+$b = 0;
+foreach ($quizzescountsql as $quizzescountid) {
+    $quizmodulecompletions = $DB->get_records('course_modules_completion', ['coursemoduleid' => $quizzescountid->id]);
+    if (count($quizmodulecompletions) == $courseinfo->studentcount && !empty($courseinfo->studentcount)) {
+        $a++;
+    } else {
+        $b++;
+    }
+}
+$courseinfo->quizcompleted = $a;
+$courseinfo->quizinprogress = $b;
+$courseinfo->quizprogress = !empty($courseinfo->quizzescount) ? round(($a / $courseinfo->quizzescount) * 100) : 0;
+// Scorm.
+$scormcountsql = $DB->get_records_sql("SELECT cm.id FROM {course_modules} cm
+                        JOIN {modules} m ON m.id = cm.module AND m.name = 'scorm'
+                        WHERE 1 = 1 AND cm.course = :courseid
+                        AND cm.visible = :cmvisible AND cm.deletioninprogress = :deletioninprogress",
+                        ['courseid' => $courseid, 'cmvisible' => 1, 'deletioninprogress' => 0]);
+$courseinfo->scormcount = count($scormcountsql);
+$m = 0;
+$n = 0;
+foreach ($scormcountsql as $scormcountid) {
+    $scormmodulecompletions = $DB->get_records('course_modules_completion', ['coursemoduleid' => $scormcountid->id]);
+    if (count($scormmodulecompletions) == $courseinfo->studentcount && !empty($courseinfo->studentcount)) {
+        $m++;
+    } else {
+        $n++;
+    }
+}
+$courseinfo->scormcompleted = $m;
+$courseinfo->scorminprogress = $n;
+$courseinfo->scormprogress = !empty($courseinfo->scormcount) ? round(($m / $courseinfo->scormcount) * 100) : 0;
+
+// Badges.
+$badgeslist = $DB->get_records_sql("SELECT b.id, b.name FROM {badge} b
+                    WHERE 1 = 1 AND b.courseid = :courseid", ['courseid' => $courseid]);
+$coursebadgesinfo = [];
+foreach ($badgeslist as $badge) {
+    if ($badge->id > 0) {
+        $sql = "SELECT * FROM {files} WHERE itemid = :logo AND filearea = 'badgeimage' AND component = 'badges'
+                        AND filename != '.' ORDER BY id DESC";
+        $classimagerecord = $DB->get_record_sql($sql, ['logo' => $badge->id], 1);
+    }
+    $logourl = "";
+    if (!empty($classimagerecord)) {
+        $logourl = moodle_url::make_pluginfile_url($classimagerecord->contextid,
+                        'badges', 'badgeimage', $badge->id, '/', 'f3')->out(false);
+    }
+    $coursebadgesinfo[] = ['badgeid' => $badge->id, 'badgename' => $badge->name, 'badgeimage' => $logourl];
+}
+
+// Activity progress.
+$activityprogressreport = $DB->get_record('block_learnerscript', ['type' => 'usercourses', 'name' => 'Activity Progress'],
+                            '*', IGNORE_MULTIPLE);
+$reportcontenttypes = (new ls)->cr_listof_reporttypes($activityprogressreport->id);
+$reportid = $activityprogressreport->id;
+$reportinstance = $activityprogressreport->id;
+$reporttype = key($reportcontenttypes);
+
+// Top learners.
+$toplearnersreport = $DB->get_record('block_learnerscript', ['type' => 'usercourses', 'name' => 'Top Learners']);
+$toplearnerreportid = $toplearnersreport->id;
+$toplearnerreportinstance = $toplearnersreport->id;
+$toplearnerreporttype = 'table';
+
+// Activities.
+$activitiesreport = $DB->get_record('block_learnerscript', ['type' => 'courseactivities']);
+$activitiesreportid = $activitiesreport->id;
+$activitiesreportinstance = $activitiesreport->id;
+$activitiesreporttype = 'table';
+
+// Timeline.
+$timelinesql = "SELECT a.* FROM (SELECT a.name, a.allowsubmissionsfromdate AS timestart, m.name AS module, cm.id
+                                FROM {assign} a
+                                JOIN {course_modules} cm ON cm.instance = a.id
+                                JOIN {modules} m ON m.id = cm.module AND m.name = 'assign'
+                                WHERE 1 = 1 AND a.allowsubmissionsfromdate >= UNIX_TIMESTAMP()
+                                AND a.course = :courseid AND cm.visible = :cvisible
+                                AND cm.deletioninprogress = :deletioninprogress
+                                UNION
+                                SELECT q.name, q.timeopen AS timestart, m.name AS module, cm.id
+                                FROM {quiz} q
+                                JOIN {course_modules} cm ON cm.instance = q.id
+                                JOIN {modules} m ON m.id = cm.module AND m.name = 'quiz'
+                                WHERE 1 = 1 AND q.timeopen >= UNIX_TIMESTAMP()
+                                AND q.course = :qcourseid AND cm.visible = :qcvisible
+                                AND cm.deletioninprogress = :qdeletioninprogress
+                                UNION
+                                SELECT s.name, s.timeopen AS timestart, m.name AS module, cm.id
+                                FROM {scorm} s
+                                JOIN {course_modules} cm ON cm.instance = s.id
+                                JOIN {modules} m ON m.id = cm.module AND m.name = 'scorm'
+                                WHERE 1 = 1 AND s.timeopen >= UNIX_TIMESTAMP()
+                                AND s.course = :scourseid AND cm.visible = :scvisible
+                                AND cm.deletioninprogress = :sdeletioninprogress) AS a";
+$timelinerecords = $DB->get_records_sql($timelinesql, ['courseid' => $courseid, 'qcourseid' => $courseid,
+                    'scourseid' => $courseid, 'cvisible' => '1', 'deletioninprogress' => '0',
+                    'qcvisible' => '1', 'qdeletioninprogress' => '0', 'scvisible' => '1', 'sdeletioninprogress' => '0']);
+$timelinerecordslist = [];
+foreach ($timelinerecords as $timelinerecord) {
+    $timaccess = userdate($timelinerecord->timestart);
+    $timelinerecordslist[] = ['cmid' => $timelinerecord->id,
+    'activityname' => $timelinerecord->name, 'activitymodule' => $timelinerecord->module, 'timestart' => $timaccess, ];
+}
+echo $OUTPUT->render_from_template('block_reportdashboard/courseprofile/courseprofile',
+                                        ['courseinfo' => $courseinfo,
+                                                'reportid' => $reportid,
+                                                'reporttype' => $reporttype,
+                                                'reportinstance' => $reportinstance,
+                                                'toplearnerreportid' => $toplearnerreportid,
+                                                'toplearnerreporttype' => $toplearnerreporttype,
+                                                'toplearnerreportinstance' => $toplearnerreportinstance,
+                                                'activitiesreportid' => $activitiesreportid,
+                                                'activitiesreporttype' => $activitiesreporttype,
+                                                'activitiesreportinstance' => $activitiesreportinstance,
+                                                'coursebadgesinfo' => $coursebadgesinfo,
+                                                'coursedata' => $data,
+                                                'courseid' => $courseid,
+                                                'timelinerecordslist' => $timelinerecordslist,
+                                                'role' => $roleshortname,
+                                                'contextlevel' => $contextlevel,
+                                            'issiteadmin' => $siteadmin,
+                                            'studentrole' => $studentrole]);
+echo $OUTPUT->footer();

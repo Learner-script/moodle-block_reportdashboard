@@ -1,0 +1,92 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_reportdashboard/courseprofile/courseprofile
+
+    TODO describe template courseprofile
+
+    Example context (json):
+    {
+    }
+}}
+<div id="profile-page" class="course-profile">
+	<div class="row m-0">
+		<div class="col-md-6">
+			{{^studentrole}}
+			{{#coursedata }}
+				<span class="coursefilter">
+					<label>{{#str}}course{{/str}}</label>
+					<select name="filter_courses" class = "dashboardcourses" id = "dashboardcourses" data-select2-ajax="1" data-action = "filtercourses" data-role="{{dashboardrole}}">
+						{{# courselist }}
+							<option value = "{{id}}" {{selectedcourse}}>{{fullname}}</option>
+						{{/ courselist }}
+					</select>
+				</span>
+			{{/coursedata }}
+			{{/studentrole}}
+		</div>
+		<div class="col-md-6">
+			{{#issiteadmin}}
+				<div style="float:right;">
+				<a class="btn linkbtn btn-primary" href="{{config.wwwroot}}/blocks/reportdashboard/dashboard.php">{{#str}} dashboard, block_reportdashboard {{/str}}</a>
+				</div>
+			{{/issiteadmin}}
+			{{^issiteadmin}}
+				<div style="float:right;">
+				<a class="btn linkbtn btn-primary" href="{{config.wwwroot}}/blocks/reportdashboard/dashboard.php?role={{role}}&contextlevel={{contextlevel}}">{{#str}} dashboard, block_reportdashboard {{/str}}</a>
+				</div>
+			{{/issiteadmin}}
+		</div>
+	</div>
+	<div class="row m-0">
+		<div class="col-md-3">
+			{{> block_reportdashboard/courseprofile/coursedetails }}
+			{{> block_reportdashboard/courseprofile/badges }}
+		</div>
+		<div class="col-md-9">
+			{{> block_reportdashboard/profilepage/progressinfo }}
+
+			<div class="row mt-5">
+				<div class="col-md-6">
+					{{> block_reportdashboard/courseprofile/activityprogress }}
+				</div>
+				<div class="col-md-6">
+					{{> block_reportdashboard/courseprofile/timeline }}
+				</div>
+			</div>
+			<div class="mt-5">
+				{{> block_reportdashboard/courseprofile/totallearners }}
+			</div>
+
+			<div class="mt-5">
+				{{> block_reportdashboard/courseprofile/activities }}
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+    $(function(){
+      // bind change event to select
+      	$('#dashboardcourses').on('change', function () {
+          	var url = $(this).val(); // get selected value
+          	if (url) { // require a URL
+            	window.location = 'courseprofile.php?filter_courses=' + url; // redirect
+          	}
+          	return false;
+      	});
+    });
+</script>

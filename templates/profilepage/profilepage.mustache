@@ -1,0 +1,101 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_reportdashboard/profilepage/profilepage
+
+    TODO describe template profilepage
+
+    Example context (json):
+    {
+    }
+}}
+{{#userinfo}}
+<div id="profile-page">
+	<div class="row m-0">
+		<div class="col-md-6">
+			{{#userdata}}
+				{{^studentrole}}
+					<span class="userfilter">
+						<label>{{#str}}user{{/str}}</label>
+						<select name="filter_users" class = "dashboardusers" id = "dashboardusers" data-select2-ajax="1" data-action = "filterusers" data-role="{{dashboardrole}}">
+							{{# userslist }}
+								<option value = "{{id}}" {{selecteduser}}>{{fullname}}</option>
+							{{/ userslist }}
+						</select>
+					</span>
+				{{/studentrole}}
+			{{/userdata }}
+		</div>
+		<div class="col-md-6">
+			{{#issiteadmin}}
+				<div style="float:right;">
+				<a class="btn linkbtn btn-primary" href="{{config.wwwroot}}/blocks/reportdashboard/dashboard.php">{{#str}} dashboard, block_reportdashboard {{/str}}</a>
+				</div>
+			{{/issiteadmin}}
+			{{^issiteadmin}}
+				<div style="float:right;">
+				<a class="btn linkbtn btn-primary" href="{{config.wwwroot}}/blocks/reportdashboard/dashboard.php?role={{role}}&contextlevel={{contextlevel}}">{{#str}} dashboard, block_reportdashboard {{/str}}</a>
+				</div>
+			{{/issiteadmin}}
+		</div>
+	</div>
+	<div class="row m-0">
+		<div class="col-md-3">
+			{{> block_reportdashboard/profilepage/profiledetails }}
+			{{> block_reportdashboard/profilepage/badges }}
+		</div>
+		<div class="col-md-9">
+			{{> block_reportdashboard/profilepage/userprogressinfo }}
+
+			<div class="row mt-5">
+				<div class="col-md-6">
+					{{> block_reportdashboard/profilepage/lms_access }}
+				</div>
+				<div class="col-md-6">
+					{{> block_reportdashboard/profilepage/timespent }}
+				</div>
+			</div>
+
+			<div class="row mt-5">
+				<div class="col-md-6">
+					{{> block_reportdashboard/profilepage/loggedinfo }}
+				</div>
+				<div class="col-md-6">
+					{{> block_reportdashboard/profilepage/recentactivities }}
+				</div>
+			</div>
+
+			<div class="mt-5">
+				{{> block_reportdashboard/profilepage/courseoverview }}
+			</div>
+		</div>
+
+	</div>
+</div>
+{{/userinfo}}
+<script>
+    $(function(){
+      // bind change event to select
+      	$('#dashboardusers').on('change', function () {
+          	var url = $(this).val(); // get selected value
+          	if (url) { // require a URL
+            	window.location = 'profilepage.php?filter_users=' + url; // redirect
+          	}
+          	return false;
+      	});
+    });
+</script>

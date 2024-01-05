@@ -1,0 +1,470 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Form for editing LearnerScript dashboard block instances.
+ * @package   block_reportdashboard
+ * @copyright 2023 Moodle India
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+require_once(dirname(__FILE__) . '/../../config.php');
+require_once($CFG->libdir . '/accesslib.php');
+$sessionuserid = optional_param('filter_users', '', PARAM_INT);
+$contextlevel = optional_param('contextlevel', 10, PARAM_INT);
+$roleshortname = optional_param('role', '', PARAM_TEXT);
+
+use block_learnerscript\local\ls;
+use block_learnerscript\local\querylib;
+
+global $CFG, $SITE, $PAGE, $OUTPUT, $DB, $SESSION;
+
+$context = context_system::instance();
+$PAGE->set_pagetype('site-index');
+$PAGE->set_pagelayout('course');
+$context = context_system::instance();
+$PAGE->set_context($context);
+$PAGE->set_url('/blocks/reportdashboard/profilepage.php');
+$PAGE->set_title(get_string('profilepage', 'block_reportdashboard'));
+
+require_login();
+
+$PAGE->requires->js('/blocks/learnerscript/js/highchart.js');
+$PAGE->requires->js('/blocks/learnerscript/js/highcharts/heatmap.js');
+$PAGE->requires->js('/blocks/learnerscript/js/highcharts/exporting.js');
+$PAGE->requires->js('/blocks/learnerscript/js/highcharts/highcharts-more.js');
+$PAGE->requires->js('/blocks/learnerscript/js/highmaps/map.js');
+$PAGE->requires->css('/blocks/reportdashboard/css/radios-to-slider.min.css');
+$PAGE->requires->css('/blocks/reportdashboard/css/flatpickr.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/fixedHeader.dataTables.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/responsive.dataTables.min.css');
+$PAGE->requires->jquery_plugin('ui-css');
+$PAGE->requires->css('/blocks/learnerscript/css/select2.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/jquery.dataTables.min.css');
+
+$userid = ($roleshortname == 'student') ? $USER->id : $sessionuserid;
+echo $OUTPUT->header();
+
+$SESSION->ls_contextlevel = $contextlevel;
+$SESSION->role = $roleshortname;
+$role = $SESSION->role;
+$studentrole = ($roleshortname == 'student') ? $roleshortname : '';
+$siteadmin = is_siteadmin() || (new ls)->is_manager($USER->id, $SESSION->ls_contextlevel, $SESSION->role);
+
+if ($userid) {
+    // User filter.
+    $dashboardcourse = (is_siteadmin() || (new ls)->is_manager($USER->id, $SESSION->ls_contextlevel, $SESSION->role)) ?
+        $DB->get_records_select('course' , 'id <> :id' , ['id' => SITEID] , '' ,
+    'id, fullname') : (new querylib)->get_rolecourses($USER->id, $SESSION->role, $SESSION->ls_contextlevel,
+    SITEID, '', '');
+    $courseslist = [];
+    foreach ($dashboardcourse as $selectedcourse) {
+            $courseslist[] = $selectedcourse->id;
+    }
+
+    $coursesql = ' ';
+    $params = [];
+    if (!empty($courseslist)) {
+        list($coursesql, $params) = $DB->get_in_or_equal($courseslist, SQL_PARAMS_NAMED);
+    }
+    if (is_siteadmin() || (new ls)->is_manager($USER->id, $SESSION->ls_contextlevel, $SESSION->role)) {
+        $users = $DB->get_records('user', []);
+    } else {
+        $users = $DB->get_records_sql("SELECT DISTINCT u.*
+                            FROM {course} c
+                            JOIN {enrol} e ON c.id = e.courseid
+                            JOIN {user_enrolments} ue ON ue.enrolid = e.id
+                            JOIN {role_assignments} ra ON ra.userid = ue.userid
+                            JOIN {role} r ON r.id = ra.roleid AND r.shortname = 'student'
+                            JOIN {context} ctx ON ctx.instanceid = c.id
+                            JOIN {user} u ON u.id = ue.userid AND u.deleted = 0
+                            WHERE 1 = 1 AND c.id $coursesql",
+                            $params);
+    }
+    foreach ($users as $user) {
+        if ($user->id == $userid) {
+            $ppdashboard[] = ['id' => $user->id,
+            'fullname' => $user->firstname . ' ' . $user->lastname,
+            'selecteduser' => 'selected', ];
+        } else {
+            $ppdashboard[] = ['id' => $user->id, 'fullname' => $user->firstname . ' ' . $user->lastname,
+                                'selecteduser' => '', ];
+        }
+    }
+
+    if (!empty($ppdashboard)) {
+        $data['userslist'] = array_values($ppdashboard);
+        $data['coursedashboard'] = 1;
+    }
+    $userinfo = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
+
+    $userpicture = new user_picture($userinfo);
+    $userpicture->size = 1;
+    $userinfo->profileimage = $userpicture->get_url($PAGE)->out(false);
+
+    $userinfo->userfullname = $userinfo->firstname . ' ' . $userinfo->lastname;
+    $userinfo->lastlogin = !empty($userinfo->lastaccess) ? userdate($userinfo->lastaccess) : '--';
+    $totaltimespent = $DB->get_field_sql("SELECT SUM(timespent) AS timespent FROM {block_ls_coursetimestats}
+                                WHERE 1 = 1 AND userid = :userid", ['userid' => $userid]);
+    $timespent = !empty($totaltimespent) ? (new ls)->strtime($totaltimespent) : 0;
+    $userinfo->totaltimespent = preg_replace("/<img[^>]+>/i", "", $timespent);
+    $avgtimespent = $DB->get_field_sql("SELECT AVG(timespent) AS timespent FROM {block_ls_coursetimestats}
+                                WHERE 1 = 1 AND userid = :userid", ['userid' => $userid]);
+    $avgtime = !empty($avgtimespent) ? (new ls)->strtime($avgtimespent) : 0;
+    $userinfo->avgtimespent = preg_replace("/<img[^>]+>/i", "", $avgtime);
+
+    // Badges.
+    $badgeslist = $DB->get_records_sql("SELECT b.id, b.name FROM {badge} b
+                                JOIN {badge_issued} bi ON bi.badgeid = b.id
+                                WHERE 1 = 1 AND bi.userid = :userid", ['userid' => $userid]);
+    $userbadgesinfo = [];
+    foreach ($badgeslist as $badge) {
+        if ($badge->id > 0) {
+            $sql = "SELECT * FROM {files} WHERE itemid = :logo AND filearea = 'badgeimage' AND component = 'badges'
+                            AND filename != '.' ORDER BY id DESC";
+            $classimagerecord = $DB->get_record_sql($sql, ['logo' => $badge->id], 1);
+        }
+        $logourl = "";
+        if (!empty($classimagerecord)) {
+            $logourl = moodle_url::make_pluginfile_url($classimagerecord->contextid, 'badges',
+                            'badgeimage', $badge->id, '/', 'f3')->out(false);
+        }
+        $userbadgesinfo[] = ['badgeid' => $badge->id, 'badgename' => $badge->name, 'badgeimage' => $logourl];
+    }
+
+    // Enrolments.
+    $enrolcoursessql = "SELECT DISTINCT c.id AS course
+                      FROM {user_enrolments} ue
+                      JOIN {enrol} e ON ue.enrolid = e.id AND e.status = 0
+                      JOIN {role_assignments} ra ON ra.userid = ue.userid
+                      JOIN {role} r ON r.id = ra.roleid AND r.shortname = 'student'
+                      JOIN {context} ctx ON ctx.id = ra.contextid
+                      JOIN {course} c ON c.id = ctx.instanceid AND  c.visible = 1
+                      WHERE ue.status = 0 AND ue.userid = :userid ";
+    $enrolcourses = $DB->get_records_sql($enrolcoursessql, ['userid' => $userid]);
+
+    $completedcoursessql = "SELECT COUNT(DISTINCT cc.course) AS completed
+                          FROM {user_enrolments} ue
+                          JOIN {enrol} e ON ue.enrolid = e.id AND e.status = 0
+                          JOIN {role_assignments} ra ON ra.userid = ue.userid
+                          JOIN {role} r ON r.id = ra.roleid AND r.shortname = 'student'
+                          JOIN {context} ctx ON ctx.id = ra.contextid
+                          JOIN {course} c ON c.id = ctx.instanceid AND  c.visible = 1
+                          JOIN {course_completions} cc ON cc.course = ctx.instanceid AND cc.userid = ue.userid
+                          AND cc.timecompleted > 0
+                          WHERE ue.status = 0 AND ue.userid = :userid ";
+    $completedcoursescount = $DB->get_field_sql($completedcoursessql, ['userid' => $userid]);
+
+    $userinfo->enrolledcoursescoursescount = !empty($enrolcourses) ? count($enrolcourses) : 0;
+    $userinfo->completedcoursescount = $completedcoursescount;
+    $userinfo->inprogresscoursescount = !empty($enrolcourses) ? count($enrolcourses) - $completedcoursescount : 0;
+    $userinfo->progresspercent = !empty($userinfo->enrolledcoursescoursescount) ?
+                round($userinfo->completedcoursescount / $userinfo->enrolledcoursescoursescount) * 100 : 0;
+
+    $courseslistarray = [];
+    $courseslist = '';
+    if (!empty($enrolcourses)) {
+        foreach ($enrolcourses as $k => $v) {
+            $courseslistarray[] = $v->course;
+        }
+        $courseslist = implode(',', $courseslistarray);
+    }
+
+    list($csql, $params) = $DB->get_in_or_equal($courseslist, SQL_PARAMS_NAMED);
+    $params['cmvisible'] = 1;
+    $params['deletioninprogress'] = 0;
+    if (!empty($courseslist)) {
+        // Assignments.
+        $assignmentscountsql = $DB->get_records_sql("SELECT cm.id FROM {course_modules} cm
+                        JOIN {modules} m ON m.id = cm.module AND m.name = 'assign'
+                        WHERE 1 = 1 AND cm.visible = :cmvisible AND
+                        cm.deletioninprogress = :deletioninprogress AND cm.course $csql ",
+                        $params);
+        $userinfo->assignmentscount = count($assignmentscountsql);
+
+        $i = 0;
+        $j = 0;
+        foreach ($assignmentscountsql as $assigncountid) {
+            $assignmodulecompletions = $DB->get_records('course_modules_completion',
+                            ['coursemoduleid' => $assigncountid->id, 'userid' => $userid]);
+            if (!empty($assignmodulecompletions)) {
+                $i++;
+            } else {
+                $j++;
+            }
+        }
+        $userinfo->assigncompleted = $i;
+        $userinfo->assigninprogress = $j;
+        $userinfo->assignmentprogress = !empty($userinfo->assignmentscount) ? round(($i / $userinfo->assignmentscount) * 100) : 0;
+        // Quizzes.
+        $quizzescountsql = $DB->get_records_sql("SELECT cm.id FROM {course_modules} cm
+                                JOIN {modules} m ON m.id = cm.module AND m.name = 'quiz'
+                                WHERE 1 = 1 AND cm.visible = :cmvisible AND
+                                cm.deletioninprogress = :deletioninprogress AND cm.course $csql",
+                                $params);
+        $userinfo->quizzescount = count($quizzescountsql);
+        $a = 0;
+        $b = 0;
+        foreach ($quizzescountsql as $quizzescountid) {
+            $quizmodulecompletions = $DB->get_records('course_modules_completion',
+                            ['coursemoduleid' => $quizzescountid->id, 'userid' => $userid]);
+            if (!empty($quizmodulecompletions)) {
+                $a++;
+            } else {
+                $b++;
+            }
+        }
+        $userinfo->quizcompleted = $a;
+        $userinfo->quizinprogress = $b;
+        $userinfo->quizprogress = !empty($userinfo->quizzescount) ? round($a / $userinfo->quizzescount) * 100 : 0;
+
+        // Scorm.
+        $scormcountsql = $DB->get_records_sql("SELECT cm.id FROM {course_modules} cm
+                                JOIN {modules} m ON m.id = cm.module AND m.name = 'scorm'
+                                WHERE 1 = 1 AND cm.visible = :cmvisible AND
+                                cm.deletioninprogress = :deletioninprogress AND cm.course $csql",
+                                $params);
+        $userinfo->scormcount = count($scormcountsql);
+        $m = 0;
+        $n = 0;
+        foreach ($scormcountsql as $scormcountid) {
+            $scormmodulecompletions = $DB->get_records('course_modules_completion', ['coursemoduleid' => $scormcountid->id]);
+            if (!empty($scormmodulecompletions)) {
+                $m++;
+            } else {
+                $n++;
+            }
+        }
+        $userinfo->scormcompleted = $m;
+        $userinfo->scorminprogress = $n;
+        $userinfo->scormprogress = !empty($userinfo->scormcount) ? round($m / $userinfo->scormcount) * 100 : 0;
+
+    } else {
+        $userinfo->assignmentscount = 0;
+        $userinfo->assigncompleted = 0;
+        $userinfo->assigninprogress = 0;
+        $userinfo->assignmentprogress = 0;
+        $userinfo->quizzescount = 0;
+        $userinfo->quizcompleted = 0;
+        $userinfo->quizinprogress = 0;
+        $userinfo->quizprogress = 0;
+        $userinfo->scormcount = 0;
+        $userinfo->scormcompleted = 0;
+        $userinfo->scorminprogress = 0;
+        $userinfo->scormprogress = 0;
+    }
+
+    // User grades.
+    if (!empty($courseslist)) {
+        $params['userid'] = $userid;
+        $avggrade = $DB->get_record_sql("SELECT AVG(gg.finalgrade) as finalgrade
+                                FROM {grade_grades} gg
+                                JOIN {grade_items} gi ON gi.id = gg.itemid
+                                WHERE gi.itemtype = 'course' AND gg.userid = :userid
+                                AND gi.courseid $csql", $params);
+        $userinfo->avggrade = !empty($avggrade->finalgrade) ? round($avggrade->finalgrade, 2) : 0;
+        $highestgrade = $DB->get_record_sql("SELECT MAX(gg.finalgrade) as finalgrade
+                                    FROM {grade_grades} gg
+                                    JOIN {grade_items} gi ON gi.id = gg.itemid
+                                    WHERE gi.itemtype = 'course' AND gg.userid = :userid
+                                    AND gi.courseid $csql", $params);
+
+        $lowestgrade = $DB->get_record_sql("SELECT MIN(gg.finalgrade) as finalgrade
+                                FROM {grade_grades} gg
+                                JOIN {grade_items} gi ON gi.id = gg.itemid
+                                WHERE gi.itemtype = 'course' AND gg.userid = :userid
+                                AND gi.courseid $csql", $params);
+        $userinfo->highestgrade = !empty($highestgrade->finalgrade) ? round($highestgrade->finalgrade, 2) : 0;
+        $userinfo->lowestgrade = !empty($lowestgrade->finalgrade) ? round($lowestgrade->finalgrade, 2) : 0;
+    } else {
+        $userinfo->avggrade = 0;
+        $userinfo->highestgrade = 0;
+        $userinfo->lowestgrade = 0;
+    }
+
+    // Course info.
+    $courses = $DB->get_records_sql("SELECT c.id, c.fullname
+                        FROM {course} c
+                        JOIN {enrol} e ON e.courseid = c.id AND e.status = 0
+                        JOIN {user_enrolments} ue on ue.enrolid = e.id AND ue.status = 0
+                        JOIN {role_assignments}  ra ON ra.userid = ue.userid
+                        JOIN {role} r ON r.id = ra.roleid
+                        JOIN {context} ctx ON ctx.instanceid = c.id
+                        JOIN {user} u ON u.id = ra.userid AND u.confirmed = 1 AND u.deleted = 0
+                        WHERE ra.contextid = ctx.id AND ctx.contextlevel = 50 AND c.visible = 1
+                        AND u.id = :userid", ['userid' => $userid]);
+    $usercourseinfo = [];
+    foreach ($courses as $course) {
+        if ($course->id > 0) {
+            $usercourseinfo[] = ['id' => $course->id, 'coursename' => $course->fullname];
+        }
+    }
+
+    // Activity progress.
+    $coursetimespentreport = $DB->get_record('block_learnerscript', ['type' => 'sql', 'name' => 'Timespent each course']);
+    $reportcontenttypes = (new ls)->cr_listof_reporttypes($coursetimespentreport->id);
+    $reportid = $coursetimespentreport->id;
+    $reportinstance = $coursetimespentreport->id;
+    $reporttype = key($reportcontenttypes);
+
+    // Recent activities.
+
+    $modules = $DB->get_fieldset_select('modules', 'name', '', ['visible' => 1]);
+
+    $aliases = [];
+    foreach ($modules as $modulename) {
+        $aliases[] = $modulename;
+        $activities[] = "'$modulename'";
+        $fields1[] = "COALESCE($modulename.name,'')";
+    }
+    $activitynames = implode(',', $fields1);
+
+    $moduleactivities = "SELECT recacc.cmid, m.name as module,
+                        CONCAT($activitynames) AS activityname, recacc.timeaccess
+                        FROM {block_recentlyaccesseditems} recacc
+                        JOIN {course_modules} main ON main.id = recacc.cmid
+                        JOIN {modules} m ON main.module = m.id
+                        JOIN {course} c ON c.id = main.course
+                        JOIN {enrol} e ON e.courseid = c.id AND e.status = 0
+                        JOIN {user_enrolments} ue ON ue.enrolid = e.id AND ue.status = 0
+                        JOIN {user} u ON u.id = ue.userid AND recacc.userid = u.id
+                        ";
+    foreach ($aliases as $alias) {
+        $moduleactivities .= " LEFT JOIN {".$alias."} AS $alias ON $alias.id = main.instance AND m.name = '$alias'";
+    }
+    $moduleactivities .= " WHERE u.id = :userid and main.visible = :cmvisible
+                            AND main.deletioninprogress = :deletioninprogress
+                            ORDER BY recacc.id DESC LIMIT 5";
+    $recentactivities = $DB->get_records_sql($moduleactivities, ['userid' => $userid,
+                    'cmvisible' => 1, 'deletioninprogress' => 0]);
+
+    $recentactivitieslist = [];
+    $i = 0;
+    foreach ($recentactivities as $k => $v) {
+        $timaccess = (new ls)->strtime(time() - ($v->timeaccess)).' ago';
+        $timaccessremoveimg = preg_replace("/<img[^>]+\>/i", "", $timaccess);
+        $timaccessarray = explode(" ", $timaccessremoveimg, 2);
+        $recentactivitieslist[$i]['activityid'] = $v->cmid;
+        $recentactivitieslist[$i]['activityname'] = $v->activityname;
+        $recentactivitieslist[$i]['module'] = $v->module;
+        $recentactivitieslist[$i]['timeccessday'] = $timaccessarray[0];
+        $recentactivitieslist[$i]['timeccesstime'] = $timaccessarray[1];
+        $i++;
+    }
+
+    // No login courses.
+    $inactivedate = strtotime("-10 days");
+
+    $accesscourses = $DB->get_records_sql("SELECT ul.courseid, c.fullname as course,
+                            ul.timeaccess as timeaccess
+                            FROM {user_lastaccess} ul
+                            JOIN {course} c ON c.id = ul.courseid
+                            WHERE ul.userid = :userid AND c.visible = :visible
+                            GROUP BY ul.courseid", ['userid' => $userid,
+                            'visible' => 1]);
+    foreach ($accesscourses as $c) {
+        $courseacesslist[$c->courseid] = $c->courseid;
+    }
+    $accsql = '';
+    if (!empty($accesscourses)) {
+        list($accsql, $params) = $DB->get_in_or_equal($courseacesslist, SQL_PARAMS_NAMED, 'param', false, false);
+    }
+    $params['accessuserid'] = $userid;
+    $params['accessvisible'] = 1;
+    $params['timeaccess'] = $inactivedate;
+    $params['userid'] = $userid;
+    $params['accesstime'] = $inactivedate;
+    $recentaccesscourses = $DB->get_records_sql("SELECT a.* FROM (
+                        SELECT ul.courseid, c.fullname as course,
+                        ul.timeaccess as timeaccess
+                        FROM {user_lastaccess} ul
+                        JOIN {course} c ON c.id = ul.courseid
+                        WHERE ul.userid = :accessuserid AND c.visible = :accessvisible
+                        AND ul.timeaccess < :timeaccess GROUP BY ul.courseid
+                        UNION
+                        SELECT c.id AS courseid, c.fullname as course,
+                        ue.timecreated as timeaccess
+                        FROM {course} c
+                        JOIN {enrol} e ON e.courseid = c.id AND e.status = 0
+                        JOIN {user_enrolments} ue on ue.enrolid = e.id AND ue.status = 0
+                        JOIN {role_assignments}  ra ON ra.userid = ue.userid
+                        JOIN {role} r ON r.id = ra.roleid AND r.shortname = 'student'
+                        JOIN {context} ctx ON ctx.instanceid = c.id
+                        JOIN {user} u ON u.id = ra.userid AND u.confirmed = 1 AND u.deleted = 0
+                        WHERE ra.contextid = ctx.id AND ctx.contextlevel = 50 AND c.visible = 1
+                        AND u.id = :userid AND ue.timecreated < :accesstime AND c.id $accsql) AS a
+                        WHERE 1 = 1 ORDER BY a.timeaccess ASC
+                        LIMIT 0, 5", $params);
+    $recentaccesscourseslist = [];
+    if (!empty($recentaccesscourses)) {
+        foreach ($recentaccesscourses as $r => $c) {
+            $courseprogress = $DB->get_field_sql("SELECT ROUND((COUNT(distinct cc.course) / COUNT(DISTINCT c.id)) *100, 2)
+                            as progress
+                            FROM {user_enrolments} ue
+                            JOIN {enrol} e ON ue.enrolid = e.id AND e.status = 0
+                            JOIN {role_assignments} ra ON ra.userid = ue.userid
+                            JOIN {role} r ON r.id = ra.roleid AND r.shortname = 'student'
+                            JOIN {context} ctx ON ctx.id = ra.contextid
+                            JOIN {course} c ON c.id = ctx.instanceid AND  c.visible = 1
+                       LEFT JOIN {course_completions} cc ON cc.course = ctx.instanceid AND cc.userid = ue.userid
+                             AND cc.timecompleted > 0 WHERE ue.status = 0 AND ue.userid = :userid AND c.id = :courseid",
+                             ['userid' => $userid, 'courseid' => $c->courseid]);
+            $courseaccess = (new ls)->strtime(time() - ($c->timeaccess)).' ago';
+            $courseaccessrmvimg = preg_replace("/<img[^>]+\>/i", "", $courseaccess);
+            $courseaccessarray = explode(" ", $courseaccessrmvimg, 2);
+            $recentaccesscourseslist[] = ['course' => $c->course, 'courseid' => $c->courseid,
+                        'timeaccessday' => $courseaccessarray[0], 'timeaccesstime' => $courseaccessarray[1],
+                        'courseprogress' => ($courseprogress > 0) ? round($courseprogress, 0) : 0, ];
+        }
+    }
+
+    // Coursesoverview.
+    $coursesoverviewreport = $DB->get_record('block_learnerscript', ['type' => 'coursesoverview']);
+    $coursesoverviewreportid = $coursesoverviewreport->id;
+    $coursesoverviewinstance = $coursesoverviewreport->id;
+    $coursesoverviewtype = 'table';
+
+    $userstatus = $DB->get_field_sql("SELECT suspended FROM {user} WHERE id = :userid",
+                    ['userid' => $userid]);
+    // User LMS access.
+    $userlmsaccess = $DB->get_field('block_ls_userlmsaccess', 'logindata', ['userid' => $userid]);
+    $lmsaccess = json_decode($userlmsaccess);
+    echo $OUTPUT->render_from_template('block_reportdashboard/profilepage/profilepage',
+                                            ['userinfo' => $userinfo,
+                                                    'userbadgesinfo' => $userbadgesinfo,
+                                                    'usercourseinfo' => $usercourseinfo,
+                                                    'coursesoverviewreportid' => $coursesoverviewreportid,
+                                                    'coursesoverviewinstance' => $coursesoverviewinstance,
+                                                    'coursesoverviewtype' => $coursesoverviewtype,
+                                                    'userid' => $userid,
+                                                    'reportid' => $reportid,
+                                                    'reportinstance' => $reportinstance,
+                                                    'reporttype' => $reporttype,
+                                                    'recentactivities' => $recentactivitieslist,
+                                                    'recentaccesscourses' => $recentaccesscourseslist,
+                                                    'testdata' => $userlmsaccess,
+                                                    'userdata' => $data,
+                                                    'role' => $roleshortname,
+                                                    'contextlevel' => $contextlevel,
+                                                'issiteadmin' => $siteadmin,
+                                                'userstatus' => $userstatus,
+                                                'studentrole' => $studentrole
+                                                ]);
+    $PAGE->requires->js_call_amd('block_learnerscript/report', 'generate_plotgraph',
+                                                [$lmsaccess]);
+} else {
+    throw new \moodle_exception('useridmissing', 'block_learnerscript');
+}
+echo $OUTPUT->footer();

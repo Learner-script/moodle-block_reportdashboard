@@ -1,0 +1,162 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_reportdashboard/profilepage/userprogressinfo
+
+    TODO describe template progressinfo
+
+    Example context (json):
+    {
+    }
+}}
+<div class="progressinfo_cards d-flex flex-wrap">
+
+	<!-- userprogress -->
+	<div class="progressinfo_card px-1">
+		<div class="courseprogress_card card p-2 ls-card">
+			<div class="progressbar_section">
+				<div class="half_progressbar " style="--percentage:{{progresspercent}}">
+					<div class="half_progressbar_percentageblock">{{progresspercent}}/100
+                	</div>
+                </div>
+				<h6 class="text-center">{{#str}} progress, block_reportdashboard {{/str}}</h5>
+			</div>
+			<ul class="progressinfo_list m-0 p-0">
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} enrollment, block_reportdashboard {{/str}}</div>
+					<div class="data">{{enrolledcoursescoursescount}}</div>
+				</li>
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} completion, block_reportdashboard {{/str}}</div>
+					<div class="data">{{completedcoursescount}}</div>
+				</li>
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} inprogress, block_reportdashboard {{/str}}</div>
+					<div class="data">{{inprogresscoursescount}}</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<!-- Grades -->
+	<div class="progressinfo_card px-1">
+		<div class="grades_card card p-2 ls-card">
+			<div class="progressbar_section">
+				<div class="half_progressbar " style="--percentage:{{avggrade}}">
+					<div class="half_progressbar_percentageblock">{{avggrade}}/100
+                	</div>
+                </div>
+				<h6 class="text-center">{{#str}} grades, block_reportdashboard {{/str}}</h5>
+			</div>
+			<ul class="progressinfo_list m-0 p-0">
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} average, block_reportdashboard {{/str}}</div>
+					<div class="data">{{avggrade}}</div>
+				</li>
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} highest, block_reportdashboard {{/str}}</div>
+					<div class="data">{{highestgrade}}</div>
+				</li>
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} lowest, block_reportdashboard {{/str}}</div>
+					<div class="data">{{lowestgrade}}</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<!-- Assignment card -->
+	<div class="progressinfo_card px-1">
+		<div class="assignment_card card p-2 ls-card">
+			<div class="progressbar_section">
+				<div class="half_progressbar " style="--percentage:{{assignmentprogress}}">
+					<div class="half_progressbar_percentageblock">{{assignmentprogress}}/100
+                	</div>
+                </div>
+				<h6 class="text-center">{{#str}} assignment, block_reportdashboard {{/str}}</h5>
+			</div>
+			<ul class="progressinfo_list m-0 p-0">
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} total, block_reportdashboard {{/str}}</div>
+					<div class="data">{{assignmentscount}}</div>
+				</li>
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} completed, block_reportdashboard {{/str}}</div>
+					<div class="data">{{assigncompleted}}</div>
+				</li>
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} inprogress, block_reportdashboard {{/str}}</div>
+					<div class="data">{{assigninprogress}}</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<!-- Quizzes -->
+	<div class="progressinfo_card px-1">
+		<div class="quizzes_card card p-2 ls-card">
+			<div class="progressbar_section">
+				<div class="half_progressbar " style="--percentage:{{quizprogress}}">
+					<div class="half_progressbar_percentageblock">{{quizprogress}}/100
+                	</div>
+                </div>
+				<h6 class="text-center">{{#str}} quizzes, block_reportdashboard {{/str}}</h5>
+			</div>
+			<ul class="progressinfo_list m-0 p-0">
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} total, block_reportdashboard {{/str}}</div>
+					<div class="data">{{quizzescount}}</div>
+				</li>
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} completed, block_reportdashboard {{/str}}</div>
+					<div class="data">{{quizcompleted}}</div>
+				</li>
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} inprogress, block_reportdashboard {{/str}}</div>
+					<div class="data">{{quizinprogress}}</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<!-- Scorm -->
+	<div class="progressinfo_card px-1">
+		<div class="scorm_card card p-2 ls-card">
+			<div class="progressbar_section">
+				<div class="half_progressbar " style="--percentage:{{scormprogress}}">
+					<div class="half_progressbar_percentageblock">{{scormprogress}}/100
+                	</div>
+                </div>
+				<h6 class="text-center">{{#str}} scorm, block_reportdashboard {{/str}}</h5>
+			</div>
+			<ul class="progressinfo_list m-0 p-0">
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} total, block_reportdashboard {{/str}}</div>
+					<div class="data">{{scormcount}}</div>
+				</li>
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} completed, block_reportdashboard {{/str}}</div>
+					<div class="data">{{scormcompleted}}</div>
+				</li>
+				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
+					<div class="label text-muted">{{#str}} inprogress, block_reportdashboard {{/str}}</div>
+					<div class="data">{{scorminprogress}}</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>

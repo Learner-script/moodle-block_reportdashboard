@@ -1,0 +1,47 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_reportdashboard/courseprofile/timeline
+
+    TODO describe template timeline
+
+    Example context (json):
+    {
+    }
+}}
+<h5 class="mb-3 pl-2">{{#str}} timeline, block_reportdashboard {{/str}}</h5>
+<div class="timeline_card card ls-card">
+	<ul class="timeline_list m-0 p-2">
+		{{#timelinerecordslist}}
+		<li class="timeline_item d-flex px-2 py-3 align-items-center">
+        <div class="timeline_img rounded-circle mr-2" style="background-image: url('{{config.wwwroot}}/mod/{{activitymodule}}/pix/monologo.png');"></div>
+			<div class="timeline_content">
+
+				<div class="timeline_info"><a href='{{config.wwwroot}}/mod/{{activitymodule}}/view.php?id={{cmid}}' target="_blank"><b>{{activityname}}</b></a></div>
+				<div class="time">{{timestart}}</div>
+			</div>
+		</li>
+		{{/timelinerecordslist}}
+        {{^timelinerecordslist}}
+            <li class="px-2 py-3">
+                <div class="timeline_content">
+                    <span class="alert alert-info">{{#str}} noupcomingactivities, block_learnerscript {{/str}}</span>
+                </div>
+            </li>
+        {{/timelinerecordslist}}
+	</ul>
+</div>

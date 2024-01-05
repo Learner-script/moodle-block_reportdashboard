@@ -1,0 +1,75 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_reportdashboard/courseprofile/coursedetails
+
+    TODO describe template coursedetails
+
+    Example context (json):
+    {
+    }
+}}
+{{#courseinfo}}
+<div class="card ls-card coursedetails">
+	<div class="courseinfo">
+		<div class="p-2">
+			<div class="courseimg rounded" style="background-image: url('{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/courseimg.png');">
+			</div>
+			<div class="px-1 py-2">
+				<p class="course_heading m-0 text-muted">{{#str}} coursename, block_reportdashboard {{/str}}</p>
+				<h6 class="coursename m-0">{{fullname}}</h6>
+			</div>
+		</div>
+		<ul class="topcontent m-0 pb-2 px-0">
+			<li class="d-flex justify-content-between px-3 py-1">
+				<div class="label text-muted">{{#str}} activitiescount, block_reportdashboard {{/str}}</div>
+				<div class="data">{{activitiescount}}</div>
+			</li>
+			<li class="d-flex justify-content-between px-3 py-1">
+				<div class="label text-muted">{{#str}} enrollmentcount, block_reportdashboard {{/str}}</div>
+				<div class="data">{{enrollmentscount}}</div>
+			</li>
+			<li class="d-flex justify-content-between px-3 py-1">
+				<div class="label text-muted">{{#str}} students, block_reportdashboard {{/str}}</div>
+				<div class="data">{{studentcount}}</div>
+			</li>
+			<li class="d-flex justify-content-between px-3 py-1">
+				<div class="label text-muted">{{#str}} teachers, block_reportdashboard {{/str}}</div>
+				<div class="data">{{editingteachercount}}</div>
+			</li>
+			<li class="d-flex justify-content-between px-3 py-1">
+				<div class="label text-muted">{{#str}} otherenrolments, block_reportdashboard {{/str}}</div>
+				<div class="data">{{otherenrolcount}}</div>
+			</li>
+		</ul>
+		<ul class="bottomcontent m-0 py-2 px-0">
+			<li class="d-flex justify-content-between px-3 py-1">
+				<div class="label text-muted">{{#str}} totaltime, block_reportdashboard {{/str}}</div>
+				<div class="data">{{totaltimespent}}</div>
+			</li>
+			<li class="d-flex justify-content-between px-3 py-1">
+				<div class="label text-muted">{{#str}} avgtimespent, block_reportdashboard {{/str}}</div>
+				<div class="data">{{avgtimespent}}</div>
+			</li>
+			<li class="d-flex justify-content-between px-3 py-1">
+				<div class="label text-muted">{{#str}} groups, block_reportdashboard {{/str}}</div>
+				<div class="data">{{groups}}</div>
+			</li>
+		</ul>
+	</div>
+</div>
+{{/courseinfo}}
