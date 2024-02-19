@@ -45,7 +45,6 @@ class reportdashboard {
                 $redirecturl = $CFG->wwwroot.'/blocks/reportdashboard/dashboard.php?role='.$SESSION->role;
             }
             header("Location: $redirecturl");
-            die;
         } else if ($deletereport == 0) {
             if (empty($SESSION->role)) {
                 $redirecturl = $CFG->wwwroot.'/blocks/reportdashboard/dashboard.php';
@@ -53,7 +52,6 @@ class reportdashboard {
                 $redirecturl = $CFG->wwwroot.'/blocks/reportdashboard/dashboard.php?role='.$SESSION->role;
             }
             header("Location: $redirecturl");
-            die;
         }
         return true;
     }
@@ -69,7 +67,7 @@ class reportdashboard {
         $params['subpagepattern'] = $dashboardid;
         $reportcount = 0;
         $blocksdata = $DB->get_fieldset_sql($sql, $params);
-        foreach ($blocksdata as $key => $value) {
+        foreach ($blocksdata as $value) {
             $value = unserialize(base64_decode($value));
             $report = $DB->get_record('block_learnerscript', ['id' => $value->reportlist]);
             if (isset($report->id)) {
@@ -97,17 +95,19 @@ class reportdashboard {
             $pagetypepattern .= '-' . $role;
         }
 
-        $lsinstancessql = "SELECT id, id as instance
+        $lsinstancessql = "SELECT id, id AS instance
                              FROM {block_instances}
-                            WHERE pagetypepattern = '$pagetypepattern'";
-
+                            WHERE pagetypepattern = :pagetypepattern";
+        $params['pagetypepattern'] = "'" . $pagetypepattern . "'";
         if ($deletedashboard != 1) {
-            $lsinstancessql .= " AND subpagepattern = '$deletedashboard' ";
+            $params['subpagepattern'] = "'" . $deletedashboard . "'";
+            $lsinstancessql .= " AND subpagepattern = :subpagepattern ";
         }
         if ($blockinstanceid > 0) {
-            $lsinstancessql .= " AND id = $blockinstanceid ";
+            $params['blockinstanceid'] = $blockinstanceid;
+            $lsinstancessql .= " AND id = :blockinstanceid ";
         }
-        $lsinstances = $DB->get_records_sql_menu($lsinstancessql);
+        $lsinstances = $DB->get_records_sql_menu($lsinstancessql, $params);
         if (!empty($lsinstances)) {
             blocks_delete_instances($lsinstances);
         }

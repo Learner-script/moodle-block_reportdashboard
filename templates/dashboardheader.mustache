@@ -23,38 +23,37 @@
     {
     }
 }}
-<div id="dashboard-header {{reportdashoardclass}}">
+<div id="dashboard-header{{#reportdashoardclass}}{{reportdashoardclass}}{{/reportdashoardclass}}">
     <span class="right_buttons">
     {{^issiteadmin}}
         {{^managerrole}}
-            <a class= 'htitle' href="{{config.wwwroot}}/blocks/learnerscript/reports.php?role={{role}}&contextlevel={{contextlevel}}"
+            <a class= "htitle" href="{{config.wwwroot}}/blocks/learnerscript/reports.php?role={{role}}&contextlevel={{contextlevel}}"
                target="_blank">
                 <span class="tooltiptext tooltip-top">{{#str}}reports, block_learnerscript{{/str}}</span>
-                <img src={{config.wwwroot}}/blocks/learnerscript/pix/managereport.png id='addreport' class="addblocks-to-dashboard">
+                <img src="{{config.wwwroot}}/blocks/learnerscript/pix/managereport.png" id="addreport" class="addblocks-to-dashboard" alt ="{{#str}} managereport, block_reportdashboard {{/str}}">
             </a>
         {{/managerrole}}
     {{/issiteadmin}}
     {{#issiteadmin}}
-        <a class= 'htitle' href="{{config.wwwroot}}/blocks/learnerscript/managereport.php"
+        <a class= "htitle" href="{{config.wwwroot}}/blocks/learnerscript/managereport.php"
            target="_blank">
             <span class="tooltiptext tooltip-top">{{#str}}managereports, block_learnerscript{{/str}}</span>
-            <img src={{config.wwwroot}}/blocks/learnerscript/pix/managereport.png id='addreport' class="addblocks-to-dashboard">
+            <img src="{{config.wwwroot}}/blocks/learnerscript/pix/managereport.png" id="addreport" class="addblocks-to-dashboard" alt ="{{#str}} managereport, block_reportdashboard {{/str}}">
         </a>
     {{/issiteadmin}}
     {{#managerrole}}
         {{^issiteadmin}}
-            <a class= 'htitle' href="{{config.wwwroot}}/blocks/learnerscript/managereport.php"
+            <a class= "htitle" href="{{config.wwwroot}}/blocks/learnerscript/managereport.php"
                target="_blank">
                 <span class="tooltiptext tooltip-top">{{#str}}managereports, block_learnerscript{{/str}}</span>
-                <img src={{config.wwwroot}}/blocks/learnerscript/pix/managereport.png id='addreport' class="addblocks-to-dashboard">
+                <img src="{{config.wwwroot}}/blocks/learnerscript/pix/managereport.png" id="addreport" class="addblocks-to-dashboard" alt ="{{#str}} managereport, block_reportdashboard {{/str}}">
             </a>
         {{/issiteadmin}}
     {{/managerrole}}
     {{> block_reportdashboard/switchrole }}
     </span>
-    </span>
-    <div id='internalbsm' style="display: none;">
-    <div id='innerwrapper'>
+    <div id="internalbsm" style="display: none;">
+    <div id="innerwrapper">
     <div class='sidenav'>
         <ul id="dashboards_menu" >
         </ul>

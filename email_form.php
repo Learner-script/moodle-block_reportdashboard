@@ -23,9 +23,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
-use block_learnerscript\learnerscript;
-/** Anaytics Email Form */
-class analytics_emailform extends moodleform {
+
+/** Reportdashboard Email Form */
+class block_reportdashboard_emailform extends moodleform {
     /**
      * Form definition
      */
@@ -36,11 +36,9 @@ class analytics_emailform extends moodleform {
         $instance = $this->_customdata['instance'];
 
         if ($this->_customdata['AjaxForm']) {
-            $ajaxform = 'AjaxForm';
             $mform->_attributes['id'] = 'sendemail'.$instance.'';
             $requireclass = 'sendemailreq'.$instance.'';
         } else {
-            $ajaxform = '';
             $requireclass = 'sendemailformelements';
         }
         $data = [];

@@ -36,7 +36,6 @@
 
 # Dependencies:
 	Learnerscript
-	Reporttiles
 
 # Cross-DB compatibility:
 	Compatible with PGSQL, MSSQL, MYSQL and MariaDB
@@ -47,9 +46,6 @@
 # Documentation URL:
 	1. https://learnerscript.com
 	2. https://learnerscript.com/index.php/knowledge-base/
-
-# Subscription needed(URL):
-	https://learnerscript.com/available-plans
 
 # Useful links:
 

@@ -23,9 +23,7 @@ require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/accesslib.php');
 require_once($CFG->dirroot . '/blocks/learnerscript/classes/observer.php');
 
-use block_reportdashboard\local\reportdashboard;
 use block_learnerscript\local\ls as ls;
-use block_learnerscript\local\querylib as querylib;
 global $CFG, $PAGE, $OUTPUT, $THEME, $ADMIN, $DB;
 $adminediting = optional_param('adminedit', -1, PARAM_BOOL);
 $dashboardurl = optional_param('dashboardurl', '', PARAM_RAW_TRIMMED);
@@ -40,6 +38,8 @@ require_login();
 if (isguestuser()) {
     throw new moodle_exception('noguest');
 }
+// Force user login in course (SITE or Course).
+
 $context = context_system::instance();
 $PAGE->set_context($context);
 
@@ -100,7 +100,7 @@ $subpagepatterntype = $dashboardurl;
 $PAGE->set_url($seturl);
 $PAGE->set_pagetype($pagepattentype);
 $PAGE->set_subpage($subpagepatterntype);
-$PAGE->set_pagelayout('base');
+$PAGE->set_pagelayout('report');
 $PAGE->add_body_class('reportdashboard');
 $PAGE->navbar->ignore_active();
 $navdashboardurl = new moodle_url($seturl);
@@ -238,7 +238,7 @@ if (!empty($role) || is_siteadmin()) {
     }
     if ($configuredinstances > 0) {
         echo html_writer::tag('input', '', ['type' => 'hidden', 'name' => 'filter_courses',
-        'id' => 'ls_courseid', 'class' => 'report_courses', 'value' => $dashboardcourseid]);
+        'id' => 'ls_courseid', 'class' => 'report_courses', 'value' => $dashboardcourseid, ]);
         echo html_writer::div('', "loader");
     }
 } else {

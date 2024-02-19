@@ -43,7 +43,7 @@ class block_reportdashboard_edit_form extends block_edit_form {
                                                         null, '', 'id, name');
         ksort($reportlist);
         $reports = [];
-        $reports[0] = 'Select Report';
+        $reports[0] = get_string('selectreport', 'block_reporttiles');
         $rolereports = (new ls)->listofreportsbyrole();
         foreach ($rolereports as $report) {
             $reports[$report['id']] = $report['name'];
@@ -71,7 +71,7 @@ class block_reportdashboard_edit_form extends block_edit_form {
         $mform->setType('config_tilescolourpicker', PARAM_RAW);
         $mform->registerNoSubmitButton('updatereportselect');
 
-        $mform->addElement('submit', 'updatereportselect', 'updatereportselect');
+        $mform->addElement('submit', 'updatereportselect', get_string('updatereportselect', 'block_reportdashboard'));
     }
     /**
      * Load in existing data as form defaults
@@ -103,13 +103,13 @@ class block_reportdashboard_edit_form extends block_edit_form {
      *
      */
     public function definition_after_data() {
-        global $DB, $OUTPUT;
+        global $DB;
 
         $mform = $this->_form;
         $reportid = $mform->getElementValue('config_reportlist');
         if (isset($reportid) && $reportid[0]) {
-            if (!$report = $DB->get_record('block_learnerscript', ['id' => $reportid[0]])) {
-                $reportcontenttypes = [null => '--SELECT--'];
+            if (!$DB->get_record('block_learnerscript', ['id' => $reportid[0]])) {
+                $reportcontenttypes = [null => get_string('selectall', 'block_reportdashboard')];
             } else {
                 $reportcontenttypes = (new block_learnerscript\local\ls)->cr_listof_reporttypes($reportid[0]);
             }

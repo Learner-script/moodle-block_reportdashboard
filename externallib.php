@@ -45,8 +45,8 @@ class block_reportdashboard_external extends external_api {
                 'action' => new external_value(PARAM_TEXT, 'Action', VALUE_DEFAULT, ''),
                 'userlist' => new external_value(PARAM_TEXT, 'Users list', VALUE_DEFAULT, ''),
                 'reportid' => new external_value(PARAM_INT, 'Report ID', VALUE_DEFAULT, 0),
-                'maximumSelectionLength' => new external_value(PARAM_INT, 'Maximum Selection Length to Search', VALUE_DEFAULT, 0),
-                'setminimumInputLength' => new external_value(PARAM_INT, 'Minimum Input Length to Search', VALUE_DEFAULT, 2),
+                'maximumselectionlength' => new external_value(PARAM_INT, 'Maximum Selection Length to Search', VALUE_DEFAULT, 0),
+                'setminimuminputlength' => new external_value(PARAM_INT, 'Minimum Input Length to Search', VALUE_DEFAULT, 2),
                 'courses' => new external_value(PARAM_RAW, 'Course id of report', VALUE_DEFAULT),
             ]
         );
@@ -54,23 +54,23 @@ class block_reportdashboard_external extends external_api {
     /**
      * This function displays the list of users based on the search text
      * @param string $term Search text
-     * @param string $_type Filter type
+     * @param string $type Filter type
      * @param string $query SQL query
      * @param int $action Action
      * @param object $userlist Users list
      * @param int $reportid Report id
-     * @param int $maximumSelectionLength Maximum length of the string to search
-     * @param int $setminimumInputLength Maximum length of the string to enter
+     * @param int $maximumselectionlength Maximum length of the string to search
+     * @param int $setminimuminputlength Maximum length of the string to enter
      * @param array $courses Courses list
      */
-    public static function userlist($term, $_type, $query, $action, $userlist, $reportid,
-                                $maximumSelectionLength, $setminimumInputLength, $courses) {
+    public static function userlist($term, $type, $query, $action, $userlist, $reportid,
+                                $maximumselectionlength, $setminimuminputlength, $courses) {
         global $DB, $SESSION, $USER;
         $context = context_system::instance();
         // We always must pass webservice params through validate_parameters.
-        $params = self::validate_parameters(self::userlist_parameters(), ['term' => $term, '_type' => $_type, 'query' => $query,
-        'action' => $action, 'userlist' => $userlist, 'reportid' => $reportid, 'maximumSelectionLength' => $maximumSelectionLength,
-        'setminimumInputLength' => $setminimumInputLength, 'courses' => $courses]);
+        $params = self::validate_parameters(self::userlist_parameters(), ['term' => $term, '_type' => $type, 'query' => $query,
+        'action' => $action, 'userlist' => $userlist, 'reportid' => $reportid, 'maximumselectionlength' => $maximumselectionlength,
+        'setminimuminputlength' => $setminimuminputlength, 'courses' => $courses, ]);
 
         // We always must call validate_context in a webservice.
         self::validate_context($context);
@@ -96,7 +96,7 @@ class block_reportdashboard_external extends external_api {
         $data = [];
         $permissions = (isset($reportclass->componentdata['permissions'])) ? $reportclass->componentdata['permissions'] : [];
         $roles = [];
-        foreach ($permissions['elements'] as $a => $b) {
+        foreach ($permissions['elements'] as $b) {
             $roles[] = $b['formdata']->roleid;
             $contextlevels[] = $b['formdata']->contextlevel;
         }
@@ -110,7 +110,7 @@ class block_reportdashboard_external extends external_api {
                     list($rolesql, $params2) = $DB->get_in_or_equal($roles, SQL_PARAMS_NAMED);
                     $rolewiseusers = "SELECT  u.*
                     FROM {user} u
-                    JOIN {role_assignments}  AS lra ON lra.userid = u.id
+                    JOIN {role_assignments} lra ON lra.userid = u.id
                     JOIN {role} r ON r.id = lra.roleid
                     JOIN {context} ctx ON ctx.id  = lra.contextid
                     WHERE u.confirmed = 1 AND u.suspended = 0  AND u.deleted = 0 AND u.id = :userid
@@ -230,14 +230,15 @@ class block_reportdashboard_external extends external_api {
         $context = contextsystem::instance();
         // We always must pass webservice params through validate_parameters.
         self::validate_parameters(self::sendemails_parameters(), ['reportid' => $reportid, 'instance' => $instance,
-        'pageurl' => $pageurl]);
+        'pageurl' => $pageurl, ]);
 
         // We always must call validate_context in a webservice.
         self::validate_context($context);
 
         $pageurl = $pageurl ? $pageurl : $CFG->wwwroot . '/blocks/reportdashboard/dashboard.php';
         require_once($CFG->dirroot . '/blocks/reportdashboard/email_form.php');
-        $emailform = new analytics_emailform($pageurl, ['reportid' => $reportid, 'AjaxForm' => true, 'instance' => $instance]);
+        $emailform = new block_reportdashboard_emailform($pageurl, ['reportid' => $reportid,
+                    'AjaxForm' => true, 'instance' => $instance]);
         $return = $emailform->render();
         $data = json_encode($return);
         return $data;

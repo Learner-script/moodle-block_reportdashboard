@@ -32,30 +32,34 @@
 			<div class="user_status d-flex justify-content-end align-items-center"><span class="inactivenow"></span>{{# str}} inactive, block_reportdashboard{{/ str}}</div>
 		{{/userstatus}}
 		<div class="profileimg rounded-circle m-auto">
-			<img class="userpicture" src="{{profileimage}}" alt=""/>
+			{{#profileimage}}
+			<img class="userpicture" src="{{profileimage}}" alt="userprofile">
+			{{/profileimage}}
 		</div>
 		<div class="username mt-3 d-flex justify-content-center align-item-center">
+			{{#userfullname}}
 			<h4 class="font-weight-light">{{userfullname}}</h4>
-			<img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/chat.png">
+			{{/userfullname}}
+			<img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/chat.png" alt="{{#str}} chat, block_reportdashboard {{/str}}">
 		</div>
 	</div>
 	<ul class="card-content-details px-3">
-		<li class="my-2"><img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/email.png">{{email}}</li>
-		<li class="my-2"><img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/phone.png">{{phone1}}</li>
-		<li class="my-2"><img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/location.png">{{address}}</li>
+		<li class="my-2"><img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/email.png" alt="{{#str}} email, block_reportdashboard {{/str}}">{{email}}</li>
+		<li class="my-2"><img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/phone.png" alt="{{#str}} phone, block_reportdashboard {{/str}}">{{phone1}}</li>
+		<li class="my-2"><img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/location.png" alt="{{#str}} location, block_reportdashboard {{/str}}">{{address}}</li>
 	</ul>
 	<ul class="accessedtime_details">
 		<li>
 			<div class="label text-muted">{{# str}} lastaccessedon, block_reportdashboard{{/ str}}</div>
-			<div class="time_info d-flex align-items-center"><span class="d-flex align-items-center"><img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/lastaccessedondate.png">{{lastlogin}}</span></div>
+			<div class="time_info d-flex align-items-center"><span class="d-flex align-items-center"><img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/lastaccessedondate.png" alt="{{#str}} date, block_reportdashboard {{/str}}">{{lastlogin}}</span></div>
 		</li>
 		<li>
 			<div class="label text-muted">{{# str}} totaltimespent, block_reportdashboard{{/ str}}</div>
-			<div class="time_info d-flex align-items-center"><span class="d-flex align-items-center"><img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/time.png">{{totaltimespent}}</span></div>
+			<div class="time_info d-flex align-items-center"><span class="d-flex align-items-center"><img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/time.png" alt="{{#str}} time, block_reportdashboard {{/str}}">{{totaltimespent}}</span></div>
 		</li>
 		<li>
 			<div class="label text-muted">{{# str}} averagetimespent, block_reportdashboard{{/ str}}</div>
-			<div class="time_info d-flex align-items-center"><span class="d-flex align-items-center"><img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/time.png">{{avgtimespent}}</span></div>
+			<div class="time_info d-flex align-items-center"><span class="d-flex align-items-center"><img src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/time.png" alt="{{#str}} time, block_reportdashboard {{/str}}">{{avgtimespent}}</span></div>
 		</li>
 	</ul>
 </div>

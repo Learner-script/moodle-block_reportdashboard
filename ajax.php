@@ -71,10 +71,11 @@ switch ($action) {
         $return = ['total' => count($data), 'items' => $data];
         break;
     case 'reportlist':
+        $params = ['search' => "'%" . $search . "%'"];
+        $reportsearch = $DB->sql_like('name', ":search", false);
         $sql = "SELECT id,name
                 FROM {block_learnerscript}
-                WHERE visible = 1 AND name LIKE :search";
-        $params = ['search' => "'%" . $search . "%'"];
+                WHERE visible = 1 AND $reportsearch";
         $courselist = $DB->get_records_sql($sql, $params);
         $activitylist = [];
         foreach ($courselist as $cl) {
@@ -96,7 +97,7 @@ switch ($action) {
         break;
     case 'sendemails':
         require_once($CFG->dirroot . '/blocks/reportdashboard/email_form.php');
-        $emailform = new analytics_emailform($CFG->wwwroot . '/blocks/reportdashboard/dashboard.php',
+        $emailform = new block_reportdashboard_emailform($CFG->wwwroot . '/blocks/reportdashboard/dashboard.php',
             ['reportid' => $reportid, 'AjaxForm' => true, 'instance' => $instance]);
         $return = $emailform->render();
         break;

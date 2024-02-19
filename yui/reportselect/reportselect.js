@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 YUI.add('moodle-block_reportdashboard-reportselect', function (Y) {
     var REPORTSELECT = 'block_reportdashboard-reportselect';
     var REPORTSELECT = function () {

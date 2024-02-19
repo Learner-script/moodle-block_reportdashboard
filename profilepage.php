@@ -107,14 +107,15 @@ if ($userid) {
     if (!empty($ppdashboard)) {
         $data['userslist'] = array_values($ppdashboard);
         $data['coursedashboard'] = 1;
+        $data['wwwroot'] = $CFG->wwwroot;
     }
     $userinfo = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
-
+    $defaultpicture = $CFG->wwwroot."/pix/user35.png";
     $userpicture = new user_picture($userinfo);
     $userpicture->size = 1;
-    $userinfo->profileimage = $userpicture->get_url($PAGE)->out(false);
+    $userinfo->profileimage = !empty($userpicture) ? $userpicture->get_url($PAGE)->out(false) : $defaultpicture;
 
-    $userinfo->userfullname = $userinfo->firstname . ' ' . $userinfo->lastname;
+    $userinfo->userfullname = !empty($userinfo->firstname) ? ($userinfo->firstname . ' ' . $userinfo->lastname) : 'NA';
     $userinfo->lastlogin = !empty($userinfo->lastaccess) ? userdate($userinfo->lastaccess) : '--';
     $totaltimespent = $DB->get_field_sql("SELECT SUM(timespent) AS timespent FROM {block_ls_coursetimestats}
                                 WHERE 1 = 1 AND userid = :userid", ['userid' => $userid]);
@@ -269,19 +270,19 @@ if ($userid) {
     // User grades.
     if (!empty($courseslist)) {
         $params['userid'] = $userid;
-        $avggrade = $DB->get_record_sql("SELECT AVG(gg.finalgrade) as finalgrade
+        $avggrade = $DB->get_record_sql("SELECT AVG(gg.finalgrade) AS finalgrade
                                 FROM {grade_grades} gg
                                 JOIN {grade_items} gi ON gi.id = gg.itemid
                                 WHERE gi.itemtype = 'course' AND gg.userid = :userid
                                 AND gi.courseid $csql", $params);
         $userinfo->avggrade = !empty($avggrade->finalgrade) ? round($avggrade->finalgrade, 2) : 0;
-        $highestgrade = $DB->get_record_sql("SELECT MAX(gg.finalgrade) as finalgrade
+        $highestgrade = $DB->get_record_sql("SELECT MAX(gg.finalgrade) AS finalgrade
                                     FROM {grade_grades} gg
                                     JOIN {grade_items} gi ON gi.id = gg.itemid
                                     WHERE gi.itemtype = 'course' AND gg.userid = :userid
                                     AND gi.courseid $csql", $params);
 
-        $lowestgrade = $DB->get_record_sql("SELECT MIN(gg.finalgrade) as finalgrade
+        $lowestgrade = $DB->get_record_sql("SELECT MIN(gg.finalgrade) AS finalgrade
                                 FROM {grade_grades} gg
                                 JOIN {grade_items} gi ON gi.id = gg.itemid
                                 WHERE gi.itemtype = 'course' AND gg.userid = :userid
@@ -331,7 +332,7 @@ if ($userid) {
     }
     $activitynames = implode(',', $fields1);
 
-    $moduleactivities = "SELECT recacc.cmid, m.name as module,
+    $moduleactivities = "SELECT recacc.cmid, m.name AS module,
                         CONCAT($activitynames) AS activityname, recacc.timeaccess
                         FROM {block_recentlyaccesseditems} recacc
                         JOIN {course_modules} main ON main.id = recacc.cmid
@@ -342,13 +343,13 @@ if ($userid) {
                         JOIN {user} u ON u.id = ue.userid AND recacc.userid = u.id
                         ";
     foreach ($aliases as $alias) {
-        $moduleactivities .= " LEFT JOIN {".$alias."} AS $alias ON $alias.id = main.instance AND m.name = '$alias'";
+        $moduleactivities .= " LEFT JOIN {".$alias."} $alias ON $alias.id = main.instance AND m.name = '$alias'";
     }
     $moduleactivities .= " WHERE u.id = :userid and main.visible = :cmvisible
                             AND main.deletioninprogress = :deletioninprogress
                             ORDER BY recacc.id DESC LIMIT 5";
     $recentactivities = $DB->get_records_sql($moduleactivities, ['userid' => $userid,
-                    'cmvisible' => 1, 'deletioninprogress' => 0]);
+                    'cmvisible' => 1, 'deletioninprogress' => 0, ]);
 
     $recentactivitieslist = [];
     $i = 0;
@@ -367,13 +368,13 @@ if ($userid) {
     // No login courses.
     $inactivedate = strtotime("-10 days");
 
-    $accesscourses = $DB->get_records_sql("SELECT ul.courseid, c.fullname as course,
-                            ul.timeaccess as timeaccess
+    $accesscourses = $DB->get_records_sql("SELECT ul.courseid, c.fullname AS course,
+                            ul.timeaccess AS timeaccess
                             FROM {user_lastaccess} ul
                             JOIN {course} c ON c.id = ul.courseid
                             WHERE ul.userid = :userid AND c.visible = :visible
                             GROUP BY ul.courseid", ['userid' => $userid,
-                            'visible' => 1]);
+                            'visible' => 1, ]);
     foreach ($accesscourses as $c) {
         $courseacesslist[$c->courseid] = $c->courseid;
     }
@@ -387,15 +388,15 @@ if ($userid) {
     $params['userid'] = $userid;
     $params['accesstime'] = $inactivedate;
     $recentaccesscourses = $DB->get_records_sql("SELECT a.* FROM (
-                        SELECT ul.courseid, c.fullname as course,
-                        ul.timeaccess as timeaccess
+                        SELECT ul.courseid, c.fullname AS course,
+                        ul.timeaccess AS timeaccess
                         FROM {user_lastaccess} ul
                         JOIN {course} c ON c.id = ul.courseid
                         WHERE ul.userid = :accessuserid AND c.visible = :accessvisible
                         AND ul.timeaccess < :timeaccess GROUP BY ul.courseid
                         UNION
-                        SELECT c.id AS courseid, c.fullname as course,
-                        ue.timecreated as timeaccess
+                        SELECT c.id AS courseid, c.fullname AS course,
+                        ue.timecreated AS timeaccess
                         FROM {course} c
                         JOIN {enrol} e ON e.courseid = c.id AND e.status = 0
                         JOIN {user_enrolments} ue on ue.enrolid = e.id AND ue.status = 0
@@ -411,7 +412,7 @@ if ($userid) {
     if (!empty($recentaccesscourses)) {
         foreach ($recentaccesscourses as $r => $c) {
             $courseprogress = $DB->get_field_sql("SELECT ROUND((COUNT(distinct cc.course) / COUNT(DISTINCT c.id)) *100, 2)
-                            as progress
+                            AS progress
                             FROM {user_enrolments} ue
                             JOIN {enrol} e ON ue.enrolid = e.id AND e.status = 0
                             JOIN {role_assignments} ra ON ra.userid = ue.userid
@@ -460,8 +461,7 @@ if ($userid) {
                                                     'contextlevel' => $contextlevel,
                                                 'issiteadmin' => $siteadmin,
                                                 'userstatus' => $userstatus,
-                                                'studentrole' => $studentrole
-                                                ]);
+                                                'studentrole' => $studentrole, ]);
     $PAGE->requires->js_call_amd('block_learnerscript/report', 'generate_plotgraph',
                                                 [$lmsaccess]);
 } else {

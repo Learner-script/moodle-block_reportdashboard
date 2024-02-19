@@ -21,8 +21,8 @@
  * @copyright  2023 Moodle India
  * @since      3.3
  */
-define(['block_learnerscript/ajax', 'jquery', 'block_learnerscript/report'],
-    function(ajax, $, report, RadiosToSlider, flatpickr) {
+define(['jquery', 'block_learnerscript/ajax', 'block_learnerscript/report'],
+    function($, ajax, report, RadiosToSlider, flatpickr) {
         var coursels;
         coursels = {
             init: function() {

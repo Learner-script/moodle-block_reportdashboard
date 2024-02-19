@@ -46,12 +46,14 @@ class block_reportdashboard extends block_base {
             !empty($this->config->reportcontenttype)) ? $this->config->reportcontenttype : '';
         $reportslist = isset($this->config->reportlist) ? $this->config->reportlist : '';
         $instance = isset($this->instance->id) ? $this->instance->id : '';
+        $this->page->requires->js(new moodle_url('/blocks/learnerscript/js/highchart.js'));
+        $this->page->requires->jquery();
+        $this->page->requires->jquery_plugin('ui-css');
         $this->page->requires->js_call_amd('block_learnerscript/reportwidget', 'CreateDashboardwidget'
             , [['reportid' => $reportslist, 'reporttype' => $reportcontenttype, 'instanceid' => $instance ]]);
-                $this->page->requires->js_call_amd('block_learnerscript/smartfilter', 'SelectDuration');
-                $this->page->requires->js_call_amd('block_learnerscript/smartfilter', 'ReportContenttypes');
-                $this->page->requires->js('/blocks/reportdashboard/js/jquery.radios-to-slider.min.js');
-                $this->page->requires->js(new moodle_url('/blocks/learnerscript/js/highchart.js'));
+        $this->page->requires->js_call_amd('block_learnerscript/smartfilter', 'SelectDuration');
+        $this->page->requires->js_call_amd('block_learnerscript/smartfilter', 'ReportContenttypes');
+        $this->page->requires->js('/blocks/reportdashboard/js/jquery.radios-to-slider.min.js');
     }
     /**
      * Subclasses should override this and return true if the
@@ -109,8 +111,6 @@ class block_reportdashboard extends block_base {
       */
     public function get_content() {
         global $DB, $COURSE;
-        $this->page->requires->js(new moodle_url('/blocks/learnerscript/js/highchart.js'));
-        $this->page->requires->jquery_plugin('ui-css');
         $this->page->requires->css('/blocks/learnerscript/css/fixedHeader.dataTables.min.css');
         $this->page->requires->css('/blocks/learnerscript/css/responsive.dataTables.min.css');
         $this->page->requires->css('/blocks/learnerscript/css/jquery.dataTables.min.css');
@@ -171,7 +171,6 @@ class block_reportdashboard extends block_base {
             $reportrecord->reportcontenttype = (isset($this->config->reportcontenttype) &&
                 !empty($this->config->reportcontenttype)) ? $this->config->reportcontenttype : '';
             $reportrecord->instanceid = $instanceid;
-            $filterform = new block_learnerscript\form\filter_form(null, $reportrecord);
             $properties = new stdClass();
             $properties->courseid = $COURSE->id;
             $reportclass = (new ls)->create_reportclass($reportid, $properties);
@@ -260,7 +259,7 @@ class block_reportdashboard extends block_base {
             $this->content->text .= html_writer::end_div();
             $this->content->text .= $output->render($reportarea);
             $this->content->text .= html_writer::tag('input', '', ['type' => 'hidden', 'id' => 'ls_courseid',
-                                    'value' => " . $COURSE->id . "]);
+                                    'value' => " . $COURSE->id . ", ]);
         } else {
             if (is_siteadmin()) {
                 $this->content->text .= get_string('configurationmessage', 'block_reportdashboard');

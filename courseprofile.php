@@ -31,15 +31,15 @@ use block_learnerscript\local\querylib;
 
 global $CFG, $SITE, $PAGE, $OUTPUT, $DB, $SESSION;
 
+require_login();
+
 $context = context_system::instance();
 $PAGE->set_pagetype('site-index');
 $PAGE->set_pagelayout('course');
 $context = context_system::instance();
 $PAGE->set_context($context);
-$PAGE->set_url('//blocks/reportdashboard/courseprofile.php');
+$PAGE->set_url('/blocks/reportdashboard/courseprofile.php');
 $PAGE->set_title(get_string('courseprofile', 'block_learnerscript'));
-
-require_login();
 
 $PAGE->requires->css('/blocks/reportdashboard/css/radios-to-slider.min.css');
 $PAGE->requires->css('/blocks/reportdashboard/css/flatpickr.min.css');
@@ -102,7 +102,7 @@ $courseinfo->editingteachercount = count($editingteachercount);
 $courseinfo->otherenrolcount = $courseinfo->enrollmentscount -
                     ($courseinfo->studentcount + $courseinfo->editingteachercount);
 $activitiescount = $DB->count_records('course_modules', ['course' => $courseid, 'visible' => 1,
-                'deletioninprogress' => 0]);
+                'deletioninprogress' => 0, ]);
 $courseinfo->activitiescount = $activitiescount;
 
 $totaltimespent = $DB->get_record_sql("SELECT SUM(timespent) AS timespent FROM {block_ls_coursetimestats}
@@ -141,14 +141,14 @@ $courseinfo->progresspercent = !empty($courseinfo->studentcount) ?
                 round(($courseinfo->completioncount / $courseinfo->studentcount) * 100) : 0;
 
 // Course grades.
-$avggrade = $DB->get_record_sql("SELECT AVG(gg.finalgrade) as finalgrade FROM {grade_grades} gg
+$avggrade = $DB->get_record_sql("SELECT AVG(gg.finalgrade) AS finalgrade FROM {grade_grades} gg
                             JOIN {grade_items} gi ON gi.id = gg.itemid
                             WHERE gi.itemtype = 'course' AND gi.courseid = :courseid", ['courseid' => $courseid]);
 $courseinfo->avggrade = !empty($avggrade->finalgrade) ? round($avggrade->finalgrade, 0) : 0;
-$highestgrade = $DB->get_field_sql("SELECT MAX(gg.finalgrade) as finalgrade FROM {grade_grades} gg
+$highestgrade = $DB->get_field_sql("SELECT MAX(gg.finalgrade) AS finalgrade FROM {grade_grades} gg
                             JOIN {grade_items} gi ON gi.id = gg.itemid
                             WHERE gi.itemtype = 'course' AND gi.courseid = :courseid", ['courseid' => $courseid]);
-$lowestgrade = $DB->get_field_sql("SELECT MIN(gg.finalgrade) as finalgrade FROM {grade_grades} gg
+$lowestgrade = $DB->get_field_sql("SELECT MIN(gg.finalgrade) AS finalgrade FROM {grade_grades} gg
                             JOIN {grade_items} gi ON gi.id = gg.itemid
                             WHERE gi.itemtype = 'course' AND gi.courseid = :courseid", ['courseid' => $courseid]);
 $courseinfo->highestgrade = !empty($highestgrade->finalgrade) ? round($highestgrade->finalgrade, 2) : 0;
@@ -299,7 +299,8 @@ $timelinesql = "SELECT a.* FROM (SELECT a.name, a.allowsubmissionsfromdate AS ti
                                 AND cm.deletioninprogress = :sdeletioninprogress) AS a";
 $timelinerecords = $DB->get_records_sql($timelinesql, ['courseid' => $courseid, 'qcourseid' => $courseid,
                     'scourseid' => $courseid, 'cvisible' => '1', 'deletioninprogress' => '0',
-                    'qcvisible' => '1', 'qdeletioninprogress' => '0', 'scvisible' => '1', 'sdeletioninprogress' => '0']);
+                    'qcvisible' => '1', 'qdeletioninprogress' => '0', 'scvisible' => '1',
+                    'sdeletioninprogress' => '0', ]);
 $timelinerecordslist = [];
 foreach ($timelinerecords as $timelinerecord) {
     $timaccess = userdate($timelinerecord->timestart);
@@ -324,5 +325,5 @@ echo $OUTPUT->render_from_template('block_reportdashboard/courseprofile/coursepr
                                                 'role' => $roleshortname,
                                                 'contextlevel' => $contextlevel,
                                             'issiteadmin' => $siteadmin,
-                                            'studentrole' => $studentrole]);
+                                            'studentrole' => $studentrole, ]);
 echo $OUTPUT->footer();

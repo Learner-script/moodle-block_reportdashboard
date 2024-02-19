@@ -29,11 +29,11 @@
 	<div class="progressinfo_card px-1">
 		<div class="courseprogress_card card p-2 ls-card">
 			<div class="progressbar_section">
-				<div class="half_progressbar " style="--percentage:{{progresspercent}}">
+				<div class="half_progressbar" {{#progresspercent}} style="--percentage:{{progresspercent}}" {{/progresspercent}}>
 					<div class="half_progressbar_percentageblock">{{progresspercent}}/100
                 	</div>
                 </div>
-				<h6 class="text-center">{{#str}} progress, block_reportdashboard {{/str}}</h5>
+				<h6 class="text-center">{{#str}} progress, block_reportdashboard {{/str}}</h6>
 			</div>
 			<ul class="progressinfo_list m-0 p-0">
 				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
@@ -56,11 +56,11 @@
 	<div class="progressinfo_card px-1">
 		<div class="grades_card card p-2 ls-card">
 			<div class="progressbar_section">
-				<div class="half_progressbar " style="--percentage:{{avggrade}}">
+				<div class="half_progressbar" {{#avggrade}} style="--percentage:{{avggrade}}" {{/avggrade}}>
 					<div class="half_progressbar_percentageblock">{{avggrade}}/100
                 	</div>
                 </div>
-				<h6 class="text-center">{{#str}} grades, block_reportdashboard {{/str}}</h5>
+				<h6 class="text-center">{{#str}} grades, block_reportdashboard {{/str}}</h6>
 			</div>
 			<ul class="progressinfo_list m-0 p-0">
 				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
@@ -83,11 +83,11 @@
 	<div class="progressinfo_card px-1">
 		<div class="assignment_card card p-2 ls-card">
 			<div class="progressbar_section">
-				<div class="half_progressbar " style="--percentage:{{assignmentprogress}}">
+				<div class="half_progressbar" {{#assignmentprogress}} style="--percentage:{{assignmentprogress}}" {{/assignmentprogress}}>
 					<div class="half_progressbar_percentageblock">{{assignmentprogress}}/100
                 	</div>
                 </div>
-				<h6 class="text-center">{{#str}} assignment, block_reportdashboard {{/str}}</h5>
+				<h6 class="text-center">{{#str}} assignment, block_reportdashboard {{/str}}</h6>
 			</div>
 			<ul class="progressinfo_list m-0 p-0">
 				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
@@ -110,11 +110,11 @@
 	<div class="progressinfo_card px-1">
 		<div class="quizzes_card card p-2 ls-card">
 			<div class="progressbar_section">
-				<div class="half_progressbar " style="--percentage:{{quizprogress}}">
+				<div class="half_progressbar" {{#quizprogress}} style="--percentage:{{quizprogress}}" {{/quizprogress}}>
 					<div class="half_progressbar_percentageblock">{{quizprogress}}/100
                 	</div>
                 </div>
-				<h6 class="text-center">{{#str}} quizzes, block_reportdashboard {{/str}}</h5>
+				<h6 class="text-center">{{#str}} quizzes, block_reportdashboard {{/str}}</h6>
 			</div>
 			<ul class="progressinfo_list m-0 p-0">
 				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">
@@ -137,11 +137,11 @@
 	<div class="progressinfo_card px-1">
 		<div class="scorm_card card p-2 ls-card">
 			<div class="progressbar_section">
-				<div class="half_progressbar " style="--percentage:{{scormprogress}}">
+				<div class="half_progressbar" {{#scormprogress}} style="--percentage:{{scormprogress}}" {{/scormprogress}}>
 					<div class="half_progressbar_percentageblock">{{scormprogress}}/100
                 	</div>
                 </div>
-				<h6 class="text-center">{{#str}} scorm, block_reportdashboard {{/str}}</h5>
+				<h6 class="text-center">{{#str}} scorm, block_reportdashboard {{/str}}</h6>
 			</div>
 			<ul class="progressinfo_list m-0 p-0">
 				<li class="progressinfo_item py-2 pr-2 d-flex align-items-center justify-content-between ">

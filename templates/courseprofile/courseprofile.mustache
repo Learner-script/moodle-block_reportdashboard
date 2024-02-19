@@ -29,7 +29,7 @@
 			{{^studentrole}}
 			{{#coursedata }}
 				<span class="coursefilter">
-					<label>{{#str}}course{{/str}}</label>
+					<label>{{#str}} course, block_reportdashboard {{/str}}</label>
 					<select name="filter_courses" class = "dashboardcourses" id = "dashboardcourses" data-select2-ajax="1" data-action = "filtercourses" data-role="{{dashboardrole}}">
 						{{# courselist }}
 							<option value = "{{id}}" {{selectedcourse}}>{{fullname}}</option>

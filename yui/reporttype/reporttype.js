@@ -1,5 +1,6 @@
+/* eslint-disable no-undef */
 YUI.add('moodle-block_reportdashboard-reporttype', function (Y) {
-    
+
     M.block_reportdashboard = M.block_reportdashboard || {};
 
     M.block_reportdashboard.reporttype = {
@@ -18,7 +19,8 @@ YUI.add('moodle-block_reportdashboard-reporttype', function (Y) {
                         method: "POST",
                         sync: false,
                         timeout: 10000,
-                        data: {'reportid': params.reportid, 'selreport': selectid.get('value'), 'blockinstanceid': params.block_instanceid},
+                        data: {'reportid': params.reportid, 'selreport': selectid.get('value'),
+                            'blockinstanceid': params.block_instanceid},
                         on: {
                             success: function (id, o) {
                                 try {

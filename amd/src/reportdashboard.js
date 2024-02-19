@@ -17,27 +17,28 @@
  * TODO describe module reportdashboard
  *
  * @module     block_reportdashboard/reportdashboard
- * @copyright  2023 YOUR NAME <your@email.com>
+ * @copyright  2023 Moodle India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['core/ajax',
+define(['jquery',
+        'core/ajax',
         'block_learnerscript/report',
         'block_learnerscript/reportwidget',
         'block_learnerscript/schedule',
         'block_learnerscript/helper',
         'block_learnerscript/ajax',
+        'block_learnerscript/config',
         'block_learnerscript/select2',
         'block_learnerscript/datatables',
         'block_learnerscript/smartfilter',
         'block_learnerscript/radioslider',
         'block_learnerscript/flatpickr',
         'core/str',
-        'jquery',
         'jqueryui',
         'block_learnerscript/bootstrapnotify',
     ],
-    function(Ajax, report, reportwidget, schedule, helper, ajax, select2, DataTable,
-        smartfilter, RadiosToSlider, flatpickr, Str, $) {
+    function($, Ajax, report, reportwidget, schedule, helper, ajax, cfgs, select2, dataTable,
+        smartfilter, RadiosToSlider, flatpickr, Str) {
         return {
             init: function() {
                     $(document).ajaxStop(function() {

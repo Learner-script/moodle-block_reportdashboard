@@ -23,13 +23,15 @@
     {
     }
 }}
-<h5 class="mb-3 pl-2">Activities</h5>
+<h5 class="mb-3 pl-2">{{#str}} nactivities, block_reportdashboard {{/str}}</h5>
 <div class="activities_card card ls-card">
 	<div class="p-2">
 		<div class = "reportdashboard_header">
-			<div id='reportcontainer{{activitiesreportinstance}}' class='report_dashboard_container' data-reportid={{activitiesreportid}}
-            data-reporttype={{activitiesreporttype}} data-blockinstance={{activitiesreportid}} >
+            {{#activitiesreportinstance}}
+			<div id="reportcontainer{{activitiesreportinstance}}" class="report_dashboard_container" data-reportid="{{activitiesreportid}}"
+            data-reporttype="{{activitiesreporttype}}" data-blockinstance="{{activitiesreportid}}" >
 </div>
+{{/activitiesreportinstance}}
 		</div>
 	</div>
 </div>

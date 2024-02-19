@@ -28,7 +28,7 @@ use templatable;
 use stdClass;
 use block_learnerscript\local\ls as ls;
 use block_reportdashboard\local\reportdashboard as reportdashboard;
-use block_learnerscript\local\querylib as querylib;
+
 /** Dashboard header */
 class dashboardheader implements renderable, templatable {
     /** @var $editingon */
@@ -60,7 +60,7 @@ class dashboardheader implements renderable, templatable {
      * @return array
      */
     public function export_for_template(renderer_base $output) {
-        global $DB, $USER, $SESSION;
+        global $SESSION;
         $data = [];
         $switchableroles = (new ls)->switchrole_options();
         $data['editingon'] = $this->editingon;
@@ -112,7 +112,9 @@ class dashboardheader implements renderable, templatable {
             if ($value != 'Dashboard' && !(new reportdashboard)->is_dashboardempty($key)) {
                 continue;
             }
-            $getreports = $DB->count_records_sql("SELECT COUNT(id) FROM {block_instances} WHERE subpagepattern LIKE '%$key%' ");
+            $params['subpage'] = "'%" . $key ."%'";
+            $getreports = $DB->count_records_sql("SELECT COUNT(id) FROM {block_instances} WHERE 1 = 1
+                            AND " . $DB->sql_like('subpagepattern', ':subpage', false), $params);
             $getdashboardname[$i]['name'] = ucfirst($value);
             $getdashboardname[$i]['pagetypepattern'] = $value;
             $getdashboardname[$i]['random'] = $i;
