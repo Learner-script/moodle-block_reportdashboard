@@ -55,22 +55,6 @@ define(['jquery',
                         });
                     });
 
-                    $("#createdashbaord_form").submit(function(event) {
-                        var dashboardname = $("#id_dashboard").val();
-                        var name = dashboardname.trim();
-                        if (name == '' || name === null) {
-                            $("#id_error_dashboard").css('display', 'block');
-                            $("#id_error_dashboard_nospaces").css('display', 'none');
-                            event.preventDefault();
-                        }
-                        var spaceexist = name.indexOf(" ");
-                        if (spaceexist > 0 && spaceexist != '') {
-                            $("#id_error_dashboard").css('display', 'none');
-                            $("#id_error_dashboard_nospaces").css('display', 'block');
-                            event.preventDefault();
-                        }
-                    });
-
                 $.ui.dialog.prototype._focusTabbable = $.noop;
                 var DheaderPosition = $("#dashboard-header").position();
                 $(".sidenav").offset({top: 0});

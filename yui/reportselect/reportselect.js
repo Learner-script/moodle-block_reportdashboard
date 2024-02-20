@@ -3,7 +3,7 @@ YUI.add('moodle-block_reportdashboard-reportselect', function (Y) {
     var REPORTSELECT = 'block_reportdashboard-reportselect';
     var REPORTSELECT = function () {
         REPORTSELECT.superclass.constructor.apply(this, arguments);
-    }
+    };
 
     Y.extend(REPORTSELECT, Y.Base, {
         initializer: function (params) {
@@ -23,5 +23,5 @@ YUI.add('moodle-block_reportdashboard-reportselect', function (Y) {
     M.block_reportdashboard = M.block_reportdashboard || {};
     M.block_reportdashboard.init_reportselect = function (params) {
         return new REPORTSELECT(params);
-    }
+    };
 }, '@VERSION@', {requires: ['base', 'node', 'node-event-simulate']});
