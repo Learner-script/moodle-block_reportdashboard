@@ -183,7 +183,7 @@ if ($userid) {
         $courseslist = implode(',', $courseslistarray);
     }
 
-    list($csql, $params) = $DB->get_in_or_equal($courseslist, SQL_PARAMS_NAMED);
+    list($csql, $params) = $DB->get_in_or_equal($courseslistarray, SQL_PARAMS_NAMED);
     $params['cmvisible'] = 1;
     $params['deletioninprogress'] = 0;
     if (!empty($courseslist)) {

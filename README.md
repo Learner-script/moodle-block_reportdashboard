@@ -38,7 +38,7 @@
 	Learnerscript
 
 # Cross-DB compatibility:
-	Compatible with PGSQL, MSSQL, MYSQL and MariaDB
+	Compatible with MYSQL and MariaDB
 
 # Bug tracker URL:
 	https://learnerscript.com/support/
