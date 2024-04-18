@@ -17,34 +17,35 @@
 {{!
     @template block_reportdashboard/switchrole
 
-    TODO describe template switchrole
+    Describe the accesseble roles to current user.
 
     Example context (json):
     {
     }
 }}
 {{#switchrole}}
-{{^ issiteadmin }}
-    <span class="dropdown">
-        <a class="dropdown-toggle htitle" id="switchrole{{reportinstance}}" data-toggle="dropdown" data-tooltip="true"
-            aria-haspopup="true" aria-expanded="false">
-            <span class="tooltiptext tooltip-top">{{#str}}switchrole, block_reportdashboard{{/str}}</span>
-            <img src={{config.wwwroot}}/blocks/learnerscript/pix/switchrole.png>
-        </a>
-        <ul class="menu dropdown-menu dropdown-menu-right dropdown-content" area-labelledby="switchrole{{reportinstance}}">
+    {{^ issiteadmin }}
+        {{^dashboardlink}}
+            <span class="dropdown">
+                <a class="dropdown-toggle htitle" id="switchrole{{reportinstance}}" data-toggle="dropdown" data-tooltip="true"
+                    aria-haspopup="true" aria-expanded="false">
+                    <span class="tooltiptext tooltip-top" title="{{#str}}switchrole, block_reportdashboard{{/str}}">           {{#pix}}switchrole, block_learnerscript, {{#str}}switchrole, block_reportdashboard{{/str}}{{/pix}}</span>
+                </a>
+                <ul class="menu dropdown-menu dropdown-menu-right dropdown-content" area-labelledby="switchrole{{reportinstance}}">
 
-                <li role="presentation">
-                    <a href='{{config.wwwroot}}/blocks/reportdashboard/dashboard.php?role={{role}}&contextlevel={{contextlevel}}' class="dropdown-item menu-action">{{#str}}defaultrole, block_reportdashboard{{/str}}</a>
-                </li>
+                        <li role="presentation">
+                            <a href='{{config.wwwroot}}/blocks/reportdashboard/dashboard.php?role={{role}}&contextlevel={{contextlevel}}' class="dropdown-item menu-action">{{#str}}defaultrole, block_reportdashboard{{/str}}</a>
+                        </li>
 
-                {{#roles}}
-                    <li role="presentation" class='{{active}}'>
-                        <a href='{{config.wwwroot}}/blocks/reportdashboard/dashboard.php?role={{roleshortname}}&contextlevel={{contextlevel}}&dashboardurl={{dashboardurl}}'
-                            class="dropdown-item menu-action">{{rolename}}</a>
-                    </li>
-                {{/roles}}
+                        {{#roles}}
+                            <li role="presentation" class='{{active}}'>
+                                <a href='{{config.wwwroot}}/blocks/reportdashboard/dashboard.php?role={{roleshortname}}&contextlevel={{contextlevel}}&dashboardurl={{dashboardurl}}'
+                                    class="dropdown-item menu-action">{{rolename}}</a>
+                            </li>
+                        {{/roles}}
 
-        </ul>
-    </span>
+                </ul>
+            </span>
+        {{/dashboardlink}}
     {{/ issiteadmin }}
 {{/switchrole}}

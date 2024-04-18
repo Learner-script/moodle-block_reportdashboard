@@ -17,7 +17,7 @@
 {{!
     @template block_reportdashboard/profilepage/badges
 
-    TODO describe template badges
+    Review the badge information of the user.
 
     Example context (json):
     {
@@ -31,7 +31,7 @@
 	{{#userbadgesinfo}}
 		<div class="col-md-4 col-sm-4 pr-1 pl-0 mb-2">
 			<div class="badges_card card rounded text-center p-2 h-100">
-				<img class="m-auto" src="{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/badge1.png">
+				{{#pix}}courseprofile/badge1, block_reportdashboard, {{#str}}badges, block_reportdashboard{{/str}}{{/pix}}
 				<h6 class="font-weight-light mt-1">{{badgename}}</h6>
 			</div>
 		</div>

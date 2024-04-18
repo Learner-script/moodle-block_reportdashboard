@@ -41,8 +41,6 @@ $PAGE->set_context($context);
 $PAGE->set_url('/blocks/reportdashboard/courseprofile.php');
 $PAGE->set_title(get_string('courseprofile', 'block_learnerscript'));
 
-$PAGE->requires->css('/blocks/reportdashboard/css/radios-to-slider.min.css');
-$PAGE->requires->css('/blocks/reportdashboard/css/flatpickr.min.css');
 $PAGE->requires->css('/blocks/learnerscript/css/fixedHeader.dataTables.min.css');
 $PAGE->requires->css('/blocks/learnerscript/css/responsive.dataTables.min.css');
 $PAGE->requires->jquery_plugin('ui-css');
@@ -91,11 +89,11 @@ $enrolmentsql = "SELECT DISTINCT ue.userid
 $enrollmentscount = $DB->get_records_sql($enrolmentsql, ['courseid' => $courseid]);
 $courseinfo->enrollmentscount = count($enrollmentscount);
 
-$studentcountsql = $enrolmentsql . "AND r.shortname = 'student'";
+$studentcountsql = $enrolmentsql . " AND r.shortname = 'student'";
 $studentcount = $DB->get_records_sql($studentcountsql, ['courseid' => $courseid]);
 $courseinfo->studentcount = count($studentcount);
 
-$editingteachercountsql = $enrolmentsql . "AND r.shortname = 'editingteacher'";
+$editingteachercountsql = $enrolmentsql . " AND r.shortname = 'editingteacher'";
 $editingteachercount = $DB->get_records_sql($editingteachercountsql, ['courseid' => $courseid]);
 $courseinfo->editingteachercount = count($editingteachercount);
 
@@ -274,11 +272,12 @@ $activitiesreportinstance = $activitiesreport->id;
 $activitiesreporttype = 'table';
 
 // Timeline.
+$currenttime = time();
 $timelinesql = "SELECT a.* FROM (SELECT a.name, a.allowsubmissionsfromdate AS timestart, m.name AS module, cm.id
                                 FROM {assign} a
                                 JOIN {course_modules} cm ON cm.instance = a.id
                                 JOIN {modules} m ON m.id = cm.module AND m.name = 'assign'
-                                WHERE 1 = 1 AND a.allowsubmissionsfromdate >= UNIX_TIMESTAMP()
+                                WHERE 1 = 1 AND a.allowsubmissionsfromdate >= :assigntime
                                 AND a.course = :courseid AND cm.visible = :cvisible
                                 AND cm.deletioninprogress = :deletioninprogress
                                 UNION
@@ -286,7 +285,7 @@ $timelinesql = "SELECT a.* FROM (SELECT a.name, a.allowsubmissionsfromdate AS ti
                                 FROM {quiz} q
                                 JOIN {course_modules} cm ON cm.instance = q.id
                                 JOIN {modules} m ON m.id = cm.module AND m.name = 'quiz'
-                                WHERE 1 = 1 AND q.timeopen >= UNIX_TIMESTAMP()
+                                WHERE 1 = 1 AND q.timeopen >= :quiztime
                                 AND q.course = :qcourseid AND cm.visible = :qcvisible
                                 AND cm.deletioninprogress = :qdeletioninprogress
                                 UNION
@@ -294,13 +293,14 @@ $timelinesql = "SELECT a.* FROM (SELECT a.name, a.allowsubmissionsfromdate AS ti
                                 FROM {scorm} s
                                 JOIN {course_modules} cm ON cm.instance = s.id
                                 JOIN {modules} m ON m.id = cm.module AND m.name = 'scorm'
-                                WHERE 1 = 1 AND s.timeopen >= UNIX_TIMESTAMP()
+                                WHERE 1 = 1 AND s.timeopen >= :scormtime
                                 AND s.course = :scourseid AND cm.visible = :scvisible
                                 AND cm.deletioninprogress = :sdeletioninprogress) AS a";
 $timelinerecords = $DB->get_records_sql($timelinesql, ['courseid' => $courseid, 'qcourseid' => $courseid,
                     'scourseid' => $courseid, 'cvisible' => '1', 'deletioninprogress' => '0',
                     'qcvisible' => '1', 'qdeletioninprogress' => '0', 'scvisible' => '1',
-                    'sdeletioninprogress' => '0', ]);
+                    'sdeletioninprogress' => '0', 'assigntime' => $currenttime,
+                    'quiztime' => $currenttime, 'scormtime' => $currenttime, ]);
 $timelinerecordslist = [];
 foreach ($timelinerecords as $timelinerecord) {
     $timaccess = userdate($timelinerecord->timestart);

@@ -17,7 +17,7 @@
 {{!
     @template block_reportdashboard/dashboardheader
 
-    TODO describe template dashboardheader
+    Describe the accesseble options for the role on the dashboard
 
     Example context (json):
     {
@@ -29,24 +29,24 @@
         {{^managerrole}}
             <a class= "htitle" href="{{config.wwwroot}}/blocks/learnerscript/reports.php?role={{role}}&contextlevel={{contextlevel}}"
                target="_blank">
-                <span class="tooltiptext tooltip-top">{{#str}}reports, block_learnerscript{{/str}}</span>
-                <img src="{{config.wwwroot}}/blocks/learnerscript/pix/managereport.png" id="addreport" class="addblocks-to-dashboard" alt ="{{#str}} managereport, block_reportdashboard {{/str}}">
+                <span class="tooltiptext tooltip-top" title="{{#str}}managereport, block_reportdashboard{{/str}}">
+                {{#pix}}managereport, block_learnerscript, {{#str}}managereport, block_reportdashboard{{/str}}{{/pix}}</span>
             </a>
         {{/managerrole}}
     {{/issiteadmin}}
     {{#issiteadmin}}
         <a class= "htitle" href="{{config.wwwroot}}/blocks/learnerscript/managereport.php"
            target="_blank">
-            <span class="tooltiptext tooltip-top">{{#str}}managereports, block_learnerscript{{/str}}</span>
-            <img src="{{config.wwwroot}}/blocks/learnerscript/pix/managereport.png" id="addreport" class="addblocks-to-dashboard" alt ="{{#str}} managereport, block_reportdashboard {{/str}}">
+            <span class="tooltiptext tooltip-top" title="{{#str}}managereport, block_reportdashboard{{/str}}">
+            {{#pix}}managereport, block_learnerscript, {{#str}}managereport, block_reportdashboard{{/str}}{{/pix}}</span>
         </a>
     {{/issiteadmin}}
     {{#managerrole}}
         {{^issiteadmin}}
             <a class= "htitle" href="{{config.wwwroot}}/blocks/learnerscript/managereport.php"
                target="_blank">
-                <span class="tooltiptext tooltip-top">{{#str}}managereports, block_learnerscript{{/str}}</span>
-                <img src="{{config.wwwroot}}/blocks/learnerscript/pix/managereport.png" id="addreport" class="addblocks-to-dashboard" alt ="{{#str}} managereport, block_reportdashboard {{/str}}">
+                <span class="tooltiptext tooltip-top" title="{{#str}}managereport, block_reportdashboard{{/str}}">
+                {{#pix}}managereport, block_learnerscript, {{#str}}managereport, block_reportdashboard{{/str}}{{/pix}}</span>
             </a>
         {{/issiteadmin}}
     {{/managerrole}}

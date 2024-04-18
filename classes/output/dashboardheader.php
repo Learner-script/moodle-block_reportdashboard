@@ -60,7 +60,7 @@ class dashboardheader implements renderable, templatable {
      * @return array
      */
     public function export_for_template(renderer_base $output) {
-        global $SESSION;
+        global $SESSION, $USER, $DB;
         $data = [];
         $switchableroles = (new ls)->switchrole_options();
         $data['editingon'] = $this->editingon;
@@ -79,6 +79,24 @@ class dashboardheader implements renderable, templatable {
 
         $data['role'] = $SESSION->role;
         $data['contextlevel'] = $SESSION->ls_contextlevel;
+        if (!is_siteadmin()) {
+            $userrolesql = "SELECT COUNT(CONCAT(ra.roleid, '_',c.contextlevel)) AS rolecontext
+                FROM {role_assignments} ra
+                JOIN {context} c ON c.id = ra.contextid
+                JOIN {role} r ON r.id = ra.roleid
+                WHERE 1 = 1 AND ra.userid = :userid AND (";
+            foreach ($USER->access['ra'] as $key => $value) {
+                $userrolesql .= " c.path LIKE '".$key."' OR ";
+            }
+            $userrolesql .= " 1 = 1) GROUP BY ra.roleid, c.contextlevel, r.shortname";
+
+            $userrolescount = $DB->get_field_sql($userrolesql, ['userid' => $USER->id]);
+            $dashboardlink = $userrolescount > 1 ? 1 : 0;
+            $data['dashboardlink'] = $dashboardlink;
+        } else {
+            $data['dashboardlink'] = 0;
+        }
+
         return array_merge($data, $switchableroles);
     }
     /**

@@ -29,7 +29,7 @@
 	5. After choosing the file click on continue till the Upgrade of the new version is successful.
 
 # Supported Moodle versions:
-	Moodle 4.2
+	Moodle 4.3
 
 # Code repository name:
 	moodle-block_reportdashboard
@@ -38,7 +38,7 @@
 	Learnerscript
 
 # Cross-DB compatibility:
-	Compatible with MYSQL and MariaDB
+	Compatible with MYSQL, PostgreSQL and MariaDB
 
 # Bug tracker URL:
 	https://learnerscript.com/support/

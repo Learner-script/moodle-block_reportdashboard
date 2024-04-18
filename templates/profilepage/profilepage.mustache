@@ -17,7 +17,7 @@
 {{!
     @template block_reportdashboard/profilepage/profilepage
 
-    TODO describe template profilepage
+    Display the profile page information for different roles. 
 
     Example context (json):
     {
@@ -47,9 +47,11 @@
 				</div>
 			{{/issiteadmin}}
 			{{^issiteadmin}}
-				<div style="float:right;">
-				<a class="btn linkbtn btn-primary" href="{{config.wwwroot}}/blocks/reportdashboard/dashboard.php?role={{role}}&contextlevel={{contextlevel}}">{{#str}} dashboard, block_reportdashboard {{/str}}</a>
-				</div>
+				{{#dashboardlink}}
+					<div style="float:right;">
+					<a class="btn linkbtn btn-primary" href="{{config.wwwroot}}/blocks/reportdashboard/dashboard.php?role={{role}}&contextlevel={{contextlevel}}">{{#str}} dashboard, block_reportdashboard {{/str}}</a>
+					</div>
+				{{/dashboardlink}}
 			{{/issiteadmin}}
 		</div>
 	</div>
