@@ -80,7 +80,7 @@ class dashboardheader implements renderable, templatable {
         $data['role'] = $SESSION->role;
         $data['contextlevel'] = $SESSION->ls_contextlevel;
         if (!is_siteadmin()) {
-            $userrolesql = "SELECT COUNT(CONCAT(ra.roleid, '_',c.contextlevel)) AS rolecontext
+            $userrolesql = "SELECT CONCAT(ra.roleid, '_',c.contextlevel) AS rolecontext
                 FROM {role_assignments} ra
                 JOIN {context} c ON c.id = ra.contextid
                 JOIN {role} r ON r.id = ra.roleid
@@ -90,8 +90,8 @@ class dashboardheader implements renderable, templatable {
             }
             $userrolesql .= " 1 = 1) GROUP BY ra.roleid, c.contextlevel, r.shortname";
 
-            $userrolescount = $DB->get_field_sql($userrolesql, ['userid' => $USER->id]);
-            $dashboardlink = $userrolescount > 1 ? 1 : 0;
+            $userrolescount = $DB->get_records_sql($userrolesql, ['userid' => $USER->id]);
+            $dashboardlink = count($userrolescount) > 1 ? 1 : 0;
             $data['dashboardlink'] = $dashboardlink;
         } else {
             $data['dashboardlink'] = 0;

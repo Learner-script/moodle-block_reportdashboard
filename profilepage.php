@@ -58,7 +58,7 @@ $userid = ($roleshortname == 'student') ? $USER->id : $sessionuserid;
 echo $OUTPUT->header();
 
 if (!is_siteadmin()) {
-    $userrolesql = "SELECT COUNT(CONCAT(ra.roleid, '_',c.contextlevel)) AS rolecontext
+    $userrolesql = "SELECT CONCAT(ra.roleid, '_',c.contextlevel) AS rolecontext
                 FROM {role_assignments} ra
                 JOIN {context} c ON c.id = ra.contextid
                 JOIN {role} r ON r.id = ra.roleid
@@ -68,8 +68,8 @@ if (!is_siteadmin()) {
     }
     $userrolesql .= " 1 = 1) GROUP BY ra.roleid, c.contextlevel, r.shortname";
 
-    $userrolescount = $DB->get_field_sql($userrolesql, ['userid' => $USER->id]);
-    $dashboardlink = $userrolescount > 1 ? 1 : 0;
+    $userrolescount = $DB->get_records_sql($userrolesql, ['userid' => $USER->id]);
+    $dashboardlink = count($userrolescount) > 1 ? 1 : 0;
 } else {
     $dashboardlink = 0;
 }
@@ -139,11 +139,11 @@ if ($userid) {
     $totaltimespent = $DB->get_field_sql("SELECT SUM(timespent) AS timespent FROM {block_ls_coursetimestats}
                                 WHERE 1 = 1 AND userid = :userid", ['userid' => $userid]);
     $timespent = !empty($totaltimespent) ? (new ls)->strtime($totaltimespent) : 0;
-    $userinfo->totaltimespent = preg_replace("/<img[^>]+>/i", "", $timespent);
+    $userinfo->totaltimespent = $timespent;
     $avgtimespent = $DB->get_field_sql("SELECT AVG(timespent) AS timespent FROM {block_ls_coursetimestats}
                                 WHERE 1 = 1 AND userid = :userid", ['userid' => $userid]);
     $avgtime = !empty($avgtimespent) ? (new ls)->strtime($avgtimespent) : 0;
-    $userinfo->avgtimespent = preg_replace("/<img[^>]+>/i", "", $avgtime);
+    $userinfo->avgtimespent = $avgtime;
 
     // Badges.
     $badgeslist = $DB->get_records_sql("SELECT b.id, b.name FROM {badge} b
@@ -295,6 +295,12 @@ if ($userid) {
                                 WHERE gi.itemtype = 'course' AND gg.userid = :userid
                                 AND gi.courseid $csql", $params);
         $userinfo->avggrade = !empty($avggrade->finalgrade) ? round($avggrade->finalgrade, 2) : 0;
+        $avggradeper = $DB->get_record_sql("SELECT (SUM(gg.finalgrade)/SUM(gi.grademax))*100 AS avgper
+                                FROM {grade_grades} gg
+                                JOIN {grade_items} gi ON gi.id = gg.itemid
+                                WHERE gi.itemtype = 'course' AND gg.userid = :userid
+                                AND gi.courseid $csql GROUP BY gi.grademax", $params);
+        $userinfo->avggradepercentage = !empty($avggradeper->avgper) ? round($avggradeper->avgper, 0) : 0;
         $highestgrade = $DB->get_record_sql("SELECT MAX(gg.finalgrade) AS finalgrade
                                     FROM {grade_grades} gg
                                     JOIN {grade_items} gi ON gi.id = gg.itemid
@@ -312,10 +318,11 @@ if ($userid) {
         $userinfo->avggrade = 0;
         $userinfo->highestgrade = 0;
         $userinfo->lowestgrade = 0;
+        $userinfo->avggradepercentage = 0;
     }
 
     // Course info.
-    $courses = $DB->get_records_sql("SELECT c.id, c.fullname
+    $courses = $DB->get_records_sql("SELECT DISTINCT c.id, c.fullname
                         FROM {course} c
                         JOIN {enrol} e ON e.courseid = c.id AND e.status = 0
                         JOIN {user_enrolments} ue on ue.enrolid = e.id AND ue.status = 0

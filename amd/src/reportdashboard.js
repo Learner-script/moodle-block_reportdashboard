@@ -35,7 +35,7 @@ define(['jquery',
         'jqueryui',
         'block_learnerscript/bootstrapnotify',
     ],
-    function($, Ajax, report, reportwidget, schedule, helper, ajax, cfgs, select2, dataTable,
+    function($, Ajax, report, reportwidget, schedule, helper, ajax, select2, dataTable,
         smartfilter, flatpickr, Str) {
         return {
             init: function() {

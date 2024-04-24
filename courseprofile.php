@@ -107,13 +107,13 @@ $totaltimespent = $DB->get_record_sql("SELECT SUM(timespent) AS timespent FROM {
                     WHERE 1 = 1 AND courseid = :courseid", ['courseid' => $courseid]);
 
 $timespent = !empty($totaltimespent->timespent) ? (new ls)->strtime($totaltimespent->timespent) : 0;
-$courseinfo->totaltimespent = preg_replace("/<img[^>]+>/i", "", $timespent);
+$courseinfo->totaltimespent = $timespent;
 
 $avgtimespent = $DB->get_record_sql("SELECT AVG(timespent) AS timespent FROM {block_ls_coursetimestats}
                     WHERE 1 = 1 AND courseid = :courseid", ['courseid' => $courseid]);
 
 $avgtime = !empty($avgtimespent->timespent) ? (new ls)->strtime($avgtimespent->timespent) : 0;
-$courseinfo->avgtimespent = preg_replace("/<img[^>]+>/i", "", $avgtime);
+$courseinfo->avgtimespent = $avgtime;
 
 $groups = $DB->get_records('groups', ['courseid' => $courseid]);
 $courseinfo->groups = count($groups);
@@ -142,6 +142,12 @@ $courseinfo->progresspercent = !empty($courseinfo->studentcount) ?
 $avggrade = $DB->get_record_sql("SELECT AVG(gg.finalgrade) AS finalgrade FROM {grade_grades} gg
                             JOIN {grade_items} gi ON gi.id = gg.itemid
                             WHERE gi.itemtype = 'course' AND gi.courseid = :courseid", ['courseid' => $courseid]);
+$avggradeper = $DB->get_record_sql("SELECT (SUM(gg.finalgrade)/SUM(gi.grademax))*100 AS avgper
+                                FROM {grade_grades} gg
+                                JOIN {grade_items} gi ON gi.id = gg.itemid
+                                WHERE gi.itemtype = 'course'
+                                AND gi.courseid = :courseid", ['courseid' => $courseid]);
+$courseinfo->avggradepercentage = !empty($avggradeper->avgper) ? round($avggradeper->avgper, 0) : 0;
 $courseinfo->avggrade = !empty($avggrade->finalgrade) ? round($avggrade->finalgrade, 0) : 0;
 $highestgrade = $DB->get_field_sql("SELECT MAX(gg.finalgrade) AS finalgrade FROM {grade_grades} gg
                             JOIN {grade_items} gi ON gi.id = gg.itemid

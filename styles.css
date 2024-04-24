@@ -144,7 +144,6 @@ body.reportdashboard.path-blocks-reportdashboard .ui-widget-content {
 body.reportdashboard.path-blocks-reportdashboard .block_reportdashboard
 .report_dashboard_container table .ui-widget-content td img.icon {
     padding-left: 3px;
-    float: left;
 }
 
 body.reportdashboard.path-blocks-reportdashboard .ui-tabs .ui-tabs-panel {
@@ -5224,7 +5223,7 @@ body#page-blocks-reportdashboard-dashboard table.dataTable thead .sorting::befor
 /* new design */
 body#page-site-index #profile-page .ls-card {
     box-shadow: 0 2px 6px 2px #ddd;
-    overflow: hidden;
+    overflow: visible;
     overflow-x: auto;
 }
 

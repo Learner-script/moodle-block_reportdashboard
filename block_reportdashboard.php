@@ -102,12 +102,12 @@ class block_reportdashboard extends block_base {
         return true;
     }
     /**
-      * Parent class version of this function simply returns NULL
-      * This should be implemented by the derived class to return
-      * the content object.
-      *
-      * @return object
-      */
+     * Parent class version of this function simply returns NULL
+     * This should be implemented by the derived class to return
+     * the content object.
+     *
+     * @return object
+     */
     public function get_content() {
         global $DB, $COURSE;
         $this->page->requires->css('/blocks/learnerscript/css/fixedHeader.dataTables.min.css');
