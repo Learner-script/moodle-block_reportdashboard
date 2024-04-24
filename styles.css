@@ -144,7 +144,6 @@ body.reportdashboard.path-blocks-reportdashboard .ui-widget-content {
 body.reportdashboard.path-blocks-reportdashboard .block_reportdashboard
 .report_dashboard_container table .ui-widget-content td img.icon {
     padding-left: 3px;
-    float: left;
 }
 
 body.reportdashboard.path-blocks-reportdashboard .ui-tabs .ui-tabs-panel {
@@ -1383,6 +1382,7 @@ body.reportdashboard.path-blocks-reportdashboard .ui-dialog .ui-dialog-titlebar,
 body.path-blocks-learnerscript .ui-widget.ui-widget-content {
     border-radius: 4px 4px 0 0;
     padding: 0;
+    min-height: 400px;
 }
 
 body.path-blocks-learnerscript .ui-dialog .ui-dialog-titlebar,
@@ -3624,7 +3624,6 @@ body.reportdashboard.path-blocks-reportdashboard.path-blocks .generaltable.dataT
     display: table;
     margin: auto;
     border-left: none;
-    border-right: none;
 }
 
 body.path-blocks-reportdashboard .dataTables_wrapper .report_header_skew {
@@ -3877,6 +3876,7 @@ body.path-blocks-reportdashboard .block.block_reporttiles .card-block .card-text
 /* code for message icon pop up */
 body.reportdashboard.path-blocks-reportdashboard .ui-dialog.ui-widget.ui-widget-content {
     min-width: 220px;
+    min-height: 440px;
 }
 
 @media (min-width: 1200) {
@@ -4556,10 +4556,6 @@ body.path-blocks-reportdashboard .block_reporttiles div.tiles_information table 
     font-size: 14px;
 }
 
-body.reportdashboard.path-blocks-reportdashboard span.right_buttons .htitle {
-    max-width: 36px;
-}
-
 body.path-blocks-reportdashboard aside#block-region-side-pre .block.block_reportdashboard
 .reportdashboard_header span.dropdown ul li img,
 body.path-blocks-reportdashboard aside.span3 .block.block_reportdashboard .reportdashboard_header span.dropdown ul li img,
@@ -5227,7 +5223,7 @@ body#page-blocks-reportdashboard-dashboard table.dataTable thead .sorting::befor
 /* new design */
 body#page-site-index #profile-page .ls-card {
     box-shadow: 0 2px 6px 2px #ddd;
-    overflow: hidden;
+    overflow: visible;
     overflow-x: auto;
 }
 
@@ -5527,6 +5523,7 @@ body#page-site-index #profile-page .logs_card .logs_list .course_img {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    background-image: url([[pix:block_reportdashboard|courseprofile/userimg]]);
 }
 
 body#page-site-index #profile-page .logs_card .logs_list .progress {
@@ -5696,6 +5693,7 @@ body#page-site-index .course-profile .coursedetails .courseimg.rounded {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
+    background-image: url([[pix:block_reportdashboard|courseprofile/courseimg]]);
 }
 
 body#page-site-index .course-profile .coursedetails .topcontent,
@@ -5997,7 +5995,9 @@ body.path-blocks-reportdashboard .alert-info {
 }
 
 body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child::before,
-body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child::before {
+body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child::before,
+body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child::before,
+body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child::before {
     top: 9px;
     left: 4px;
     height: 14px;
@@ -6014,18 +6014,22 @@ body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > 
     font-family: 'Courier New', Courier, monospace;
     line-height: 14px;
     content: '+';
-    background-color: #31b131;
+    background-color: #808080;
 }
 
 body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child,
-body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child {
+body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child,
+body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child,
+body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child {
     position: relative;
     padding-left: 30px;
     cursor: pointer;
 }
 
 body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child::before,
-body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child::before {
+body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child::before,
+body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child::before
+body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child::before {
     background-color: #808080;
 }
 

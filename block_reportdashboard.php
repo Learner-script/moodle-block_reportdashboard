@@ -53,7 +53,6 @@ class block_reportdashboard extends block_base {
             , [['reportid' => $reportslist, 'reporttype' => $reportcontenttype, 'instanceid' => $instance ]]);
         $this->page->requires->js_call_amd('block_learnerscript/smartfilter', 'SelectDuration');
         $this->page->requires->js_call_amd('block_learnerscript/smartfilter', 'ReportContenttypes');
-        $this->page->requires->js('/blocks/reportdashboard/js/jquery.radios-to-slider.min.js');
     }
     /**
      * Subclasses should override this and return true if the
@@ -102,19 +101,18 @@ class block_reportdashboard extends block_base {
     public function hide_header() {
         return true;
     }
-     /**
-      * Parent class version of this function simply returns NULL
-      * This should be implemented by the derived class to return
-      * the content object.
-      *
-      * @return object
-      */
+    /**
+     * Parent class version of this function simply returns NULL
+     * This should be implemented by the derived class to return
+     * the content object.
+     *
+     * @return object
+     */
     public function get_content() {
         global $DB, $COURSE;
         $this->page->requires->css('/blocks/learnerscript/css/fixedHeader.dataTables.min.css');
         $this->page->requires->css('/blocks/learnerscript/css/responsive.dataTables.min.css');
         $this->page->requires->css('/blocks/learnerscript/css/jquery.dataTables.min.css');
-        $this->page->requires->css('/blocks/learnerscript/css/on-off-switch.css');
         $this->page->requires->css('/blocks/reportdashboard/css/radios-to-slider.min.css');
         $this->page->requires->css('/blocks/reportdashboard/css/flatpickr.min.css');
         $this->page->requires->css('/blocks/learnerscript/css/select2.min.css');

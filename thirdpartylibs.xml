@@ -1,87 +1,39 @@
 <?xml version="1.0"?>
 <libraries>
-  	<library>
-		<location>js/flatpickr.min.js</location>
-		<name>Flatpickr</name>
-		<description>flatpickr - javascript datetime picker</description>
-		<version>v4.0.7</version>
-		<license>MIT</license>
-		<repository></repository>
-		<copyrights>
-			<copyright>2017 Gregory Petrosyan</copyright>
-		</copyrights>
-		<customised/>
-  	</library>
-  	<library>
-		<location>js/jquery.radios-to-slider.min.js</location>
-		<name>radios-to-slider</name>
-		<description>jquery plugin to create a slider using a list of radio buttons</description>
-		<version>v0.3.1</version>
-		<license>MIT</license>
-		<repository></repository>
-		<copyrights>
-			<copyright>2014 Rubén Torres - rubentdlh@gmail.com</copyright>
-		</copyrights>
-		<customised/>
-  	</library>
-	<library>
-		<location>css/BootSideMenu.css</location>
-		<name>BootSideMenu</name>
-		<description>BootSideMenu CSS</description>
-		<version></version>
-		<license>MIT</license>
-		<repository></repository>
-		<copyrights>
-			<copyright></copyright>
-		</copyrights>
-		<customised/>
-  	</library>
-  	<library>
-		<location>css/flatpickr.min.css</location>
-		<name>flatpickr</name>
-		<description>Flatpickr CSS</description>
-		<version></version>
-		<license>MIT</license>
-		<repository></repository>
-		<copyrights>
-		<copyright></copyright>
-		</copyrights>
-		<customised/>
-  	</library>
-	<library>
-		<location>css/jquery.dataTables.css</location>
-		<name>jQuery datatables</name>
-		<description>jQUery datatables CSS</description>
-		<version></version>
-		<license>MIT</license>
-		<repository></repository>
-		<copyrights>
-		<copyright></copyright>
-		</copyrights>
-		<customised/>
-  	</library>
-	<library>
-		<location>css/radios-to-slider.min.css</location>
-		<name>radios-to-slider</name>
-		<description>jQUery datatables CSS</description>
-		<version></version>
-		<license>MIT</license>
-		<repository></repository>
-		<copyrights>
-		<copyright></copyright>
-		</copyrights>
-		<customised/>
-  	</library>
-	<library>
-		<location>css/select2.min.css</location>
-		<name>select2</name>
-		<description>select2 CSS</description>
-		<version></version>
-		<license>MIT</license>
-		<repository></repository>
-		<copyrights>
-		<copyright></copyright>
-		</copyrights>
-		<customised/>
-  	</library>
+      <library>
+        <location>css/flatpickr.min.css</location>
+        <name>flatpickr</name>
+        <description>Flatpickr CSS</description>
+        <version>4.6.13</version>
+        <license>MIT</license>
+        <repository>https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css</repository>
+        <copyrights>
+            <copyright>2024 cdnjs</copyright>
+        </copyrights>
+        <customised/>
+      </library>
+    <library>
+        <location>css/jquery.dataTables.css</location>
+        <name>jQuery datatables</name>
+        <description>jQUery datatables CSS</description>
+        <version>1.13.6</version>
+        <license>MIT</license>
+        <repository>https://cdn.datatables.net/1.13.6/</repository>
+        <copyrights>
+            <copyright>SpryMedia Ltd</copyright>
+        </copyrights>
+        <customised/>
+      </library>
+    <library>
+        <location>css/radios-to-slider.min.css</location>
+        <name>radios-to-slider</name>
+        <description>jquery plugin to create a slider using a list of radio buttons</description>
+        <version>0.3.1</version>
+        <license>MIT</license>
+        <repository>https://github.com/rubentd/radios-to-slider/tree/master</repository>
+        <copyrights>
+            <copyright>2014 Ruben Torres</copyright>
+        </copyrights>
+        <customised/>
+    </library>
 </libraries>

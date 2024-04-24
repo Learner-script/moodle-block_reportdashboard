@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe module reportdashboard
+ * Describe the module reportdashboard information
  *
  * @module     block_reportdashboard/reportdashboard
  * @copyright  2023 Moodle India
@@ -27,18 +27,16 @@ define(['jquery',
         'block_learnerscript/schedule',
         'block_learnerscript/helper',
         'block_learnerscript/ajax',
-        'block_learnerscript/config',
         'block_learnerscript/select2',
-        'block_learnerscript/datatables',
+        'block_learnerscript/jquery.dataTables',
         'block_learnerscript/smartfilter',
-        'block_learnerscript/radioslider',
         'block_learnerscript/flatpickr',
         'core/str',
         'jqueryui',
         'block_learnerscript/bootstrapnotify',
     ],
-    function($, Ajax, report, reportwidget, schedule, helper, ajax, cfgs, select2, dataTable,
-        smartfilter, RadiosToSlider, flatpickr, Str) {
+    function($, Ajax, report, reportwidget, schedule, helper, ajax, select2, dataTable,
+        smartfilter, flatpickr, Str) {
         return {
             init: function() {
                     $(document).ajaxStop(function() {
@@ -96,15 +94,6 @@ define(['jquery',
                     if (activityelement.length != 0) {
                         smartfilter.CourseActivities({courseid: courseid, element: activityelement});
                     }
-                });
-
-                /**
-                 * Duration buttons
-                 */
-                RadiosToSlider.init($('#segmented-button'), {
-                    size: 'medium',
-                    animation: true,
-                    reportdashboard: true
                 });
                 /**
                  * Duration Filter

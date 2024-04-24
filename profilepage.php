@@ -42,7 +42,7 @@ $PAGE->set_title(get_string('profilepage', 'block_reportdashboard'));
 require_login();
 
 $PAGE->requires->js('/blocks/learnerscript/js/highchart.js');
-$PAGE->requires->js('/blocks/learnerscript/js/highcharts/heatmap.js');
+$PAGE->requires->js('/blocks/learnerscript/js/highmaps/heatmap.js');
 $PAGE->requires->js('/blocks/learnerscript/js/highcharts/exporting.js');
 $PAGE->requires->js('/blocks/learnerscript/js/highcharts/highcharts-more.js');
 $PAGE->requires->js('/blocks/learnerscript/js/highmaps/map.js');
@@ -56,6 +56,23 @@ $PAGE->requires->css('/blocks/learnerscript/css/jquery.dataTables.min.css');
 
 $userid = ($roleshortname == 'student') ? $USER->id : $sessionuserid;
 echo $OUTPUT->header();
+
+if (!is_siteadmin()) {
+    $userrolesql = "SELECT CONCAT(ra.roleid, '_',c.contextlevel) AS rolecontext
+                FROM {role_assignments} ra
+                JOIN {context} c ON c.id = ra.contextid
+                JOIN {role} r ON r.id = ra.roleid
+                WHERE 1 = 1 AND ra.userid = :userid AND (";
+    foreach ($USER->access['ra'] as $key => $value) {
+        $userrolesql .= " c.path LIKE '".$key."' OR ";
+    }
+    $userrolesql .= " 1 = 1) GROUP BY ra.roleid, c.contextlevel, r.shortname";
+
+    $userrolescount = $DB->get_records_sql($userrolesql, ['userid' => $USER->id]);
+    $dashboardlink = count($userrolescount) > 1 ? 1 : 0;
+} else {
+    $dashboardlink = 0;
+}
 
 $SESSION->ls_contextlevel = $contextlevel;
 $SESSION->role = $roleshortname;
@@ -75,9 +92,11 @@ if ($userid) {
     }
 
     $coursesql = ' ';
+    $ucoursesql = '';
     $params = [];
     if (!empty($courseslist)) {
         list($coursesql, $params) = $DB->get_in_or_equal($courseslist, SQL_PARAMS_NAMED);
+        $ucoursesql = " AND c.id $coursesql";
     }
     if (is_siteadmin() || (new ls)->is_manager($USER->id, $SESSION->ls_contextlevel, $SESSION->role)) {
         $users = $DB->get_records('user', []);
@@ -90,7 +109,7 @@ if ($userid) {
                             JOIN {role} r ON r.id = ra.roleid AND r.shortname = 'student'
                             JOIN {context} ctx ON ctx.instanceid = c.id
                             JOIN {user} u ON u.id = ue.userid AND u.deleted = 0
-                            WHERE 1 = 1 AND c.id $coursesql",
+                            WHERE 1 = 1 $ucoursesql",
                             $params);
     }
     foreach ($users as $user) {
@@ -120,11 +139,11 @@ if ($userid) {
     $totaltimespent = $DB->get_field_sql("SELECT SUM(timespent) AS timespent FROM {block_ls_coursetimestats}
                                 WHERE 1 = 1 AND userid = :userid", ['userid' => $userid]);
     $timespent = !empty($totaltimespent) ? (new ls)->strtime($totaltimespent) : 0;
-    $userinfo->totaltimespent = preg_replace("/<img[^>]+>/i", "", $timespent);
+    $userinfo->totaltimespent = $timespent;
     $avgtimespent = $DB->get_field_sql("SELECT AVG(timespent) AS timespent FROM {block_ls_coursetimestats}
                                 WHERE 1 = 1 AND userid = :userid", ['userid' => $userid]);
     $avgtime = !empty($avgtimespent) ? (new ls)->strtime($avgtimespent) : 0;
-    $userinfo->avgtimespent = preg_replace("/<img[^>]+>/i", "", $avgtime);
+    $userinfo->avgtimespent = $avgtime;
 
     // Badges.
     $badgeslist = $DB->get_records_sql("SELECT b.id, b.name FROM {badge} b
@@ -172,7 +191,7 @@ if ($userid) {
     $userinfo->completedcoursescount = $completedcoursescount;
     $userinfo->inprogresscoursescount = !empty($enrolcourses) ? count($enrolcourses) - $completedcoursescount : 0;
     $userinfo->progresspercent = !empty($userinfo->enrolledcoursescoursescount) ?
-                round($userinfo->completedcoursescount / $userinfo->enrolledcoursescoursescount) * 100 : 0;
+                round(($userinfo->completedcoursescount / $userinfo->enrolledcoursescoursescount) * 100) : 0;
 
     $courseslistarray = [];
     $courseslist = '';
@@ -229,7 +248,7 @@ if ($userid) {
         }
         $userinfo->quizcompleted = $a;
         $userinfo->quizinprogress = $b;
-        $userinfo->quizprogress = !empty($userinfo->quizzescount) ? round($a / $userinfo->quizzescount) * 100 : 0;
+        $userinfo->quizprogress = !empty($userinfo->quizzescount) ? round(($a / $userinfo->quizzescount) * 100) : 0;
 
         // Scorm.
         $scormcountsql = $DB->get_records_sql("SELECT cm.id FROM {course_modules} cm
@@ -250,7 +269,7 @@ if ($userid) {
         }
         $userinfo->scormcompleted = $m;
         $userinfo->scorminprogress = $n;
-        $userinfo->scormprogress = !empty($userinfo->scormcount) ? round($m / $userinfo->scormcount) * 100 : 0;
+        $userinfo->scormprogress = !empty($userinfo->scormcount) ? round(($m / $userinfo->scormcount) * 100) : 0;
 
     } else {
         $userinfo->assignmentscount = 0;
@@ -276,6 +295,12 @@ if ($userid) {
                                 WHERE gi.itemtype = 'course' AND gg.userid = :userid
                                 AND gi.courseid $csql", $params);
         $userinfo->avggrade = !empty($avggrade->finalgrade) ? round($avggrade->finalgrade, 2) : 0;
+        $avggradeper = $DB->get_record_sql("SELECT (SUM(gg.finalgrade)/SUM(gi.grademax))*100 AS avgper
+                                FROM {grade_grades} gg
+                                JOIN {grade_items} gi ON gi.id = gg.itemid
+                                WHERE gi.itemtype = 'course' AND gg.userid = :userid
+                                AND gi.courseid $csql GROUP BY gi.grademax", $params);
+        $userinfo->avggradepercentage = !empty($avggradeper->avgper) ? round($avggradeper->avgper, 0) : 0;
         $highestgrade = $DB->get_record_sql("SELECT MAX(gg.finalgrade) AS finalgrade
                                     FROM {grade_grades} gg
                                     JOIN {grade_items} gi ON gi.id = gg.itemid
@@ -293,10 +318,11 @@ if ($userid) {
         $userinfo->avggrade = 0;
         $userinfo->highestgrade = 0;
         $userinfo->lowestgrade = 0;
+        $userinfo->avggradepercentage = 0;
     }
 
     // Course info.
-    $courses = $DB->get_records_sql("SELECT c.id, c.fullname
+    $courses = $DB->get_records_sql("SELECT DISTINCT c.id, c.fullname
                         FROM {course} c
                         JOIN {enrol} e ON e.courseid = c.id AND e.status = 0
                         JOIN {user_enrolments} ue on ue.enrolid = e.id AND ue.status = 0
@@ -368,19 +394,21 @@ if ($userid) {
     // No login courses.
     $inactivedate = strtotime("-10 days");
 
-    $accesscourses = $DB->get_records_sql("SELECT ul.courseid, c.fullname AS course,
-                            ul.timeaccess AS timeaccess
+    $accesscourses = $DB->get_records_sql("SELECT c.id, c.fullname AS course,
+                            MAX(ul.timeaccess) AS timeaccess
                             FROM {user_lastaccess} ul
                             JOIN {course} c ON c.id = ul.courseid
                             WHERE ul.userid = :userid AND c.visible = :visible
-                            GROUP BY ul.courseid", ['userid' => $userid,
+                            GROUP BY c.id", ['userid' => $userid,
                             'visible' => 1, ]);
     foreach ($accesscourses as $c) {
-        $courseacesslist[$c->courseid] = $c->courseid;
+        $courseacesslist[] = $c->id;
     }
     $accsql = '';
+    $coureaccesssql = '';
     if (!empty($accesscourses)) {
         list($accsql, $params) = $DB->get_in_or_equal($courseacesslist, SQL_PARAMS_NAMED, 'param', false, false);
+        $coureaccesssql .= " AND c.id $accsql";
     }
     $params['accessuserid'] = $userid;
     $params['accessvisible'] = 1;
@@ -388,12 +416,12 @@ if ($userid) {
     $params['userid'] = $userid;
     $params['accesstime'] = $inactivedate;
     $recentaccesscourses = $DB->get_records_sql("SELECT a.* FROM (
-                        SELECT ul.courseid, c.fullname AS course,
-                        ul.timeaccess AS timeaccess
+                        SELECT c.id AS courseid, c.fullname AS course,
+                        MAX(ul.timeaccess) AS timeaccess
                         FROM {user_lastaccess} ul
                         JOIN {course} c ON c.id = ul.courseid
                         WHERE ul.userid = :accessuserid AND c.visible = :accessvisible
-                        AND ul.timeaccess < :timeaccess GROUP BY ul.courseid
+                        AND ul.timeaccess < :timeaccess GROUP BY c.id
                         UNION
                         SELECT c.id AS courseid, c.fullname AS course,
                         ue.timecreated AS timeaccess
@@ -405,9 +433,9 @@ if ($userid) {
                         JOIN {context} ctx ON ctx.instanceid = c.id
                         JOIN {user} u ON u.id = ra.userid AND u.confirmed = 1 AND u.deleted = 0
                         WHERE ra.contextid = ctx.id AND ctx.contextlevel = 50 AND c.visible = 1
-                        AND u.id = :userid AND ue.timecreated < :accesstime AND c.id $accsql) AS a
+                        AND u.id = :userid AND ue.timecreated < :accesstime $coureaccesssql) AS a
                         WHERE 1 = 1 ORDER BY a.timeaccess ASC
-                        LIMIT 0, 5", $params);
+                        LIMIT 5", $params);
     $recentaccesscourseslist = [];
     if (!empty($recentaccesscourses)) {
         foreach ($recentaccesscourses as $r => $c) {
@@ -461,10 +489,11 @@ if ($userid) {
                                                     'contextlevel' => $contextlevel,
                                                 'issiteadmin' => $siteadmin,
                                                 'userstatus' => $userstatus,
-                                                'studentrole' => $studentrole, ]);
+                                                'studentrole' => $studentrole,
+                                                'dashboardlink' => $dashboardlink, ]);
     $PAGE->requires->js_call_amd('block_learnerscript/report', 'generate_plotgraph',
                                                 [$lmsaccess]);
 } else {
-    throw new \moodle_exception('useridmissing', 'block_learnerscript');
+    throw new \moodle_exception('useridmissing', 'block_reportdashboard');
 }
 echo $OUTPUT->footer();

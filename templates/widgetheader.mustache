@@ -17,7 +17,7 @@
 {{!
     @template block_reportdashboard/widgetheader
 
-    TODO describe template widgetheader
+    Review the information of the custom reports.
 
     Example context (json):
     {
@@ -25,7 +25,9 @@
 }}
 {{# reportnameheading}}<h4 class='reportdashboard_report_heading' title="{{reporttitle}}">{{reportnameheading}}
 {{# helpimgsql}}
-<img src='{{helpimg}}' id='helpimg' title='help with {{reportnameheading}}' alt='{{#str}} help, block_reportdashboard {{/str}}' onclick = '(function(e){ require("block_learnerscript/report").block_statistics_help({{reportid}}) })(event)'>
+<a href="#" onclick='(function(e){ require("block_learnerscript/report").block_statistics_help({{reportid}}) })(event)'>
+    {{#pix}} help, core, Help text{{/pix}}
+</a>
 {{/ helpimgsql}}
 </h4>
 {{/reportnameheading}}

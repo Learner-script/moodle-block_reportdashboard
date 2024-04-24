@@ -17,7 +17,7 @@
 {{!
     @template block_reportdashboard/profilepage/progressinfo
 
-    TODO describe template progressinfo
+    Review the activities progress information on profile page.
 
     Example context (json):
     {
@@ -58,8 +58,8 @@
 	<div class="progressinfo_card px-1">
 		<div class="grades_card card p-2 ls-card">
 			<div class="progressbar_section">
-				<div class="half_progressbar" style="--percentage:{{avggrade}}">
-					<div class="half_progressbar_percentageblock">{{avggrade}}/100
+				<div class="half_progressbar" style="--percentage:{{avggradepercentage}}">
+					<div class="half_progressbar_percentageblock">{{avggradepercentage}}/100
                 	</div>
                 </div>
 				<h6 class="text-center">{{#str}} grades, block_reportdashboard {{/str}}</h5>

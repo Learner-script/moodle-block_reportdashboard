@@ -92,7 +92,6 @@ class widgetheader implements renderable, templatable {
     public function export_for_template(renderer_base $output) {
         global $OUTPUT, $USER, $PAGE, $CFG, $DB, $SESSION;
         $data = [];
-        $helpimg = $CFG->wwwroot."/pix/help.png";
         if (!empty($this->methodname)) {
             foreach ($this->methodname as $method) {
                 $data['action'][] = ["method" => $method,
@@ -137,7 +136,6 @@ class widgetheader implements renderable, templatable {
         $data['startduration'] = $this->startduration;
         if ($report->type == 'sql') {
             $data['helpimgsql'] = "1";
-            $data['helpimg'] = $helpimg;
         }
         return $data;
     }

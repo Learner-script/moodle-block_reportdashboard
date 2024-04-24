@@ -17,7 +17,7 @@
 {{!
     @template block_reportdashboard/courseprofile/coursedetails
 
-    TODO describe template coursedetails
+    Course information review.
 
     Example context (json):
     {
@@ -27,7 +27,7 @@
 <div class="card ls-card coursedetails">
 	<div class="courseinfo">
 		<div class="p-2">
-			<div class="courseimg rounded" style="background-image: url('{{config.wwwroot}}/blocks/reportdashboard/pix/courseprofile/courseimg.png');">
+			<div class="courseimg rounded">
 			</div>
 			<div class="px-1 py-2">
 				<p class="course_heading m-0 text-muted">{{#str}} coursename, block_reportdashboard {{/str}}</p>
@@ -59,11 +59,11 @@
 		<ul class="bottomcontent m-0 py-2 px-0">
 			<li class="d-flex justify-content-between px-3 py-1">
 				<div class="label text-muted">{{#str}} totaltime, block_reportdashboard {{/str}}</div>
-				<div class="data">{{totaltimespent}}</div>
+				<div class="data">{{{totaltimespent}}}</div>
 			</li>
 			<li class="d-flex justify-content-between px-3 py-1">
 				<div class="label text-muted">{{#str}} avgtimespent, block_reportdashboard {{/str}}</div>
-				<div class="data">{{avgtimespent}}</div>
+				<div class="data">{{{avgtimespent}}}</div>
 			</li>
 			<li class="d-flex justify-content-between px-3 py-1">
 				<div class="label text-muted">{{#str}} groups, block_reportdashboard {{/str}}</div>
