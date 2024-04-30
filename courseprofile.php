@@ -16,7 +16,7 @@
 /**
  * Form for editing LearnerScript dashboard block instances.
  * @package   block_reportdashboard
- * @copyright 2023 Moodle India
+ * @copyright 2023 Moodle India Information Solutions Private Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -41,11 +41,11 @@ $PAGE->set_context($context);
 $PAGE->set_url('/blocks/reportdashboard/courseprofile.php');
 $PAGE->set_title(get_string('courseprofile', 'block_learnerscript'));
 
-$PAGE->requires->css('/blocks/learnerscript/css/fixedHeader.dataTables.min.css');
-$PAGE->requires->css('/blocks/learnerscript/css/responsive.dataTables.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/datatables/fixedHeader.dataTables.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/datatables/responsive.dataTables.min.css');
 $PAGE->requires->jquery_plugin('ui-css');
-$PAGE->requires->css('/blocks/learnerscript/css/select2.min.css');
-$PAGE->requires->css('/blocks/learnerscript/css/jquery.dataTables.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/select2/select2.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/datatables/jquery.dataTables.min.css');
 
 
 echo $OUTPUT->header();

@@ -18,7 +18,7 @@
  * @module     block_reportdashboard/coursels
  * @class      report
  * @package
- * @copyright  2023 Moodle India
+ * @copyright  2023 Moodle India Information Solutions Private Limited
  * @since      3.3
  */
 define(['jquery', 'block_learnerscript/ajax', 'block_learnerscript/report'],

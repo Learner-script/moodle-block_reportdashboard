@@ -18,7 +18,7 @@
  * Strings for component 'block_reportdashboard', language 'en', branch 'MOODLE_20_STABLE'
  *
  * @package   block_reportdashboard
- * @copyright 2023 Moodle India
+ * @copyright 2023 Moodle India Information Solutions Private Limited
  * @license   http://www.gnu.org/copyleft/gpl.reportdashboard GNU GPL v3 or later
  */
 $string['active'] = 'Active';

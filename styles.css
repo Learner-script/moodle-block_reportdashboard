@@ -2687,7 +2687,6 @@ body.path-blocks-reportdashboard .block_reportdashboard .generaltable > tbody > 
 }
 
 body.reportdashboard.path-blocks div.dataTables_paginate .paginate_button + .ellipsis {
-    float: left;
     margin-left: 5px;
     padding: 0;
     cursor: pointer;

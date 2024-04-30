@@ -13,19 +13,7 @@
         <customised/>
       </library>
     <library>
-        <location>css/jquery.dataTables.css</location>
-        <name>jQuery datatables</name>
-        <description>jQUery datatables CSS</description>
-        <version>1.13.6</version>
-        <license>MIT</license>
-        <repository>https://cdn.datatables.net/1.13.6/</repository>
-        <copyrights>
-            <copyright>SpryMedia Ltd</copyright>
-        </copyrights>
-        <customised/>
-      </library>
-    <library>
-        <location>css/radios-to-slider.min.css</location>
+        <location>css/radioslider/radios-to-slider.min.css</location>
         <name>radios-to-slider</name>
         <description>jquery plugin to create a slider using a list of radio buttons</description>
         <version>0.3.1</version>

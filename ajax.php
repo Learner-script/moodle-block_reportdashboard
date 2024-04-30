@@ -16,7 +16,7 @@
 /**
  * LearnerScript report dashboard Services.
  * @package  block_reportdashboard
- * @copyright 2023 Moodle India
+ * @copyright 2023 Moodle India Information Solutions Private Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define('AJAX_SCRIPT', true);
