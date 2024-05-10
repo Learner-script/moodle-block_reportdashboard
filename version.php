@@ -27,5 +27,5 @@ $plugin->version = 2021051712;        // The current plugin version (Date: YYYYM
 $plugin->component = 'block_reportdashboard'; // Full name of the plugin (used for diagnostics).
 $plugin->release = 'v3.0';
 $plugin->requires = '2023041800'; // Requires this Moodle version.
-$plugin->maturity   = MATURITY_STABLE;
+$plugin->maturity   = MATURITY_BETA;
 $plugin->dependencies = ['block_learnerscript' => ANY_VERSION];

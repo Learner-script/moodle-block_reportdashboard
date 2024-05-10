@@ -1,3 +1,9 @@
+Please note that this plugin is currently under active development. While it is functional, it may still contain bugs or incomplete features. We are continuously working on improving and enhancing its functionality.
+
+Important: Do not install this plugin on production systems or critical environments. It is intended for testing and evaluation purposes only.
+
+If you encounter any issues or have suggestions for improvement, please feel free to report them. Your feedback is highly appreciated and will help us make this plugin even better.
+
 # ReportDahboard [Version 3]
 
 	Maintained by: Naveen(naveen.mandagiri@moodle.com), Jahnavi(jahnavi.nanduri@moodle.com),
