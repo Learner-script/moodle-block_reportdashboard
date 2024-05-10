@@ -16,7 +16,7 @@
 /**
  * Form for editing LearnerScript dashboard block instances.
  * @package   block_reportdashboard
- * @copyright 2023 Moodle India
+ * @copyright 2023 Moodle India Information Solutions Private Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(dirname(__FILE__) . '/../../config.php');
@@ -116,7 +116,7 @@ if (!$dashboardurl) {
 $PAGE->requires->js(new moodle_url('/blocks/learnerscript/js/highchart.js'));
 $PAGE->requires->jquery();
 $PAGE->requires->js_call_amd('block_reportdashboard/reportdashboard', 'init');
-$PAGE->requires->css('/blocks/reportdashboard/css/radios-to-slider.min.css');
+$PAGE->requires->css('/blocks/reportdashboard/css/radioslider/radios-to-slider.min.css');
 $PAGE->requires->css('/blocks/reportdashboard/css/flatpickr.min.css');
 
 $output = $PAGE->get_renderer('block_reportdashboard');

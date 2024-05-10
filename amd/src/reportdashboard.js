@@ -17,7 +17,7 @@
  * Describe the module reportdashboard information
  *
  * @module     block_reportdashboard/reportdashboard
- * @copyright  2023 Moodle India
+ * @copyright  2023 Moodle India Information Solutions Private Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define(['jquery',
@@ -27,13 +27,13 @@ define(['jquery',
         'block_learnerscript/schedule',
         'block_learnerscript/helper',
         'block_learnerscript/ajax',
-        'block_learnerscript/select2',
-        'block_learnerscript/jquery.dataTables',
+        'block_learnerscript/select2/select2',
+        'block_learnerscript/datatables/jquery.dataTables',
         'block_learnerscript/smartfilter',
         'block_learnerscript/flatpickr',
         'core/str',
         'jqueryui',
-        'block_learnerscript/bootstrapnotify',
+        'block_learnerscript/bootstrapnotify/bootstrapnotify',
     ],
     function($, Ajax, report, reportwidget, schedule, helper, ajax, select2, dataTable,
         smartfilter, flatpickr, Str) {

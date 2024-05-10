@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * LearnerScript Dashboard block plugin installation.
+ * Reportdashboard external API
  *
  * @package    block_reportdashboard
- * @copyright  2023 Moodle India
+ * @copyright  2023 Moodle India Information Solutions Private Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(__DIR__ . '/../../config.php');
@@ -28,8 +28,7 @@ use block_learnerscript\local\reportbase;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
-global $CFG, $DB, $USER, $OUTPUT, $COURSE;
-require_login();
+
 /** block_reportdashboard External */
 class block_reportdashboard_external extends external_api {
     /**
@@ -67,13 +66,12 @@ class block_reportdashboard_external extends external_api {
                                 $maximumselectionlength, $setminimuminputlength, $courses) {
         global $DB, $SESSION, $USER;
         $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('block/learnerscript:managereports', $context);
         // We always must pass webservice params through validate_parameters.
         $params = self::validate_parameters(self::userlist_parameters(), ['term' => $term, '_type' => $type, 'query' => $query,
         'action' => $action, 'userlist' => $userlist, 'reportid' => $reportid, 'maximumselectionlength' => $maximumselectionlength,
         'setminimuminputlength' => $setminimuminputlength, 'courses' => $courses, ]);
-
-        // We always must call validate_context in a webservice.
-        self::validate_context($context);
 
         $params['firstname'] = '%' . $term . '%';
         $params['lastname'] = '%' . $term . '%';
@@ -169,11 +167,11 @@ class block_reportdashboard_external extends external_api {
     public static function reportlist($search) {
         global $DB, $USER;
         $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('block/learnerscript:viewreports', $context);
         // We always must pass webservice params through validate_parameters.
         $params = self::validate_parameters(self::reportlist_parameters(), ['search' => $search]);
 
-        // We always must call validate_context in a webservice.
-        self::validate_context($context);
         $search = 'admin';
         $sql = "SELECT id, name FROM {block_learnerscript} WHERE visible = 1 AND name LIKE :search";
         $params = ['search' => "'%" . $search ."%'"];
@@ -226,14 +224,12 @@ class block_reportdashboard_external extends external_api {
      */
     public static function sendemails($reportid, $instance, $pageurl) {
         global $CFG;
-        self::set_context(context_system::instance());
-        $context = contextsystem::instance();
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('block/learnerscript:managereports', $context);
         // We always must pass webservice params through validate_parameters.
         self::validate_parameters(self::sendemails_parameters(), ['reportid' => $reportid, 'instance' => $instance,
         'pageurl' => $pageurl, ]);
-
-        // We always must call validate_context in a webservice.
-        self::validate_context($context);
 
         $pageurl = $pageurl ? $pageurl : $CFG->wwwroot . '/blocks/reportdashboard/dashboard.php';
         require_once($CFG->dirroot . '/blocks/reportdashboard/email_form.php');

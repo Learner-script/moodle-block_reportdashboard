@@ -18,7 +18,7 @@
  * Privacy Subsystem implementation for block_reportdashboard.
  *
  * @package    block_reportdashboard
- * @copyright  2023 Moodle India
+ * @copyright  2023 Moodle India Information Solutions Private Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace block_reportdashboard\privacy;

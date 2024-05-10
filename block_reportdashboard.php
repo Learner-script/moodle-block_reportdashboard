@@ -17,7 +17,7 @@
 /**
  * Form for editing Cobalt report dashboard block instances.
  * @package   block_reportdashboard
- * @copyright 2023 Moodle India
+ * @copyright 2023 Moodle India Information Solutions Private Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die;
@@ -110,12 +110,12 @@ class block_reportdashboard extends block_base {
      */
     public function get_content() {
         global $DB, $COURSE;
-        $this->page->requires->css('/blocks/learnerscript/css/fixedHeader.dataTables.min.css');
-        $this->page->requires->css('/blocks/learnerscript/css/responsive.dataTables.min.css');
-        $this->page->requires->css('/blocks/learnerscript/css/jquery.dataTables.min.css');
-        $this->page->requires->css('/blocks/reportdashboard/css/radios-to-slider.min.css');
+        $this->page->requires->css('/blocks/learnerscript/css/datatables/fixedHeader.dataTables.min.css');
+        $this->page->requires->css('/blocks/learnerscript/css/datatables/responsive.dataTables.min.css');
+        $this->page->requires->css('/blocks/learnerscript/css/datatables/jquery.dataTables.min.css');
+        $this->page->requires->css('/blocks/reportdashboard/css/radioslider/radios-to-slider.min.css');
         $this->page->requires->css('/blocks/reportdashboard/css/flatpickr.min.css');
-        $this->page->requires->css('/blocks/learnerscript/css/select2.min.css');
+        $this->page->requires->css('/blocks/learnerscript/css/select2/select2.min.css');
 
         $delete = optional_param('delete', 0, PARAM_BOOL);
         $deledbui = optional_param('bui_deleteid', 0, PARAM_INT);

@@ -16,7 +16,7 @@
 /**
  * Form for editing LearnerScript dashboard block instances.
  * @package   block_reportdashboard
- * @copyright 2023 Moodle India
+ * @copyright 2023 Moodle India Information Solutions Private Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -46,13 +46,13 @@ $PAGE->requires->js('/blocks/learnerscript/js/highmaps/heatmap.js');
 $PAGE->requires->js('/blocks/learnerscript/js/highcharts/exporting.js');
 $PAGE->requires->js('/blocks/learnerscript/js/highcharts/highcharts-more.js');
 $PAGE->requires->js('/blocks/learnerscript/js/highmaps/map.js');
-$PAGE->requires->css('/blocks/reportdashboard/css/radios-to-slider.min.css');
+$PAGE->requires->css('/blocks/reportdashboard/css/radioslider/radios-to-slider.min.css');
 $PAGE->requires->css('/blocks/reportdashboard/css/flatpickr.min.css');
-$PAGE->requires->css('/blocks/learnerscript/css/fixedHeader.dataTables.min.css');
-$PAGE->requires->css('/blocks/learnerscript/css/responsive.dataTables.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/datatables/fixedHeader.dataTables.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/datatables/responsive.dataTables.min.css');
 $PAGE->requires->jquery_plugin('ui-css');
-$PAGE->requires->css('/blocks/learnerscript/css/select2.min.css');
-$PAGE->requires->css('/blocks/learnerscript/css/jquery.dataTables.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/select2/select2.min.css');
+$PAGE->requires->css('/blocks/learnerscript/css/datatables/jquery.dataTables.min.css');
 
 $userid = ($roleshortname == 'student') ? $USER->id : $sessionuserid;
 echo $OUTPUT->header();
