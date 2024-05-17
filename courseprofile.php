@@ -49,7 +49,6 @@ $PAGE->requires->css('/blocks/learnerscript/css/datatables/jquery.dataTables.min
 
 
 echo $OUTPUT->header();
-$PAGE->requires->js(new moodle_url('/blocks/learnerscript/js/highchart.js'));
 $SESSION->ls_contextlevel = $contextlevel;
 $SESSION->role = $roleshortname;
 $studentrole = ($roleshortname == 'student') ? $roleshortname : '';
@@ -99,6 +98,8 @@ $courseinfo->editingteachercount = count($editingteachercount);
 
 $courseinfo->otherenrolcount = $courseinfo->enrollmentscount -
                     ($courseinfo->studentcount + $courseinfo->editingteachercount);
+$courseinfo->otherenrolcount = ($courseinfo->otherenrolcount > 0) ? $courseinfo->otherenrolcount : 0;
+
 $activitiescount = $DB->count_records('course_modules', ['course' => $courseid, 'visible' => 1,
                 'deletioninprogress' => 0, ]);
 $courseinfo->activitiescount = $activitiescount;
@@ -266,13 +267,15 @@ $reportinstance = $activityprogressreport->id;
 $reporttype = key($reportcontenttypes);
 
 // Top learners.
-$toplearnersreport = $DB->get_record('block_learnerscript', ['type' => 'usercourses', 'name' => 'Top Learners']);
+$toplearnersreport = $DB->get_record('block_learnerscript', ['type' => 'usercourses', 'name' => 'Top Learners'],
+                            'id', IGNORE_MULTIPLE);
 $toplearnerreportid = $toplearnersreport->id;
 $toplearnerreportinstance = $toplearnersreport->id;
 $toplearnerreporttype = 'table';
 
 // Activities.
-$activitiesreport = $DB->get_record('block_learnerscript', ['type' => 'courseactivities']);
+$activitiesreport = $DB->get_record('block_learnerscript', ['type' => 'courseactivities'],
+                            'id', IGNORE_MULTIPLE);
 $activitiesreportid = $activitiesreport->id;
 $activitiesreportinstance = $activitiesreport->id;
 $activitiesreporttype = 'table';

@@ -41,11 +41,6 @@ $PAGE->set_title(get_string('profilepage', 'block_reportdashboard'));
 
 require_login();
 
-$PAGE->requires->js('/blocks/learnerscript/js/highchart.js');
-$PAGE->requires->js('/blocks/learnerscript/js/highmaps/heatmap.js');
-$PAGE->requires->js('/blocks/learnerscript/js/highcharts/exporting.js');
-$PAGE->requires->js('/blocks/learnerscript/js/highcharts/highcharts-more.js');
-$PAGE->requires->js('/blocks/learnerscript/js/highmaps/map.js');
 $PAGE->requires->css('/blocks/reportdashboard/css/radioslider/radios-to-slider.min.css');
 $PAGE->requires->css('/blocks/reportdashboard/css/flatpickr.min.css');
 $PAGE->requires->css('/blocks/learnerscript/css/datatables/fixedHeader.dataTables.min.css');

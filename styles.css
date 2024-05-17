@@ -5965,7 +5965,7 @@ body.reportdashboard .block_reportdashboard .dataTable td {
 
 body#page-blocks-reportdashboard-dashboard .ui-dialog .ui-dialog-content .dataTables_wrapper,
 body#page-blocks-learnerscript-viewreport .ui-dialog .ui-dialog-content .dataTables_wrapper {
-    max-height: 250px;
+    max-height: 500px;
     overflow-y: auto;
     width: 100%;
 }

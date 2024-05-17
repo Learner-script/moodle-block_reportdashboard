@@ -46,7 +46,6 @@ class block_reportdashboard extends block_base {
             !empty($this->config->reportcontenttype)) ? $this->config->reportcontenttype : '';
         $reportslist = isset($this->config->reportlist) ? $this->config->reportlist : '';
         $instance = isset($this->instance->id) ? $this->instance->id : '';
-        $this->page->requires->js(new moodle_url('/blocks/learnerscript/js/highchart.js'));
         $this->page->requires->jquery();
         $this->page->requires->jquery_plugin('ui-css');
         $this->page->requires->js_call_amd('block_learnerscript/reportwidget', 'CreateDashboardwidget'

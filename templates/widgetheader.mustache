@@ -25,9 +25,9 @@
 }}
 {{# reportnameheading}}<h4 class='reportdashboard_report_heading' title="{{reporttitle}}">{{reportnameheading}}
 {{# helpimgsql}}
-<a href="#" onclick='(function(e){ require("block_learnerscript/report").block_statistics_help({{reportid}}) })(event)'>
-    {{#pix}} help, core, Help text{{/pix}}
-</a>
+    <a href="#" onclick='(function(e){ require("block_learnerscript/report").block_statistics_help({{reportid}}) })(event)'>
+        {{#pix}} help, core, {{#str}} helptext, block_learnerscript {{/str}} {{/pix}}
+    </a>
 {{/ helpimgsql}}
 </h4>
 {{/reportnameheading}}

@@ -21,7 +21,9 @@
  * @copyright  2023 Moodle India Information Solutions Private Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once(__DIR__ . '/../../config.php');
+
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/blocks/learnerscript/lib.php');
 use block_learnerscript\local\ls;
 use block_learnerscript\local\reportbase;
@@ -67,7 +69,7 @@ class block_reportdashboard_external extends external_api {
         global $DB, $SESSION, $USER;
         $context = context_system::instance();
         self::validate_context($context);
-        require_capability('block/learnerscript:managereports', $context);
+        require_capability('block/learnerscript:reportsaccess', $context);
         // We always must pass webservice params through validate_parameters.
         $params = self::validate_parameters(self::userlist_parameters(), ['term' => $term, '_type' => $type, 'query' => $query,
         'action' => $action, 'userlist' => $userlist, 'reportid' => $reportid, 'maximumselectionlength' => $maximumselectionlength,
@@ -168,7 +170,7 @@ class block_reportdashboard_external extends external_api {
         global $DB, $USER;
         $context = context_system::instance();
         self::validate_context($context);
-        require_capability('block/learnerscript:viewreports', $context);
+        require_capability('block/learnerscript:reportsaccess', $context);
         // We always must pass webservice params through validate_parameters.
         $params = self::validate_parameters(self::reportlist_parameters(), ['search' => $search]);
 
@@ -226,7 +228,7 @@ class block_reportdashboard_external extends external_api {
         global $CFG;
         $context = context_system::instance();
         self::validate_context($context);
-        require_capability('block/learnerscript:managereports', $context);
+        require_capability('block/learnerscript:reportsaccess', $context);
         // We always must pass webservice params through validate_parameters.
         self::validate_parameters(self::sendemails_parameters(), ['reportid' => $reportid, 'instance' => $instance,
         'pageurl' => $pageurl, ]);

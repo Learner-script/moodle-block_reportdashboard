@@ -113,7 +113,6 @@ if (!$dashboardurl) {
     $PAGE->navbar->add($dashboardurl);
 }
 
-$PAGE->requires->js(new moodle_url('/blocks/learnerscript/js/highchart.js'));
 $PAGE->requires->jquery();
 $PAGE->requires->js_call_amd('block_reportdashboard/reportdashboard', 'init');
 $PAGE->requires->css('/blocks/reportdashboard/css/radioslider/radios-to-slider.min.css');
@@ -155,12 +154,6 @@ if (!empty($data) && $dataaction == 'sendemails') {
     }
 }
 echo $OUTPUT->header();
-$PAGE->requires->js(new moodle_url('/blocks/learnerscript/js/highchart.js'));
-$themename = $PAGE->theme->name;
-$themelist = ['academi'];
-if (in_array($themename, $themelist)) {
-    echo '<h3>'.get_string('learnerscript', 'block_reportdashboard').'</h3>';
-}
 
 if (!empty($role) || is_siteadmin()) {
     $configuredinstances = $DB->count_records('block_instances', [
@@ -231,10 +224,8 @@ if (!empty($role) || is_siteadmin()) {
         echo html_writer::div('', "reportslist", ['style' => "display:none;"]);
         echo html_writer::div('', "statistics_reportslist", ['style' => "display:none;"]);
     } else {
-        $action = html_writer::tag('a', get_string('addreport', 'block_learnerscript'),
-                                            ['href' => $CFG->wwwroot . '/blocks/learnerscript/managereport.php']);
-        echo html_writer::div(get_string('reportsnotavailable', 'block_reportdashboard', $action), "alert alert-info",
-                ['style' => "display:none;"]);
+        echo html_writer::div(get_string('reportsnotavailable', 'block_reportdashboard'), "alert alert-info",
+                []);
     }
     if ($configuredinstances > 0) {
         echo html_writer::tag('input', '', ['type' => 'hidden', 'name' => 'filter_courses',
@@ -242,7 +233,7 @@ if (!empty($role) || is_siteadmin()) {
         echo html_writer::div('', "loader");
     }
 } else {
-    throw new moodle_exception("notasssignedrole", 'block_learnerscript');
+    throw new moodle_exception('notasssignedrole', 'block_learnerscript');
 }
 echo html_writer::end_tag('div');
 echo $OUTPUT->footer();
