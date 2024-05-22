@@ -48,18 +48,16 @@ class block_reportdashboard_emailform extends moodleform {
                         'data-placeholder' => 'Select Users', 'data-minimumInputLength' => 2, ]);
         $mform->getElement('email')->setMultiple(true);
         $mform->addRule('email', get_string('user_err', 'block_reportdashboard'), 'required', null, 'client');
-        $mform->setType('email', PARAM_RAW);
 
         $exportoptions = (new block_learnerscript\local\ls)->cr_get_export_plugins();
         $mform->addElement('select', 'format', get_string('format', 'block_reportdashboard'), $exportoptions,
                         ['class' => "export_row", "data-class" => "requireclass", 'data-element' => 'format']);
-        $mform->setType('format', PARAM_RAW);
 
         $mform->addElement('hidden', 'reportid', $reportid);
         $mform->setType('reportid', PARAM_INT);
 
         $mform->addElement('hidden', 'action', 'sendemails');
-        $mform->setType('action', PARAM_RAW);
+        $mform->setType('action', PARAM_TEXT);
 
         $btnstring = get_string('send', 'block_reportdashboard');
 

@@ -21,17 +21,17 @@
  */
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/accesslib.php');
-require_once($CFG->dirroot . '/blocks/learnerscript/classes/observer.php');
+require_once($CFG->dirroot . '/blocks/learnerscript/classes/local/observer.php');
 
 use block_learnerscript\local\ls as ls;
 global $CFG, $PAGE, $OUTPUT, $THEME, $ADMIN, $DB;
 $adminediting = optional_param('adminedit', -1, PARAM_BOOL);
-$dashboardurl = optional_param('dashboardurl', '', PARAM_RAW_TRIMMED);
+$dashboardurl = optional_param('dashboardurl', '', PARAM_TEXT);
 $deletereport = optional_param('deletereport', 0, PARAM_INT);
 $blockinstanceid = optional_param('blockinstanceid', 0, PARAM_INT);
 $reportid = optional_param('reportid', 0, PARAM_INT);
-$role = optional_param('role', '', PARAM_RAW);
-$sesskey = optional_param('sesskey', '', PARAM_RAW);
+$role = optional_param('role', '', PARAM_TEXT);
+$sesskey = optional_param('sesskey', '', PARAM_TEXT);
 $contextlevel = optional_param('contextlevel', 10, PARAM_INT);
 
 require_login();

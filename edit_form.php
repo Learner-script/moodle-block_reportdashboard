@@ -63,12 +63,12 @@ class block_reportdashboard_edit_form extends block_edit_form {
         $this->page->requires->yui_module('moodle-block_reportdashboard-reportselect', 'M.block_reportdashboard.init_reportselect',
                             [['formid' => $mform->getAttribute('id')]]);
         $mform->addElement('hidden', 'reportcontenttype');
-        $mform->setType('reportcontenttype', PARAM_RAW);
+        $mform->setType('reportcontenttype', PARAM_TEXT);
 
         $tilescolourpicker = get_string('tilesbackground', 'block_reporttiles');
         $mform->addElement('text', 'config_tilescolourpicker', $tilescolourpicker,
             ['data-class' => 'jscolor', 'value' => '12445f']);
-        $mform->setType('config_tilescolourpicker', PARAM_RAW);
+        $mform->setType('config_tilescolourpicker', PARAM_TEXT);
         $mform->registerNoSubmitButton('updatereportselect');
 
         $mform->addElement('submit', 'updatereportselect', get_string('updatereportselect', 'block_reportdashboard'));

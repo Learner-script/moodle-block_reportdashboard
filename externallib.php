@@ -48,7 +48,7 @@ class block_reportdashboard_external extends external_api {
                 'reportid' => new external_value(PARAM_INT, 'Report ID', VALUE_DEFAULT, 0),
                 'maximumselectionlength' => new external_value(PARAM_INT, 'Maximum Selection Length to Search', VALUE_DEFAULT, 0),
                 'setminimuminputlength' => new external_value(PARAM_INT, 'Minimum Input Length to Search', VALUE_DEFAULT, 2),
-                'courses' => new external_value(PARAM_RAW, 'Course id of report', VALUE_DEFAULT),
+                'courses' => new external_value(PARAM_INT, 'Course id of report', VALUE_DEFAULT),
             ]
         );
     }
@@ -149,7 +149,7 @@ class block_reportdashboard_external extends external_api {
      * @return external_description
      */
     public static function userlist_returns() {
-        return new external_value(PARAM_RAW, 'data');
+        return new external_value(PARAM_TEXT, 'data');
     }
     /**
      * Rreports list parameters description
@@ -158,7 +158,7 @@ class block_reportdashboard_external extends external_api {
     public static function reportlist_parameters() {
         return new external_function_parameters(
             [
-                'search' => new external_value(PARAM_RAW, 'Search value', VALUE_DEFAULT, ''),
+                'search' => new external_value(PARAM_TEXT, 'Search value', VALUE_DEFAULT, ''),
             ]
         );
     }
@@ -202,7 +202,7 @@ class block_reportdashboard_external extends external_api {
      * @return external_description
      */
     public static function reportlist_returns() {
-        return new external_value(PARAM_RAW, 'data');
+        return new external_value(PARAM_TEXT, 'data');
     }
     /**
      * Sendemails parameters description
@@ -246,6 +246,6 @@ class block_reportdashboard_external extends external_api {
      * @return external_description
      */
     public static function sendemails_returns() {
-        return new external_value(PARAM_RAW, 'data');
+        return new external_value(PARAM_TEXT, 'data');
     }
 }
