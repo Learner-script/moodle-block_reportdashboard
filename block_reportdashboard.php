@@ -192,7 +192,7 @@ class block_reportdashboard extends block_base {
             $reportclass->params = [];
             $methodnames = [];
             $reportclass->params['filter_courses'] = $COURSE->id == SITEID ? 0 : $COURSE->id;
-            if (has_capability('block/learnerscript:designreport', $context) && !$disableheader) {
+            if (has_capability('block/learnerscript:managereports', $context) && !$disableheader) {
                 if ($reportclass->parent === true) {
                     $methodnames[] = "schreportform";
                 }

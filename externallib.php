@@ -69,7 +69,7 @@ class block_reportdashboard_external extends external_api {
         global $DB, $SESSION, $USER;
         $context = context_system::instance();
         self::validate_context($context);
-        require_capability('block/learnerscript:reportsaccess', $context);
+        require_capability('block/learnerscript:managereports', $context);
         // We always must pass webservice params through validate_parameters.
         $params = self::validate_parameters(self::userlist_parameters(), ['term' => $term, '_type' => $type, 'query' => $query,
         'action' => $action, 'userlist' => $userlist, 'reportid' => $reportid, 'maximumselectionlength' => $maximumselectionlength,
@@ -228,7 +228,7 @@ class block_reportdashboard_external extends external_api {
         global $CFG;
         $context = context_system::instance();
         self::validate_context($context);
-        require_capability('block/learnerscript:reportsaccess', $context);
+        require_capability('block/learnerscript:managereports', $context);
         // We always must pass webservice params through validate_parameters.
         self::validate_parameters(self::sendemails_parameters(), ['reportid' => $reportid, 'instance' => $instance,
         'pageurl' => $pageurl, ]);
