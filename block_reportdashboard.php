@@ -160,7 +160,7 @@ class block_reportdashboard extends block_base {
             $reportrecord = new \block_learnerscript\local\reportbase($report->id);
             $reportrecord->customheader = true; // For not to display Form Header.
             $filterrecords = (new ls)->cr_unserialize($reportrecord->config->components);
-            if (!empty($filterrecords['filters']['elements'])) {
+            if (!empty($filterrecords->filters->elements)) {
                 $filtersarray = $filterrecords;
             } else {
                 $filtersarray = [];

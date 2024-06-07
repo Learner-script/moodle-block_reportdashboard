@@ -109,7 +109,7 @@ class widgetheader implements renderable, templatable {
         $data['sesskey'] = $USER->sesskey;
         $data['exports'] = $this->exports;
         $data['download_icon'] = $OUTPUT->image_url('download_icon', 'block_reportdashboard');
-        $data['designreportcap'] = (has_capability('block/learnerscript:designreport', \context_system::instance())
+        $data['designreportcap'] = (has_capability('block/learnerscript:managereports', \context_system::instance())
                                     && !$this->disableheader) ? true : false;
         $data['is_siteadmin'] = is_siteadmin();
         $data['widgetheader'] = (!empty($this->methodname) || !empty($this->exports) || $data['designreportcap']) ? true : false;

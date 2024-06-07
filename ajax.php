@@ -59,7 +59,6 @@ switch ($action) {
             $html .= $renderer->generate_dashboardreport($reportclass, $reporttype, $blockinstanceid);
         }
         echo $html;
-        exit;
         break;
     case 'userlist':
         $users = get_users(true, $usersearch);

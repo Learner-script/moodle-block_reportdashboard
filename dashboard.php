@@ -24,7 +24,7 @@ require_once($CFG->libdir . '/accesslib.php');
 require_once($CFG->dirroot . '/blocks/learnerscript/classes/local/observer.php');
 
 use block_learnerscript\local\ls as ls;
-global $CFG, $PAGE, $OUTPUT, $THEME, $ADMIN, $DB;
+global $CFG, $PAGE, $OUTPUT, $THEME, $ADMIN, $DB, $SESSION;
 $adminediting = optional_param('adminedit', -1, PARAM_BOOL);
 $dashboardurl = optional_param('dashboardurl', '', PARAM_TEXT);
 $deletereport = optional_param('deletereport', 0, PARAM_INT);
@@ -177,7 +177,7 @@ if (!empty($role) || is_siteadmin()) {
                 $caption = get_string('blocksediton');
                 $url->param('adminedit', 'on');
             }
-            $turnediting = $OUTPUT->single_button($url, $caption, 'get') . '</span>';
+            $turnediting = $OUTPUT->single_button($url, $caption, 'get');
         }
         $output = $PAGE->get_renderer('block_reportdashboard');
         $dashboardheader = new \block_reportdashboard\output\dashboardheader((object)

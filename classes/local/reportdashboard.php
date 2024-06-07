@@ -68,7 +68,7 @@ class reportdashboard {
         $reportcount = 0;
         $blocksdata = $DB->get_fieldset_sql($sql, $params);
         foreach ($blocksdata as $value) {
-            $value = unserialize(base64_decode($value));
+            $value = json_decode(base64_decode($value));
             $report = $DB->get_record('block_learnerscript', ['id' => $value->reportlist]);
             if (isset($report->id)) {
                 $haspermission = (new ls)->cr_check_report_permissions($report, $USER->id, context_system::instance());

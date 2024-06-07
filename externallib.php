@@ -236,7 +236,7 @@ class block_reportdashboard_external extends external_api {
         $pageurl = $pageurl ? $pageurl : $CFG->wwwroot . '/blocks/reportdashboard/dashboard.php';
         require_once($CFG->dirroot . '/blocks/reportdashboard/email_form.php');
         $emailform = new block_reportdashboard_emailform($pageurl, ['reportid' => $reportid,
-                    'AjaxForm' => true, 'instance' => $instance]);
+                    'AjaxForm' => true, 'instance' => $instance, ]);
         $return = $emailform->render();
         $data = json_encode($return);
         return $data;
