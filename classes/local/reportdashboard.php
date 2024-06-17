@@ -67,8 +67,8 @@ class reportdashboard {
         $params['subpagepattern'] = $dashboardid;
         $reportcount = 0;
         $blocksdata = $DB->get_fieldset_sql($sql, $params);
-        foreach ($blocksdata as $value) {
-            $value = json_decode(base64_decode($value));
+        foreach ($blocksdata as $key => $value) {
+            $value = unserialize(base64_decode($value));
             $report = $DB->get_record('block_learnerscript', ['id' => $value->reportlist]);
             if (isset($report->id)) {
                 $haspermission = (new ls)->cr_check_report_permissions($report, $USER->id, context_system::instance());
@@ -98,9 +98,9 @@ class reportdashboard {
         $lsinstancessql = "SELECT id, id AS instance
                              FROM {block_instances}
                             WHERE pagetypepattern = :pagetypepattern";
-        $params['pagetypepattern'] = "'" . $pagetypepattern . "'";
+        $params['pagetypepattern'] = $pagetypepattern;
         if ($deletedashboard != 1) {
-            $params['subpagepattern'] = "'" . $deletedashboard . "'";
+            $params['subpagepattern'] = $deletedashboard;
             $lsinstancessql .= " AND subpagepattern = :subpagepattern ";
         }
         if ($blockinstanceid > 0) {
