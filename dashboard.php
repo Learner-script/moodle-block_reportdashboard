@@ -21,17 +21,17 @@
  */
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/accesslib.php');
-require_once($CFG->dirroot . '/blocks/learnerscript/classes/observer.php');
+require_once($CFG->dirroot . '/blocks/learnerscript/classes/local/observer.php');
 
 use block_learnerscript\local\ls as ls;
-global $CFG, $PAGE, $OUTPUT, $THEME, $ADMIN, $DB;
+global $CFG, $PAGE, $OUTPUT, $THEME, $ADMIN, $DB, $SESSION;
 $adminediting = optional_param('adminedit', -1, PARAM_BOOL);
-$dashboardurl = optional_param('dashboardurl', '', PARAM_RAW_TRIMMED);
+$dashboardurl = optional_param('dashboardurl', '', PARAM_TEXT);
 $deletereport = optional_param('deletereport', 0, PARAM_INT);
 $blockinstanceid = optional_param('blockinstanceid', 0, PARAM_INT);
 $reportid = optional_param('reportid', 0, PARAM_INT);
-$role = optional_param('role', '', PARAM_RAW);
-$sesskey = optional_param('sesskey', '', PARAM_RAW);
+$role = optional_param('role', '', PARAM_TEXT);
+$sesskey = optional_param('sesskey', '', PARAM_TEXT);
 $contextlevel = optional_param('contextlevel', 10, PARAM_INT);
 
 require_login();
@@ -113,7 +113,6 @@ if (!$dashboardurl) {
     $PAGE->navbar->add($dashboardurl);
 }
 
-$PAGE->requires->js(new moodle_url('/blocks/learnerscript/js/highchart.js'));
 $PAGE->requires->jquery();
 $PAGE->requires->js_call_amd('block_reportdashboard/reportdashboard', 'init');
 $PAGE->requires->css('/blocks/reportdashboard/css/radioslider/radios-to-slider.min.css');
@@ -155,12 +154,6 @@ if (!empty($data) && $dataaction == 'sendemails') {
     }
 }
 echo $OUTPUT->header();
-$PAGE->requires->js(new moodle_url('/blocks/learnerscript/js/highchart.js'));
-$themename = $PAGE->theme->name;
-$themelist = ['academi'];
-if (in_array($themename, $themelist)) {
-    echo '<h3>'.get_string('learnerscript', 'block_reportdashboard').'</h3>';
-}
 
 if (!empty($role) || is_siteadmin()) {
     $configuredinstances = $DB->count_records('block_instances', [
@@ -184,7 +177,7 @@ if (!empty($role) || is_siteadmin()) {
                 $caption = get_string('blocksediton');
                 $url->param('adminedit', 'on');
             }
-            $turnediting = $OUTPUT->single_button($url, $caption, 'get') . '</span>';
+            $turnediting = $OUTPUT->single_button($url, $caption, 'get');
         }
         $output = $PAGE->get_renderer('block_reportdashboard');
         $dashboardheader = new \block_reportdashboard\output\dashboardheader((object)
@@ -231,10 +224,8 @@ if (!empty($role) || is_siteadmin()) {
         echo html_writer::div('', "reportslist", ['style' => "display:none;"]);
         echo html_writer::div('', "statistics_reportslist", ['style' => "display:none;"]);
     } else {
-        $action = html_writer::tag('a', get_string('addreport', 'block_learnerscript'),
-                                            ['href' => $CFG->wwwroot . '/blocks/learnerscript/managereport.php']);
-        echo html_writer::div(get_string('reportsnotavailable', 'block_reportdashboard', $action), "alert alert-info",
-                ['style' => "display:none;"]);
+        echo html_writer::div(get_string('reportsnotavailable', 'block_reportdashboard'), "alert alert-info",
+                []);
     }
     if ($configuredinstances > 0) {
         echo html_writer::tag('input', '', ['type' => 'hidden', 'name' => 'filter_courses',
@@ -242,7 +233,7 @@ if (!empty($role) || is_siteadmin()) {
         echo html_writer::div('', "loader");
     }
 } else {
-    throw new moodle_exception("notasssignedrole", 'block_learnerscript');
+    throw new moodle_exception('notasssignedrole', 'block_learnerscript');
 }
 echo html_writer::end_tag('div');
 echo $OUTPUT->footer();

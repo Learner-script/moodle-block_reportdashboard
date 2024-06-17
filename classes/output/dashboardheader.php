@@ -111,7 +111,7 @@ class dashboardheader implements renderable, templatable {
                             WHERE 1 = 1 AND " .
                             $DB->sql_like('pagetypepattern', ':pagetypepattern', false), $params);
         } else {
-            $params['pagetypepattern'] = '%blocks-reportdashboard-dashboard-%';
+            $params['pagetypepattern'] = '%blocks-reportdashboard-dashboard%';
             $getreports = $DB->get_records_sql("SELECT DISTINCT(subpagepattern) FROM {block_instances}
                            WHERE 1 = 1 AND " .
                             $DB->sql_like('pagetypepattern', ':pagetypepattern', false), $params);

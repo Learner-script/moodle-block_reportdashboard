@@ -21,7 +21,9 @@
  * @copyright  2023 Moodle India Information Solutions Private Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once(__DIR__ . '/../../config.php');
+
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/blocks/learnerscript/lib.php');
 use block_learnerscript\local\ls;
 use block_learnerscript\local\reportbase;
@@ -46,7 +48,7 @@ class block_reportdashboard_external extends external_api {
                 'reportid' => new external_value(PARAM_INT, 'Report ID', VALUE_DEFAULT, 0),
                 'maximumselectionlength' => new external_value(PARAM_INT, 'Maximum Selection Length to Search', VALUE_DEFAULT, 0),
                 'setminimuminputlength' => new external_value(PARAM_INT, 'Minimum Input Length to Search', VALUE_DEFAULT, 2),
-                'courses' => new external_value(PARAM_RAW, 'Course id of report', VALUE_DEFAULT),
+                'courses' => new external_value(PARAM_INT, 'Course id of report', VALUE_DEFAULT),
             ]
         );
     }
@@ -147,7 +149,7 @@ class block_reportdashboard_external extends external_api {
      * @return external_description
      */
     public static function userlist_returns() {
-        return new external_value(PARAM_RAW, 'data');
+        return new external_value(PARAM_TEXT, 'data');
     }
     /**
      * Rreports list parameters description
@@ -156,7 +158,7 @@ class block_reportdashboard_external extends external_api {
     public static function reportlist_parameters() {
         return new external_function_parameters(
             [
-                'search' => new external_value(PARAM_RAW, 'Search value', VALUE_DEFAULT, ''),
+                'search' => new external_value(PARAM_TEXT, 'Search value', VALUE_DEFAULT, ''),
             ]
         );
     }
@@ -168,7 +170,7 @@ class block_reportdashboard_external extends external_api {
         global $DB, $USER;
         $context = context_system::instance();
         self::validate_context($context);
-        require_capability('block/learnerscript:viewreports', $context);
+        require_capability('block/learnerscript:reportsaccess', $context);
         // We always must pass webservice params through validate_parameters.
         $params = self::validate_parameters(self::reportlist_parameters(), ['search' => $search]);
 
@@ -200,7 +202,7 @@ class block_reportdashboard_external extends external_api {
      * @return external_description
      */
     public static function reportlist_returns() {
-        return new external_value(PARAM_RAW, 'data');
+        return new external_value(PARAM_TEXT, 'data');
     }
     /**
      * Sendemails parameters description
@@ -234,7 +236,7 @@ class block_reportdashboard_external extends external_api {
         $pageurl = $pageurl ? $pageurl : $CFG->wwwroot . '/blocks/reportdashboard/dashboard.php';
         require_once($CFG->dirroot . '/blocks/reportdashboard/email_form.php');
         $emailform = new block_reportdashboard_emailform($pageurl, ['reportid' => $reportid,
-                    'AjaxForm' => true, 'instance' => $instance]);
+                    'AjaxForm' => true, 'instance' => $instance, ]);
         $return = $emailform->render();
         $data = json_encode($return);
         return $data;
@@ -244,6 +246,6 @@ class block_reportdashboard_external extends external_api {
      * @return external_description
      */
     public static function sendemails_returns() {
-        return new external_value(PARAM_RAW, 'data');
+        return new external_value(PARAM_TEXT, 'data');
     }
 }

@@ -28,16 +28,14 @@ $rawjson = file_get_contents('php://input');
 
 $requests = json_decode($rawjson, true);
 $action = optional_param('action', $requests['action'], PARAM_TEXT);
-$search = optional_param('term', $requests['term'], PARAM_RAW);
+$search = optional_param('term', $requests['term'], PARAM_TEXT);
 $frequency = optional_param('frequency', $requests['frequency'], PARAM_TEXT);
 $reportid = optional_param('reportid', $requests['reportid'], PARAM_INT);
-$reporttype = optional_param('selreport', $requests['selreport'], PARAM_RAW);
+$reporttype = optional_param('selreport', $requests['selreport'], PARAM_TEXT);
 $blockinstanceid = optional_param('blockinstanceid', $requests['blockinstanceid'], PARAM_INT);
 $usersearch = optional_param('term', $requests['term'], PARAM_TEXT);
 $instance = optional_param('instance', $requests['instance'], PARAM_INT);
-$oldname = optional_param('oldname', $requests['oldname'], PARAM_RAW);
-$newname = optional_param('newname', $requests['newname'], PARAM_RAW);
-$role = optional_param('role', $requests['role'], PARAM_RAW);
+$role = optional_param('role', $requests['role'], PARAM_TEXT);
 require_login();
 $context = context_system::instance();
 $PAGE->set_context($context);
@@ -61,7 +59,6 @@ switch ($action) {
             $html .= $renderer->generate_dashboardreport($reportclass, $reporttype, $blockinstanceid);
         }
         echo $html;
-        exit;
         break;
     case 'userlist':
         $users = get_users(true, $usersearch);

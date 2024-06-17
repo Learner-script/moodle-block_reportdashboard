@@ -46,7 +46,6 @@ class block_reportdashboard extends block_base {
             !empty($this->config->reportcontenttype)) ? $this->config->reportcontenttype : '';
         $reportslist = isset($this->config->reportlist) ? $this->config->reportlist : '';
         $instance = isset($this->instance->id) ? $this->instance->id : '';
-        $this->page->requires->js(new moodle_url('/blocks/learnerscript/js/highchart.js'));
         $this->page->requires->jquery();
         $this->page->requires->jquery_plugin('ui-css');
         $this->page->requires->js_call_amd('block_learnerscript/reportwidget', 'CreateDashboardwidget'
@@ -161,7 +160,7 @@ class block_reportdashboard extends block_base {
             $reportrecord = new \block_learnerscript\local\reportbase($report->id);
             $reportrecord->customheader = true; // For not to display Form Header.
             $filterrecords = (new ls)->cr_unserialize($reportrecord->config->components);
-            if (!empty($filterrecords['filters']['elements'])) {
+            if (!empty($filterrecords->filters->elements)) {
                 $filtersarray = $filterrecords;
             } else {
                 $filtersarray = [];
@@ -193,7 +192,7 @@ class block_reportdashboard extends block_base {
             $reportclass->params = [];
             $methodnames = [];
             $reportclass->params['filter_courses'] = $COURSE->id == SITEID ? 0 : $COURSE->id;
-            if (has_capability('block/learnerscript:designreport', $context) && !$disableheader) {
+            if (has_capability('block/learnerscript:managereports', $context) && !$disableheader) {
                 if ($reportclass->parent === true) {
                     $methodnames[] = "schreportform";
                 }
