@@ -47,7 +47,7 @@ body.path-blocks-reportdashboard aside#block-region-side-post .block_reportdashb
 body#page-my-index .block_reportdashboard .report_dashboard_container .co_report_header {
     max-width: 100%;
     min-width: 100%;
-    margin: 0;
+    margin: 0 -16px;
     display: flex;
     justify-content: space-between;
     background-color: #fff;
@@ -349,7 +349,8 @@ body.reportdashboard #box5 {
 }
 
 body.reportdashboard.path-blocks-reportdashboard .reportdashboard_right,
-body#page-site-index .block_reportdashboard .report_dashboard_container .reportdashboard_right {
+body#page-site-index .block_reportdashboard .report_dashboard_container .reportdashboard_right,
+body#page-my-index .block_reportdashboard .reportdashboard_header .reportdashboard_right {
     float: right;
     background-color: #dddbdb;
     color: #000;
@@ -417,7 +418,8 @@ body.reportdashboard.path-blocks-reportdashboard > .ui-dialog .ui-dialog-titleba
 body.reportdashboard.path-blocks-reportdashboard .ui-dialog .ui-dialog-titlebar img.dialog_title_icon,
 .ui-dialog.sendreportemail-popup .ui-dialog-titlebar img.dialog_title_icon,
 .ui-dialog.schedule-popup .ui-dialog-titlebar img.dialog_title_icon,
-.ui-dialog.reportfilter-popup .ui-dialog-titlebar img.dialog_title_icon {
+.ui-dialog.reportfilter-popup .ui-dialog-titlebar img.dialog_title_icon,
+body#page-my-index .block_reportdashboard .ui-dialog .ui-dialog-titlebar img.dialog_title_icon {
     margin-right: 10px;
     max-width: 35px;
     max-height: 31px;
@@ -685,11 +687,13 @@ body.reportdashboard.path-blocks-reportdashboard .dropdown-menu > li > a.disable
     font-style: normal;
 }
 
-body.reportdashboard.path-blocks-reportdashboard .dropdown-menu > li > a img {
+body.reportdashboard.path-blocks-reportdashboard .dropdown-menu > li > a img,
+body#page-my-index .block_reportdashboard .dropdown-menu > li > a img {
     margin-right: 5px;
 }
 
-body.reportdashboard.path-blocks-reportdashboard .dropdown-menu > li > a span {
+body.reportdashboard.path-blocks-reportdashboard .dropdown-menu > li > a span,
+body#page-my-index .block_reportdashboard .dropdown-menu > li > a span {
     text-transform: capitalize;
 }
 
@@ -847,7 +851,8 @@ body.dir-rtl.reportdashboard.path-blocks-reportdashboard span#widgetaction {
 }
 
 body.reportdashboard.path-blocks-reportdashboard .select2-container,
-.ui-dialog.sendreportemail-popup .select2-container {
+.ui-dialog.sendreportemail-popup .select2-container,
+body#page-my-index .block_reportdashboard .select2-container {
     width: 180px;
     max-width: 180px;
     min-width: 180px;
@@ -913,7 +918,8 @@ body.reportdashboard.path-blocks-reportdashboard .dialog_fixed {
     position: fixed;
 }
 
-body.reportdashboard.path-blocks-reportdashboard .block {
+body.reportdashboard.path-blocks-reportdashboard .block,
+body#page-my-index .block_reporttiles {
     float: left;
     width: 100%;
     border: 0 solid #e2e2e2;
@@ -1370,7 +1376,10 @@ body.reportdashboard.path-blocks-reportdashboard ul#download_menu.dropdown-menu 
 body.reportdashboard.path-blocks-reportdashboard .ui-dialog .ui-dialog-titlebar,
 .ui-dialog.sendreportemail-popup .ui-dialog-titlebar,
 .ui-dialog.schedule-popup .ui-dialog-titlebar,
-.ui-dialog.reportfilter-popup .ui-dialog-titlebar {
+.ui-dialog.reportfilter-popup .ui-dialog-titlebar,
+body#page-my-index .block_reportdashboard .ui-dialog .ui-dialog-titlebar,
+body#page-my-index .block_reportdashboard .ui-dialog.schedule-popup .ui-dialog-titlebar,
+body#page-my-index .block_reportdashboard .ui-dialog.reportfilter-popup .ui-dialog-titlebar {
     background: transparent; /* added for lambda */
     border: none;
     border-radius: 4px 4px 0 0;
@@ -1487,7 +1496,8 @@ body.path-blocks-learnerscript .ui-dialog .ui-dialog-content .dataTables_wrapper
 }
 
 body.reportdashboard.path-blocks-reportdashboard .ui-dialog .ui-dialog-titlebar .ui-button .ui-icon,
-body.reportdashboard.path-blocks-reportdashboard .ui-dialog .ui-dialog-titlebar button .ui-icon {
+body.reportdashboard.path-blocks-reportdashboard .ui-dialog .ui-dialog-titlebar button .ui-icon,
+body#page-my-index .block_reportdashboard .ui-dialog .ui-dialog-titlebar .ui-button .ui-icon {
     background-image: url([[pix:block_reportdashboard|ui-icons_888888_256x240]]);
     position: absolute;
     top: 50%;
@@ -2585,7 +2595,8 @@ body.path-blocks-reportdashboard ul.dropdown-content {
 }
 
 body.path-blocks-reportdashboard ul#switchrole_menu li,
-body.path-blocks-reportdashboard ul.dropdown-content li {
+body.path-blocks-reportdashboard ul.dropdown-content li,
+body#page-my-index .block_reportdashboard ul.dropdown-content li {
     border-bottom: 1px solid #ebebeb;
     padding: 5px 10px;
     list-style: none;
@@ -2693,32 +2704,38 @@ body.reportdashboard.path-blocks div.dataTables_paginate .paginate_button + .ell
 }
 
 /* css related to tables */
-body.path-blocks-reportdashboard div[role="main"] .dataTables_wrapper table.dataTable > thead > tr {
+body.path-blocks-reportdashboard div[role="main"] .dataTables_wrapper table.dataTable > thead > tr,
+body.block_reportdashboard div[role="main"] .dataTables_wrapper table.dataTable > thead > tr {
     background-color: #eff0f2;
     color: #333;
     border: none;
 }
 
-body.path-blocks-reportdashboard table.dataTable {
+body.path-blocks-reportdashboard table.dataTable,
+body.block_reportdashboard table.dataTable {
     border-bottom: none;
     display: table;
 }
 
-body.path-blocks-reportdashboard table.dataTable thead > tr > th {
+body.path-blocks-reportdashboard table.dataTable thead > tr > th,
+body.block_reportdashboard table.dataTable thead > tr > th {
     border: none;
 }
 
-body.path-blocks-reportdashboard table.dataTable tbody > tr:first-child > td {
+body.path-blocks-reportdashboard table.dataTable tbody > tr:first-child > td,
+body.block_reportdashboard table.dataTable tbody > tr:first-child > td {
     border-top: none;
 }
 
-body.path-blocks-reportdashboard table.dataTable tbody > tr > td {
+body.path-blocks-reportdashboard table.dataTable tbody > tr > td,
+body.block_reportdashboard table.dataTable tbody > tr > td {
     border: none;
     border-bottom: 1px solid #e2dede;
     border-right: 1px solid #ececec;
 }
 
-body.path-blocks-reportdashboard table.dataTable tbody > tr > td:last-child {
+body.path-blocks-reportdashboard table.dataTable tbody > tr > td:last-child,
+body.block_reportdashboard table.dataTable tbody > tr > td:last-child {
     border-right: none;
 }
 
@@ -3745,7 +3762,12 @@ body.reportdashboard.path-blocks-reportdashboard .ui-widget select,
 body.path-blocks-learnerscript .ui-widget select,
 body .ui-widget input,
 body .ui-widget textarea,
-body .ui-widget button {
+body .ui-widget button,
+body#page-my-index .block_reportdashboard .ui-widget select,
+body#page-my-index .block_reportdashboard .ui-widget label,
+body#page-my-index .block_reportdashboard .ui-widget p,
+body#page-my-index .block_reportdashboard .ui-widget input,
+body#page-my-index .block_reportdashboard .ui-widget span {
     font-size: 14px;
 }
 
@@ -4502,7 +4524,8 @@ body.path-blocks-reportdashboard .tooltip-top {
 }
 
 body.path-blocks-reportdashboard #widgetaction .htitle .tooltiptext,
-body.path-blocks-reportdashboard .reportdashboard_header .htitle .tooltiptext {
+body.path-blocks-reportdashboard .reportdashboard_header .htitle .tooltiptext,
+.block_reportdashboard .reportdashboard_header .htitle .tooltiptext {
     display: none;
     position: absolute;
     background-color: #555;
@@ -4940,7 +4963,10 @@ body.path-blocks-reportdashboard .newreport_dashboard #id_dashboard {
     font-weight: normal;
 }
 
-body.path-blocks-reportdashboard .sendreportemail.ui-dialog .row.fitem .col-md-3 {
+body.path-blocks-reportdashboard .sendreportemail.ui-dialog .row.fitem .col-md-3,
+body#page-my-index .block_reportdashboard .sendreportemail.ui-dialog .row.fitem .col-md-3,
+body#page-my-index .block_reportdashboard .schreportform.ui-dialog .row.fitem .col-md-3,
+body#page-my-index .block_reportdashboard .sendreportemail.ui-dialog .row.fitem .col-md-3 {
     min-width: 130px;
 }
 
@@ -4968,7 +4994,8 @@ body.reportdashboard {
 }
 
 body.reportdashboard .card:not(.block_reporttiles),
-body.reportdashboard .block_reporttiles .dashboard_reporttile_container {
+body.reportdashboard .block_reporttiles .dashboard_reporttile_container,
+body#page-my-index .block_reporttiles .dashboard_reporttile_container {
     box-shadow: 0 1px 6px rgb(0 0 0 / 4%), 0 0 7px 0 rgb(0 0 0 / 7%);
     border-radius: 8px;
     border: 1px solid #eee;
@@ -4986,7 +5013,8 @@ body.reportdashboard .block_reporttiles .dashboard_tiles {
     padding: 1em;
 }
 
-body.reportdashboard .block_reporttiles .dashboard_reporttile_container {
+body.reportdashboard .block_reporttiles .dashboard_reporttile_container,
+body#page-my-index .block_reporttiles .dashboard_reporttile_container {
     border-radius: 8px;
 }
 
@@ -5522,7 +5550,6 @@ body#page-site-index #profile-page .logs_card .logs_list .course_img {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url([[pix:block_reportdashboard|courseprofile/userimg]]);
 }
 
 body#page-site-index #profile-page .logs_card .logs_list .progress {
@@ -5613,7 +5640,7 @@ body#page-site-index #profile-page .recentactivities_card .viewmore_btn a {
 
 /* course overview card css */
 body#page-site-index #profile-page .courseoverview_card {
-    overflow: hidden;
+    overflow: visible;
 }
 
 body#page-site-index #profile-page .courseoverview_card table thead {
@@ -6019,7 +6046,9 @@ body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody 
 body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child,
 body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child,
 body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child,
-body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child {
+body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child,
+body#page-my-index .block_reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child,
+body#page-my-index .block_reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child {
     position: relative;
     padding-left: 30px;
     cursor: pointer;
@@ -6027,13 +6056,11 @@ body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody 
 
 body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child::before,
 body.path-blocks-reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child::before,
-body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child::before
-body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child::before {
+body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child::before,
+body#page-site-index #profile-page table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child::before,
+body#page-my-index .block_reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child::before,
+body#page-my-index .block_reportdashboard table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child::before {
     background-color: #808080;
-}
-
-body#page-site-index #profile-page .courseoverview_card {
-    overflow: auto;
 }
 
 body#page-site-index #profile-page .courseoverview_card .ui-dialog .ui-dialog-titlebar {
@@ -6042,6 +6069,43 @@ body#page-site-index #profile-page .courseoverview_card .ui-dialog .ui-dialog-ti
     border: none;
 }
 
-#page #profile-page .map_report_container .dataTables_wrapper table.dataTable.no-footer {
+#page #profile-page .map_report_container .dataTables_wrapper table.dataTable.no-footer,
+body#page-my-index .block_reportdashboard .map_report_container .dataTables_wrapper table.dataTable.no-footer {
     height: 250px;
+}
+
+body#page-my-index .block_reportdashboard table.dataTable.dtr-inline.collapsed>tbody>tr>td.dtr-control:before,
+body#page-my-index .block_reportdashboard table.dataTable.dtr-inline.collapsed>tbody>tr>th.dtr-control:before {
+    color: white;
+    border: 2px solid white;
+    border-radius: 14px;
+    box-shadow: 0 0 3px #444;
+    box-sizing: content-box;
+    text-align: center;
+    text-indent: 0;
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 14px;
+    content: '+';
+    background-color: #808080;
+}
+
+body#page-my-index .block_reportdashboard .ui-dialog .ui-dialog-titlebar button {
+    position: absolute;
+    padding: 0px;
+}
+
+#page #profile-page .reportdashboard_right {
+    float: right;
+    background-color: #dddbdb;
+    color: #000;
+    font-size: 12px;
+    line-height: 20px;
+    padding: 0 15px;
+    border: 1px solid #e3e3e3;
+    border-top: 0 solid;
+    margin-top: 10px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
 }

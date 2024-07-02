@@ -45,6 +45,7 @@ $string['custom'] = 'Custom';
 $string['dashboard'] = 'Dashboard';
 $string['date'] = 'Date';
 $string['defaultrole'] = 'Default role';
+$string['delete'] = "Delete";
 $string['deleteconfimation'] = 'Are you sure to delete widget/report?';
 $string['deletewidget'] = 'Delete confirmation';
 $string['disableheader'] = 'Disable header';

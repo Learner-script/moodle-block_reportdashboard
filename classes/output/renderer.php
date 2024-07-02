@@ -71,7 +71,7 @@ class block_reportdashboard_renderer extends plugin_renderer_base {
             $roles = get_switchable_roles($systemcontext);
         }
         $actions .= html_writer::start_tag("li", ["role" => "presentation"])
-        . html_writer::link($CFG->wwwroot.'/blocks/reportdashboard/dashboard.php',
+        . html_writer::link(new moodle_url('/blocks/reportdashboard/dashboard.php'),
         get_string('switchrole', 'block_reportdashboard'), [])
         . html_writer::end_tag("li");
         foreach ($roles as $key => $value) {

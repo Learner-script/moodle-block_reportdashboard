@@ -46,7 +46,7 @@ $PAGE->set_context($context);
 $lsreportconfigstatus = get_config('block_learnerscript', 'lsreportconfigstatus');
 
 if (!$lsreportconfigstatus) {
-    redirect(new moodle_url($CFG->wwwroot . '/blocks/learnerscript/lsconfig.php?import=1'));
+    redirect(new moodle_url('/blocks/learnerscript/lsconfig.php?import=1'));
     exit;
 }
 
@@ -105,7 +105,7 @@ $PAGE->add_body_class('reportdashboard');
 $PAGE->navbar->ignore_active();
 $navdashboardurl = new moodle_url($seturl);
 
-$managereporturl = $CFG->wwwroot. '/blocks/reportdashboard/dashboard.php';
+$managereporturl = new moodle_url('/blocks/reportdashboard/dashboard.php');
 $PAGE->navbar->add(get_string('dashboard', 'block_learnerscript'), $managereporturl);
 if (!$dashboardurl) {
     $PAGE->navbar->add(get_string('dashboard', 'block_reportdashboard'));
@@ -158,10 +158,7 @@ echo $OUTPUT->header();
 if (!empty($role) || is_siteadmin()) {
     $configuredinstances = $DB->count_records('block_instances', [
                                 'pagetypepattern' => $pagepattentype, 'subpagepattern' => $subpagepatterntype, ]);
-    $reports = $DB->get_records_sql("SELECT id
-    FROM {block_learnerscript}
-    WHERE visible = :visible AND global = :global",
-    ['visible' => 1, 'global' => 1]);
+    $reports = $DB->get_records('block_learnerscript', ['visible' => 1, 'global' => 1], '', 'id');
     if (!empty($reports)) {
         $editingon = false;
         if (is_siteadmin() && isset($USER->editing) && $USER->editing) {

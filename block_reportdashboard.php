@@ -226,6 +226,8 @@ class block_reportdashboard extends block_base {
                 }
             }
 
+            $report->name = !empty($blocktitle) ? $blocktitle : $report->name;
+
             $widgetheader = new \block_reportdashboard\output\widgetheader((object) ["methodname" => $methodnames,
                 "reportid" => $reportid,
                 "instanceid" => $instanceid, "reportvisible" => $report->visible,

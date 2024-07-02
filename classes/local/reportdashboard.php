@@ -40,16 +40,16 @@ class reportdashboard {
                 (new ls)->delete_report($report, $context);
             }
             if (empty($SESSION->role)) {
-                $redirecturl = $CFG->wwwroot.'/blocks/reportdashboard/dashboard.php';
+                $redirecturl = new \moodle_url('/blocks/reportdashboard/dashboard.php');
             } else {
-                $redirecturl = $CFG->wwwroot.'/blocks/reportdashboard/dashboard.php?role='.$SESSION->role;
+                $redirecturl = new \moodle_url('/blocks/reportdashboard/dashboard.php', ['role' => $SESSION->role]);
             }
             header("Location: $redirecturl");
         } else if ($deletereport == 0) {
             if (empty($SESSION->role)) {
-                $redirecturl = $CFG->wwwroot.'/blocks/reportdashboard/dashboard.php';
+                $redirecturl = new \moodle_url('/blocks/reportdashboard/dashboard.php');
             } else {
-                $redirecturl = $CFG->wwwroot.'/blocks/reportdashboard/dashboard.php?role='.$SESSION->role;
+                $redirecturl = new \moodle_url('/blocks/reportdashboard/dashboard.php', ['role' => $SESSION->role]);
             }
             header("Location: $redirecturl");
         }

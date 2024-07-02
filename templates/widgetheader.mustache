@@ -42,7 +42,7 @@
                 <p>{{# str}}deleteconfimation, block_reportdashboard, {{reportname}}{{/ str}}</p>
 				<div class='widgetdel'>
 					<a href="{{config.wwwroot}}/blocks/reportdashboard/dashboard.php?role={{dashboardrole}}&contextlevel={{dashboardcontextlevel}}&dashboardurl={{dashboardurl}}&reportid={{reportid}}&delete=1&sesskey={{sesskey}}&blockinstanceid={{instanceid}}&deletereport=0" class="btn btn-default">
-						{{# str}}widget, block_reportdashboard{{/ str}}
+						{{# str}}delete, block_reportdashboard{{/ str}}
 					</a>
 					<a href="javascript:void(0);" onclick=" (function(e){ require(['jquery','jqueryui'], function($) { $('#delete_dialog{{reportinstance}}').dialog('close'); }) }) (event);" class="btn btn-default">
 						{{# str}}cancel{{/str}}
@@ -88,7 +88,7 @@
     <ul id="reportcontenttypes-area{{instanceid}}"
         class="dropdown-menu dropdown-menu-right dropdown-content">
         {{#reportcontenttypes}}
-            <li id='reporttype{{instanceid}}' class="reportcontenttype"  class="dropdown-item menu-action"
+            <li id='reporttype{{instanceid}}' class="dropdown-item reportcontenttype"  class="dropdown-item menu-action"
                 data-reportid={{reportid}} data-reporttype={{key}} data-blockinstance={{instanceid}}> {{ value }}</li>
         {{/reportcontenttypes}}
 

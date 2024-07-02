@@ -94,18 +94,18 @@ class block_reportdashboard_external extends external_api {
             $context = context_course::instance($reportclass->config->courseid);
         }
         $data = [];
-        $permissions = (isset($reportclass->componentdata['permissions'])) ? $reportclass->componentdata['permissions'] : [];
+        $permissions = (isset($reportclass->componentdata->permissions)) ? $reportclass->componentdata->permissions : [];
         $roles = [];
-        foreach ($permissions['elements'] as $b) {
-            $roles[] = $b['formdata']->roleid;
-            $contextlevels[] = $b['formdata']->contextlevel;
+        foreach ($permissions->elements as $b) {
+            $roles[] = $b->formdata->roleid;
+            $contextlevels[] = $b->formdata->contextlevel;
         }
         $contextlevel = $SESSION->ls_contextlevel;
         $role = $SESSION->role;
         foreach ($users as $user) {
             if ($user->id > 2) {
                 $rolewiseuser = [];
-                if (!empty($permissions['elements'])) {
+                if (!empty($permissions->elements)) {
                     list($ctxsql, $params1) = $DB->get_in_or_equal($contextlevels, SQL_PARAMS_NAMED);
                     list($rolesql, $params2) = $DB->get_in_or_equal($roles, SQL_PARAMS_NAMED);
                     $rolewiseusers = "SELECT  u.*
@@ -233,7 +233,7 @@ class block_reportdashboard_external extends external_api {
         self::validate_parameters(self::sendemails_parameters(), ['reportid' => $reportid, 'instance' => $instance,
         'pageurl' => $pageurl, ]);
 
-        $pageurl = $pageurl ? $pageurl : $CFG->wwwroot . '/blocks/reportdashboard/dashboard.php';
+        $pageurl = $pageurl ? $pageurl : new moodle_url('/blocks/reportdashboard/dashboard.php');
         require_once($CFG->dirroot . '/blocks/reportdashboard/email_form.php');
         $emailform = new block_reportdashboard_emailform($pageurl, ['reportid' => $reportid,
                     'AjaxForm' => true, 'instance' => $instance, ]);

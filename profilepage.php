@@ -22,12 +22,15 @@
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/accesslib.php');
+require_once($CFG->libdir . '/badgeslib.php');
+
 $sessionuserid = optional_param('filter_users', '', PARAM_INT);
 $contextlevel = optional_param('contextlevel', 10, PARAM_INT);
 $roleshortname = optional_param('role', '', PARAM_TEXT);
 
 use block_learnerscript\local\ls;
 use block_learnerscript\local\querylib;
+use badge;
 
 global $CFG, $SITE, $PAGE, $OUTPUT, $DB, $SESSION;
 
@@ -38,9 +41,7 @@ $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url('/blocks/reportdashboard/profilepage.php');
 $PAGE->set_title(get_string('profilepage', 'block_reportdashboard'));
-
 require_login();
-
 $PAGE->requires->css('/blocks/reportdashboard/css/radioslider/radios-to-slider.min.css');
 $PAGE->requires->css('/blocks/reportdashboard/css/flatpickr.min.css');
 $PAGE->requires->css('/blocks/learnerscript/css/datatables/fixedHeader.dataTables.min.css');
@@ -49,10 +50,63 @@ $PAGE->requires->jquery_plugin('ui-css');
 $PAGE->requires->css('/blocks/learnerscript/css/select2/select2.min.css');
 $PAGE->requires->css('/blocks/learnerscript/css/datatables/jquery.dataTables.min.css');
 
+if ($roleshortname == '' && !is_siteadmin()) {
+    if (empty($roleshortname) && !empty($sessionuserid)) {
+        $sql = "
+            SELECT shortname, id
+            FROM {role}
+            WHERE shortname IN ('student', 'editingteacher')
+        ";
+        $roles_ids = $DB->get_records_sql_menu($sql);
+        $sql = "SELECT ra.roleid
+                FROM {role_assignments} ra
+                WHERE ra.userid = :userid
+                  AND ra.roleid IN (:studentroleid, :editingteacherroleid)";
+        $params = ['userid' => $USER->id, 'studentroleid' => $roles_ids['student'],
+        'editingteacherroleid' => $roles_ids['editingteacher']];
+        // $hasstudentrole = user_has_role_assignment($sessionuserid, $studentroleid, $context->id);= $DB->get_records_sql($sql, $params);records_sql($sql, $params);
+        $roles = $DB->get_records_sql($sql, $params);
+        if ($roles[$roles_ids['student']]) {
+            $roleshortname = 'student';
+        } else if ($roles[$roles_ids['editingteacher']]) {
+            $roleshortname = 'editingteacher';
+            $contextlevel = 50;
+        }
+    }
+}
+if($roleshortname == 'student' && $USER->id != $sessionuserid){
+    throw new moodle_exception(get_string('badpermissions', 'block_learnerscript'));
+} else if($roleshortname == 'editingteacher' && $USER->id != $sessionuserid) {
+    $teacher_courses = enrol_get_users_courses($USER->id, true, array('id', 'shortname'));
+
+    $is_enrolled = false;
+    foreach ($teacher_courses as $course) {
+        $context = context_course::instance($course->id);
+        $is_enrolled = is_enrolled($context, $sessionuserid);
+        if ($is_enrolled) {
+            break;
+        }
+    }
+
+    if (!$is_enrolled) {
+        throw new moodle_exception(get_string('badpermissions', 'block_learnerscript'));
+    }
+}
+
+
+
 $userid = ($roleshortname == 'student') ? $USER->id : $sessionuserid;
+$SESSION->ls_contextlevel = $contextlevel;
+$SESSION->role = $roleshortname;
+$role = $SESSION->role;
 echo $OUTPUT->header();
 
 if (!is_siteadmin()) {
+    echo html_writer::div(html_writer::link(new \moodle_url($CFG->wwwroot .
+    '/blocks/learnerscript/reports.php',
+    ['role' => $SESSION->role, 'contextlevel' => $SESSION->ls_contextlevel]),
+    get_string('managereports', 'block_learnerscript'), ['class' => 'btn linkbtn btn-primary']), '', ['class' => 'd-flex mb-2 justify-content-end']);
+    
     $userrolesql = "SELECT CONCAT(ra.roleid, '_',c.contextlevel) AS rolecontext
                 FROM {role_assignments} ra
                 JOIN {context} c ON c.id = ra.contextid
@@ -69,9 +123,6 @@ if (!is_siteadmin()) {
     $dashboardlink = 0;
 }
 
-$SESSION->ls_contextlevel = $contextlevel;
-$SESSION->role = $roleshortname;
-$role = $SESSION->role;
 $studentrole = ($roleshortname == 'student') ? $roleshortname : '';
 $siteadmin = is_siteadmin() || (new ls)->is_manager($USER->id, $SESSION->ls_contextlevel, $SESSION->role);
 
@@ -124,7 +175,7 @@ if ($userid) {
         $data['wwwroot'] = $CFG->wwwroot;
     }
     $userinfo = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
-    $defaultpicture = $CFG->wwwroot."/pix/user35.png";
+    $defaultpicture = new moodle_url("/pix/user35.png");
     $userpicture = new user_picture($userinfo);
     $userpicture->size = 1;
     $userinfo->profileimage = !empty($userpicture) ? $userpicture->get_url($PAGE)->out(false) : $defaultpicture;
@@ -150,13 +201,17 @@ if ($userid) {
             $sql = "SELECT * FROM {files} WHERE itemid = :logo AND filearea = 'badgeimage' AND component = 'badges'
                             AND filename != '.' ORDER BY id DESC";
             $classimagerecord = $DB->get_record_sql($sql, ['logo' => $badge->id], 1);
+            $batchinstance = new badge($badge->id);
+            $badgecontext = $batchinstance->get_context();
+            $badgeimage = print_badge_image($batchinstance, $context);
+
         }
         $logourl = "";
         if (!empty($classimagerecord)) {
             $logourl = moodle_url::make_pluginfile_url($classimagerecord->contextid, 'badges',
                             'badgeimage', $badge->id, '/', 'f3')->out(false);
         }
-        $userbadgesinfo[] = ['badgeid' => $badge->id, 'badgename' => $badge->name, 'badgeimage' => $logourl];
+        $userbadgesinfo[] = ['badgeid' => $badge->id, 'badgename' => $badge->name, 'badgeimage' => $badgeimage];
     }
 
     // Enrolments.
@@ -196,11 +251,10 @@ if ($userid) {
         }
         $courseslist = implode(',', $courseslistarray);
     }
-
-    list($csql, $params) = $DB->get_in_or_equal($courseslistarray, SQL_PARAMS_NAMED);
-    $params['cmvisible'] = 1;
-    $params['deletioninprogress'] = 0;
     if (!empty($courseslist)) {
+        list($csql, $params) = $DB->get_in_or_equal($courseslistarray, SQL_PARAMS_NAMED);
+        $params['cmvisible'] = 1;
+        $params['deletioninprogress'] = 0;
         // Assignments.
         $assignmentscountsql = $DB->get_records_sql("SELECT cm.id FROM {course_modules} cm
                         JOIN {modules} m ON m.id = cm.module AND m.name = 'assign'
@@ -432,6 +486,7 @@ if ($userid) {
                         WHERE 1 = 1 ORDER BY a.timeaccess ASC
                         LIMIT 5", $params);
     $recentaccesscourseslist = [];
+    $courseimage = '';
     if (!empty($recentaccesscourses)) {
         foreach ($recentaccesscourses as $r => $c) {
             $courseprogress = $DB->get_field_sql("SELECT ROUND((COUNT(distinct cc.course) / COUNT(DISTINCT c.id)) *100, 2)
@@ -448,6 +503,12 @@ if ($userid) {
             $courseaccess = (new ls)->strtime(time() - ($c->timeaccess)).' ago';
             $courseaccessrmvimg = preg_replace("/<img[^>]+\>/i", "", $courseaccess);
             $courseaccessarray = explode(" ", $courseaccessrmvimg, 2);
+
+            $course = $DB->get_record('course', ['id' => $c->courseid], '*',IGNORE_MISSING);
+            $courseimage = \core_course\external\course_summary_exporter::get_course_image($course);
+            if (!$courseimage) {
+                $courseimage = $OUTPUT->get_generated_image_for_id($c->courseid);
+            }
             $recentaccesscourseslist[] = ['course' => $c->course, 'courseid' => $c->courseid,
                         'timeaccessday' => $courseaccessarray[0], 'timeaccesstime' => $courseaccessarray[1],
                         'courseprogress' => ($courseprogress > 0) ? round($courseprogress, 0) : 0, ];
@@ -478,6 +539,7 @@ if ($userid) {
                                                     'reporttype' => $reporttype,
                                                     'recentactivities' => $recentactivitieslist,
                                                     'recentaccesscourses' => $recentaccesscourseslist,
+                                                    'courseimage' => $courseimage,
                                                     'testdata' => $userlmsaccess,
                                                     'userdata' => $data,
                                                     'role' => $roleshortname,

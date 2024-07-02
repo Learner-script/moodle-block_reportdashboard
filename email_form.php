@@ -44,7 +44,7 @@ class block_reportdashboard_emailform extends moodleform {
         $data = [];
         $mform->addElement('select', 'email', get_string('fullname'), $data, ['data-select2-ajax' => true,
                         'data-class' => $requireclass, 'data-element' => 'email', 'data-multiple' => true,
-                        'data-ajax--url' => $CFG->wwwroot . '/blocks/reportdashboard/ajax.php',
+                        'data-ajax--url' => new moodle_url('/blocks/reportdashboard/ajax.php'),
                         'data-placeholder' => 'Select Users', 'data-minimumInputLength' => 2, ]);
         $mform->getElement('email')->setMultiple(true);
         $mform->addRule('email', get_string('user_err', 'block_reportdashboard'), 'required', null, 'client');
