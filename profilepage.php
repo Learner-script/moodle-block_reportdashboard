@@ -64,7 +64,6 @@ if ($roleshortname == '' && !is_siteadmin()) {
                   AND ra.roleid IN (:studentroleid, :editingteacherroleid)";
         $params = ['userid' => $USER->id, 'studentroleid' => $roles_ids['student'],
         'editingteacherroleid' => $roles_ids['editingteacher']];
-        // $hasstudentrole = user_has_role_assignment($sessionuserid, $studentroleid, $context->id);= $DB->get_records_sql($sql, $params);records_sql($sql, $params);
         $roles = $DB->get_records_sql($sql, $params);
         if ($roles[$roles_ids['student']]) {
             $roleshortname = 'student';
@@ -74,9 +73,9 @@ if ($roleshortname == '' && !is_siteadmin()) {
         }
     }
 }
-if($roleshortname == 'student' && $USER->id != $sessionuserid){
+if ($roleshortname == 'student' && $USER->id != $sessionuserid) {
     throw new moodle_exception(get_string('badpermissions', 'block_learnerscript'));
-} else if($roleshortname == 'editingteacher' && $USER->id != $sessionuserid) {
+} else if ($roleshortname == 'editingteacher' && $USER->id != $sessionuserid) {
     $teacher_courses = enrol_get_users_courses($USER->id, true, array('id', 'shortname'));
 
     $is_enrolled = false;
@@ -106,7 +105,7 @@ if (!is_siteadmin()) {
     '/blocks/learnerscript/reports.php',
     ['role' => $SESSION->role, 'contextlevel' => $SESSION->ls_contextlevel]),
     get_string('managereports', 'block_learnerscript'), ['class' => 'btn linkbtn btn-primary']), '', ['class' => 'd-flex mb-2 justify-content-end']);
-    
+
     $userrolesql = "SELECT CONCAT(ra.roleid, '_',c.contextlevel) AS rolecontext
                 FROM {role_assignments} ra
                 JOIN {context} c ON c.id = ra.contextid
