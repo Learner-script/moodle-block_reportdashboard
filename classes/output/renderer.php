@@ -21,7 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 use block_learnerscript\local\ls as ls;
-/** block_reportdashboard */
+/**
+ * block_reportdashboard
+ */
 class block_reportdashboard_renderer extends plugin_renderer_base {
     /**
      * Returns the widget template

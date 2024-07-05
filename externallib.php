@@ -31,7 +31,9 @@ use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
 
-/** block_reportdashboard External */
+/**
+ * block_reportdashboard External
+ */
 class block_reportdashboard_external extends external_api {
     /**
      * User list parameters description

@@ -36,7 +36,8 @@
     <i class="icon fa fa-ellipsis-v fa-fw dropdown pull-right"></i></a>
 <ul class="dropdown-menu dropdown-menu-right dropdown-content">
     {{#action}}
-        <li class="report_schedule dropdown-item menu-action" id="report_schedule_{{reportid}}_{{instanceid}}" data-method = "{{method}}">
+        <li class="report_schedule dropdown-item menu-action" id="report_schedule_{{reportid}}_{{instanceid}}"
+        data-reportid = {{reportid}} data-instanceid = {{instanceid}} data-method = {{method}}>
             <span class="report_action_icons dropbtn widgetheader custom_{{ title }}">{{ title }}</span>
         </li>
     {{/ action}}

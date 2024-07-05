@@ -24,7 +24,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
 
-/** Reportdashboard Email Form */
+/**
+ * Reportdashboard Email Form
+ */
 class block_reportdashboard_emailform extends moodleform {
     /**
      * Form definition

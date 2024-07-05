@@ -25,7 +25,9 @@ use renderable;
 use renderer_base;
 use templatable;
 use stdClass;
-/** Report Area */
+/**
+ * Report Area
+ */
 class reportarea implements renderable, templatable {
     /**
      * @var $reportid

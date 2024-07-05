@@ -80,14 +80,10 @@ define(['jquery',
                 
                 $(document).on('click', ".report_schedule", function(e) {
                     const reportSchedules = document.querySelectorAll('.report_schedule');
-
-                    reportSchedules.forEach(function (element) {
-                        element.addEventListener('click', function (e) {
-                            const reportid = element.id.split('_')[2];
-                            const instanceid = element.id.split('_')[3];
-                            const method = element.getAttribute('data-method');
-
-                            require(["block_reportdashboard/reportdashboard", "jqueryui"], function (reportdashboard) {
+                            var reportid = $(this).data('reportid');
+                            var instanceid = $(this).data('instanceid');
+                            var method = $(this).data('method');
+                            require(['block_reportdashboard/reportdashboard'], function(reportdashboard) {
                                 if (typeof reportdashboard[method] === 'function') {
                                     reportdashboard[method]({
                                         reportid: reportid,
@@ -100,8 +96,6 @@ define(['jquery',
                                 e.stopImmediatePropagation();
                                 e.stopPropagation();
                             });
-                        });
-                    });
                 });
                /**
                 * Filter area

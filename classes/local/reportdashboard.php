@@ -20,10 +20,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace block_reportdashboard\local;
-use stdclass;
 use block_learnerscript\local\ls as ls;
 use context_system;
-/** Report Dashboard */
+/**
+ * Report Dashboard
+ */
 class reportdashboard {
      /**
       * This function delete the widgets from dashboard
@@ -32,7 +33,7 @@ class reportdashboard {
       * @param  int $reportid Report ID
       */
     public function delete_widget($deletereport, $blockinstanceid, $reportid = false) {
-        global $DB, $CFG, $SESSION;
+        global $DB, $SESSION;
         $context = context_system::instance();
         if ($deletereport == 1) {
             $report = $DB->get_record('block_learnerscript',  ['id' => $reportid]);

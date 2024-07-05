@@ -30,6 +30,7 @@ $roleshortname = optional_param('role', '', PARAM_TEXT);
 
 use block_learnerscript\local\ls;
 use block_learnerscript\local\querylib;
+use badge;
 
 global $CFG, $SITE, $PAGE, $OUTPUT, $DB, $SESSION;
 
@@ -121,7 +122,7 @@ if (!is_siteadmin()) {
 
     $userrolesql .= ") GROUP BY ra.roleid, c.contextlevel, r.shortname";
 
-    $userrolescount = $DB->get_records_sql($userrolesql, $userroleparams);
+    $userrolescount = $DB->get_records_sql($userrolesql, $userroleparams, IGNORE_MULTIPLE);
     $dashboardlink = count($userrolescount) > 1 ? 1 : 0;
 } else {
     $dashboardlink = 0;

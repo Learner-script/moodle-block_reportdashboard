@@ -19,7 +19,7 @@
  *
  * @package   block_reportdashboard
  * @copyright 2023 Moodle India Information Solutions Private Limited
- * @license   http://www.gnu.org/copyleft/gpl.reportdashboard GNU GPL v3 or later
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['active'] = 'Active';
 $string['activitiescount'] = 'Number of activities';

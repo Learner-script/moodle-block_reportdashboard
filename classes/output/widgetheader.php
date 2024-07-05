@@ -26,7 +26,9 @@ use renderer_base;
 use templatable;
 use stdClass;
 
-/** Widget header */
+/**
+ * Widget header
+ */
 class widgetheader implements renderable, templatable {
     /** @var string $sometext Some text to show how to pass data to a template. */
     /** @var $methodname. */
