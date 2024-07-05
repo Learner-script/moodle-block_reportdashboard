@@ -48,10 +48,10 @@ $PAGE->requires->css('/blocks/learnerscript/css/select2/select2.min.css');
 $PAGE->requires->css('/blocks/learnerscript/css/datatables/jquery.dataTables.min.css');
 
 if (!is_siteadmin()) {
-    $course_context = context_course::instance($courseid);
-    $is_enrolled = is_enrolled($course_context, $USER->id);
+    $coursecontext = context_course::instance($courseid);
+    $isenrolled = is_enrolled($coursecontext, $USER->id);
 
-    if (!$is_enrolled) {
+    if (!$isenrolled) {
         throw new moodle_exception(get_string('badpermissions', 'block_learnerscript'));
     }
 }

@@ -30,7 +30,6 @@ $roleshortname = optional_param('role', '', PARAM_TEXT);
 
 use block_learnerscript\local\ls;
 use block_learnerscript\local\querylib;
-use badge;
 
 global $CFG, $SITE, $PAGE, $OUTPUT, $DB, $SESSION;
 
@@ -57,17 +56,17 @@ if ($roleshortname == '' && !is_siteadmin()) {
             FROM {role}
             WHERE shortname IN ('student', 'editingteacher')
         ";
-        $roles_ids = $DB->get_records_sql_menu($sql);
+        $roleids = $DB->get_records_sql_menu($sql);
         $sql = "SELECT ra.roleid
                 FROM {role_assignments} ra
                 WHERE ra.userid = :userid
                   AND ra.roleid IN (:studentroleid, :editingteacherroleid)";
-        $params = ['userid' => $USER->id, 'studentroleid' => $roles_ids['student'],
-        'editingteacherroleid' => $roles_ids['editingteacher']];
+        $params = ['userid' => $USER->id, 'studentroleid' => $roleids['student'],
+        'editingteacherroleid' => $roleids['editingteacher']];
         $roles = $DB->get_records_sql($sql, $params);
-        if ($roles[$roles_ids['student']]) {
+        if ($roles[$roleids['student']]) {
             $roleshortname = 'student';
-        } else if ($roles[$roles_ids['editingteacher']]) {
+        } else if ($roles[$roleids['editingteacher']]) {
             $roleshortname = 'editingteacher';
             $contextlevel = 50;
         }
@@ -76,18 +75,18 @@ if ($roleshortname == '' && !is_siteadmin()) {
 if ($roleshortname == 'student' && $USER->id != $sessionuserid) {
     throw new moodle_exception(get_string('badpermissions', 'block_learnerscript'));
 } else if ($roleshortname == 'editingteacher' && $USER->id != $sessionuserid) {
-    $teacher_courses = enrol_get_users_courses($USER->id, true, array('id', 'shortname'));
+    $teachercourses = enrol_get_users_courses($USER->id, true, ['id', 'shortname']);
 
-    $is_enrolled = false;
-    foreach ($teacher_courses as $course) {
+    $isenrolled = false;
+    foreach ($teachercourses as $course) {
         $context = context_course::instance($course->id);
-        $is_enrolled = is_enrolled($context, $sessionuserid);
-        if ($is_enrolled) {
+        $isenrolled = is_enrolled($context, $sessionuserid);
+        if ($isenrolled) {
             break;
         }
     }
 
-    if (!$is_enrolled) {
+    if (!$isenrolled) {
         throw new moodle_exception(get_string('badpermissions', 'block_learnerscript'));
     }
 }
@@ -101,22 +100,28 @@ $role = $SESSION->role;
 echo $OUTPUT->header();
 
 if (!is_siteadmin()) {
-    echo html_writer::div(html_writer::link(new \moodle_url($CFG->wwwroot .
-    '/blocks/learnerscript/reports.php',
+    echo html_writer::div(html_writer::link(new \moodle_url('/blocks/learnerscript/reports.php',
     ['role' => $SESSION->role, 'contextlevel' => $SESSION->ls_contextlevel]),
-    get_string('managereports', 'block_learnerscript'), ['class' => 'btn linkbtn btn-primary']), '', ['class' => 'd-flex mb-2 justify-content-end']);
+    get_string('managereports', 'block_learnerscript'), ['class' => 'btn linkbtn btn-primary']),
+    '', ['class' => 'd-flex mb-2 justify-content-end']);
 
     $userrolesql = "SELECT CONCAT(ra.roleid, '_',c.contextlevel) AS rolecontext
                 FROM {role_assignments} ra
                 JOIN {context} c ON c.id = ra.contextid
                 JOIN {role} r ON r.id = ra.roleid
                 WHERE 1 = 1 AND ra.userid = :userid AND (";
+    $userroleparams['userid'] = $USER->id;
+    $i = 0;
     foreach ($USER->access['ra'] as $key => $value) {
-        $userrolesql .= " c.path LIKE '".$key."' OR ";
+        $i++;
+        $statsql[] = $DB->sql_like('c.path', ":queryparam$i");
+        $userroleparams["queryparam$i"] = $key;
     }
-    $userrolesql .= " 1 = 1) GROUP BY ra.roleid, c.contextlevel, r.shortname";
+    $userrolesql .= implode(" OR ", $statsql);
 
-    $userrolescount = $DB->get_records_sql($userrolesql, ['userid' => $USER->id]);
+    $userrolesql .= ") GROUP BY ra.roleid, c.contextlevel, r.shortname";
+
+    $userrolescount = $DB->get_records_sql($userrolesql, $userroleparams);
     $dashboardlink = count($userrolescount) > 1 ? 1 : 0;
 } else {
     $dashboardlink = 0;
@@ -388,7 +393,8 @@ if ($userid) {
     }
 
     // Activity progress.
-    $coursetimespentreport = $DB->get_record('block_learnerscript', ['type' => 'sql', 'name' => 'Timespent each course']);
+    $coursetimespentreport = $DB->get_record('block_learnerscript', ['type' => 'sql', 'name' => 'Timespent each course'],
+                                '*', IGNORE_MULTIPLE);
     $reportcontenttypes = (new ls)->cr_listof_reporttypes($coursetimespentreport->id);
     $reportid = $coursetimespentreport->id;
     $reportinstance = $coursetimespentreport->id;
@@ -503,7 +509,7 @@ if ($userid) {
             $courseaccessrmvimg = preg_replace("/<img[^>]+\>/i", "", $courseaccess);
             $courseaccessarray = explode(" ", $courseaccessrmvimg, 2);
 
-            $course = $DB->get_record('course', ['id' => $c->courseid], '*',IGNORE_MISSING);
+            $course = $DB->get_record('course', ['id' => $c->courseid], '*', IGNORE_MISSING);
             $courseimage = \core_course\external\course_summary_exporter::get_course_image($course);
             if (!$courseimage) {
                 $courseimage = $OUTPUT->get_generated_image_for_id($c->courseid);
@@ -515,7 +521,7 @@ if ($userid) {
     }
 
     // Coursesoverview.
-    $coursesoverviewreport = $DB->get_record('block_learnerscript', ['type' => 'coursesoverview']);
+    $coursesoverviewreport = $DB->get_record('block_learnerscript', ['type' => 'coursesoverview'], '*', IGNORE_MULTIPLE);
     $coursesoverviewreportid = $coursesoverviewreport->id;
     $coursesoverviewinstance = $coursesoverviewreport->id;
     $coursesoverviewtype = 'table';

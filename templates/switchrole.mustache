@@ -33,10 +33,10 @@
                 </a>
                 <ul class="menu dropdown-menu dropdown-menu-right dropdown-content" area-labelledby="switchrole{{reportinstance}}">
 
-                        {{# issiteadmin }}
-				<li role="presentation">
-				    <a href='{{config.wwwroot}}/blocks/reportdashboard/dashboard.php' class="dropdown-item menu-action">{{#str}}defaultrole, block_reportdashboard{{/str}}</a>
-				</li>
+                {{# issiteadmin }}
+    				<li role="presentation">
+    				    <a href='{{config.wwwroot}}/blocks/reportdashboard/dashboard.php' class="dropdown-item menu-action">{{#str}}defaultrole, block_reportdashboard{{/str}}</a>
+    				</li>
 			    {{/ issiteadmin }}
 			    {{^ issiteadmin }}
 				<li role="presentation">

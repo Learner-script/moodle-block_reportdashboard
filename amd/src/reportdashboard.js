@@ -65,6 +65,44 @@ define(['jquery',
                     action: 'reportlist',
                     multiple: true
                 });
+
+                /** 
+                 * Custom report report help text
+                 */
+                $(document).on('click', ".customreporthelptext", function() {
+                    var reportid = $(this).data('reportid');
+                    report.block_statistics_help(reportid);
+                });
+
+                /**
+                 * Menu option for report widget on dashboard
+                 */
+                
+                $(document).on('click', ".report_schedule", function(e) {
+                    const reportSchedules = document.querySelectorAll('.report_schedule');
+
+                    reportSchedules.forEach(function (element) {
+                        element.addEventListener('click', function (e) {
+                            const reportid = element.id.split('_')[2];
+                            const instanceid = element.id.split('_')[3];
+                            const method = element.getAttribute('data-method');
+
+                            require(["block_reportdashboard/reportdashboard", "jqueryui"], function (reportdashboard) {
+                                if (typeof reportdashboard[method] === 'function') {
+                                    reportdashboard[method]({
+                                        reportid: reportid,
+                                        instanceid: instanceid
+                                    });
+                                } else {
+                                    console.error(`Method ${method} does not exist on reportdashboard`);
+                                }
+                                e.preventDefault();
+                                e.stopImmediatePropagation();
+                                e.stopPropagation();
+                            });
+                        });
+                    });
+                });
                /**
                 * Filter area
                 */

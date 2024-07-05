@@ -46,7 +46,7 @@ $PAGE->set_context($context);
 $lsreportconfigstatus = get_config('block_learnerscript', 'lsreportconfigstatus');
 
 if (!$lsreportconfigstatus) {
-    redirect(new moodle_url('/blocks/learnerscript/lsconfig.php?import=1'));
+    redirect(new moodle_url('/blocks/learnerscript/lsconfig.php', ['import' => 1]));
     exit;
 }
 
@@ -218,8 +218,6 @@ if (!empty($role) || is_siteadmin()) {
         echo html_writer::start_tag('div', ['class' => 'width-container']);
         echo $OUTPUT->blocks('side-db-three', 'width-default width-12');
         echo html_writer::end_tag('div');
-        echo html_writer::div('', "reportslist", ['style' => "display:none;"]);
-        echo html_writer::div('', "statistics_reportslist", ['style' => "display:none;"]);
     } else {
         echo html_writer::div(get_string('reportsnotavailable', 'block_reportdashboard'), "alert alert-info",
                 []);
