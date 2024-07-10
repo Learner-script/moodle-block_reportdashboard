@@ -74,7 +74,7 @@ class block_reportdashboard extends block_base {
      * @return array page-type prefix => true/false.
      */
     public function applicable_formats() {
-        return ['all' => true];
+        return ['site' => true, 'my' => true];
     }
     /**
      * This function is called on your subclass right after an instance is loaded
