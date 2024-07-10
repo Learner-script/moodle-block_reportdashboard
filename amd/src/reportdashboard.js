@@ -74,6 +74,29 @@ define(['jquery',
                     report.block_statistics_help(reportid);
                 });
 
+                $(document).on('change', ".schuserroleslist", function(e) {
+                    var reportid = $(this).data('reportid');
+                    var reportinstance = $(this).data('reportinstance');
+                    schedule.rolewiseusers({reportid: reportid, reportinstance: reportinstance});
+                });
+
+                /**
+                 * Add schedule form users for widget
+                 */
+
+                $(document).on('change', ".schusers_data", function(e) {
+                    var reportid = $(this).data('reportid');
+                    var reportinstance = $(this).data('reportinstance');
+                    schedule.addschusers({reportid: reportid, reportinstance: reportinstance});
+                });
+                
+
+                $(document).on('change', "select[name='frequency']", function(e) {
+                    var reportid = $(this).data('reportid');
+                    var reportinstance = $(this).data('reportinstance');
+                    schedule.frequency_schedule({reportid: reportid, reportinstance: reportinstance});
+                });
+            
                 /**
                  * Menu option for report widget on dashboard
                  */
