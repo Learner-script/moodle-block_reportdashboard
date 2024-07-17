@@ -5326,3 +5326,6 @@ body#page-my-index .block_reportdashboard .ui-dialog .ui-dialog-titlebar button 
     border-radius: 5px;
     -webkit-border-radius: 5px;
 }
+body#page-my-index .block_reportdashboard .reportdashboard_header .customreporthelptext {
+    display: none;
+}

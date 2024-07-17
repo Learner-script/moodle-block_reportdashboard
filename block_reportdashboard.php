@@ -260,11 +260,7 @@ class block_reportdashboard extends block_base {
             $this->content->text .= html_writer::tag('input', '', ['type' => 'hidden', 'id' => 'ls_courseid',
                                     'value' => " . $COURSE->id . ", ]);
         } else {
-            if (is_siteadmin()) {
-                $this->content->text .= get_string('configurationmessage', 'block_reportdashboard');
-            } else {
-                $this->content->text .= '';
-            }
+            $this->content->text .= get_string('configurationmessage', 'block_reportdashboard');
         }
         unset($filteropt); // Memory footprint.
         return $this->content;

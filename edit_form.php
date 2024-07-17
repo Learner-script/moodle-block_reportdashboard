@@ -34,7 +34,38 @@ class block_reportdashboard_edit_form extends block_edit_form {
      * @param MoodleQuickForm $mform
      */
     protected function specific_definition($mform) {
-        global $DB;
+        global $DB, $USER, $SESSION;
+
+        $userrolesql = "SELECT CONCAT(ra.roleid, '_',c.contextlevel) AS rolecontext, r.shortname, c.contextlevel
+                FROM {role_assignments} ra
+                JOIN {context} c ON c.id = ra.contextid
+                JOIN {role} r ON r.id = ra.roleid
+                WHERE 1 = 1 AND ra.userid = :userid AND (";
+        $userroleparams['userid'] = $USER->id;
+        $i = 0;
+        foreach ($USER->access['ra'] as $key => $value) {
+            $i++;
+            $statsql[] = $DB->sql_like('c.path', ":queryparam$i");
+            $userroleparams["queryparam$i"] = $key;
+        }
+        $userrolesql .= implode(" OR ", $statsql);
+
+        $userrolesql .= ") GROUP BY ra.roleid, c.contextlevel, r.shortname";
+        $userroles = $DB->get_record_sql($userrolesql, $userroleparams, IGNORE_MISSING);
+        if (!empty($userroles)) {
+            $roleshortname = $userroles->shortname;
+            if ($roleshortname == 'editingteacher' && $userroles->contextlevel == 10) {
+                $rolecontextlevel = 50;
+            } else {
+                $rolecontextlevel = $userroles->contextlevel;
+            }
+        } else {
+            $roleshortname = 0;
+            $rolecontextlevel = 0;
+        }
+        $SESSION->role = $roleshortname;
+        $SESSION->ls_contextlevel = $rolecontextlevel;
+
         $this->page->requires->js('/blocks/reporttiles/js/jscolor.js', true);
         // Fields for editing HTML block title and contents.
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
@@ -44,7 +75,8 @@ class block_reportdashboard_edit_form extends block_edit_form {
         ksort($reportlist);
         $reports = [];
         $reports[0] = get_string('selectreport', 'block_reporttiles');
-        $rolereports = (new ls)->listofreportsbyrole();
+        $reportdashboard = true;
+        $rolereports = (new ls)->listofreportsbyrole(false, false, false, true, $reportdashboard);
         foreach ($rolereports as $report) {
             $reports[$report['id']] = $report['name'];
         }
@@ -96,27 +128,6 @@ class block_reportdashboard_edit_form extends block_edit_form {
         if (isset($title)) {
             // Reset the preserved title.
             $this->block->config->title = $title;
-        }
-    }
-    /**
-     * Sets defination data
-     *
-     */
-    public function definition_after_data() {
-        global $DB;
-
-        $mform = $this->_form;
-        $reportid = $mform->getElementValue('config_reportlist');
-        if (isset($reportid) && $reportid[0]) {
-            if (!$DB->get_record('block_learnerscript', ['id' => $reportid[0]])) {
-                $reportcontenttypes = [null => get_string('selectall', 'block_reportdashboard')];
-            } else {
-                $reportcontenttypes = (new block_learnerscript\local\ls)->cr_listof_reporttypes($reportid[0]);
-            }
-
-            $reportcontenttype = $mform->createElement('select', 'config_reportcontenttype',
-                get_string('reportcontenttype', 'block_reportdashboard'), $reportcontenttypes);
-            $mform->insertElementBefore($reportcontenttype, 'reportcontenttype');
         }
     }
 
