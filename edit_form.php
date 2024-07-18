@@ -36,35 +36,38 @@ class block_reportdashboard_edit_form extends block_edit_form {
     protected function specific_definition($mform) {
         global $DB, $USER, $SESSION;
 
-        $userrolesql = "SELECT CONCAT(ra.roleid, '_',c.contextlevel) AS rolecontext, r.shortname, c.contextlevel
-                FROM {role_assignments} ra
-                JOIN {context} c ON c.id = ra.contextid
-                JOIN {role} r ON r.id = ra.roleid
-                WHERE 1 = 1 AND ra.userid = :userid AND (";
-        $userroleparams['userid'] = $USER->id;
-        $i = 0;
-        foreach ($USER->access['ra'] as $key => $value) {
-            $i++;
-            $statsql[] = $DB->sql_like('c.path', ":queryparam$i");
-            $userroleparams["queryparam$i"] = $key;
-        }
-        $userrolesql .= implode(" OR ", $statsql);
-
-        $userrolesql .= ") GROUP BY ra.roleid, c.contextlevel, r.shortname";
-        $userroles = $DB->get_record_sql($userrolesql, $userroleparams, IGNORE_MISSING);
-        if (!empty($userroles)) {
-            $roleshortname = $userroles->shortname;
-            if ($roleshortname == 'editingteacher' && $userroles->contextlevel == 10) {
-                $rolecontextlevel = 50;
-            } else {
-                $rolecontextlevel = $userroles->contextlevel;
+        if (!is_siteadmin()) {
+            $userrolesql = "SELECT CONCAT(ra.roleid, '_',c.contextlevel) AS rolecontext, r.shortname, c.contextlevel
+                    FROM {role_assignments} ra
+                    JOIN {context} c ON c.id = ra.contextid
+                    JOIN {role} r ON r.id = ra.roleid
+                    WHERE 1 = 1 AND ra.userid = :userid AND (";
+            $userroleparams['userid'] = $USER->id;
+            $i = 0;
+            foreach ($USER->access['ra'] as $key => $value) {
+                $i++;
+                $statsql[] = $DB->sql_like('c.path', ":queryparam$i");
+                $userroleparams["queryparam$i"] = $key;
             }
-        } else {
-            $roleshortname = 0;
-            $rolecontextlevel = 0;
+
+            $userrolesql .= implode(" OR ", $statsql);
+
+            $userrolesql .= ") GROUP BY ra.roleid, c.contextlevel, r.shortname";
+            $userroles = $DB->get_record_sql($userrolesql, $userroleparams, IGNORE_MISSING);
+            if (!empty($userroles)) {
+                $roleshortname = $userroles->shortname;
+                if ($roleshortname == 'editingteacher' && $userroles->contextlevel == 10) {
+                    $rolecontextlevel = 50;
+                } else {
+                    $rolecontextlevel = $userroles->contextlevel;
+                }
+            } else {
+                $roleshortname = 0;
+                $rolecontextlevel = 0;
+            }
+            $SESSION->role = $roleshortname;
+            $SESSION->ls_contextlevel = $rolecontextlevel;
         }
-        $SESSION->role = $roleshortname;
-        $SESSION->ls_contextlevel = $rolecontextlevel;
 
         $this->page->requires->js('/blocks/reporttiles/js/jscolor.js', true);
         // Fields for editing HTML block title and contents.
