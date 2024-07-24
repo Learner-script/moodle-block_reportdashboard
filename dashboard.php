@@ -13,12 +13,14 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Form for editing LearnerScript dashboard block instances.
  * @package   block_reportdashboard
  * @copyright 2023 Moodle India Information Solutions Private Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/accesslib.php');
 require_once($CFG->dirroot . '/blocks/learnerscript/classes/local/observer.php');
@@ -46,7 +48,7 @@ $PAGE->set_context($context);
 $lsreportconfigstatus = get_config('block_learnerscript', 'lsreportconfigstatus');
 
 if (!$lsreportconfigstatus) {
-    redirect(new moodle_url($CFG->wwwroot . '/blocks/learnerscript/lsconfig.php?import=1'));
+    redirect(new moodle_url('/blocks/learnerscript/lsconfig.php', ['import' => 1]));
     exit;
 }
 
@@ -105,7 +107,7 @@ $PAGE->add_body_class('reportdashboard');
 $PAGE->navbar->ignore_active();
 $navdashboardurl = new moodle_url($seturl);
 
-$managereporturl = $CFG->wwwroot. '/blocks/reportdashboard/dashboard.php';
+$managereporturl = new moodle_url('/blocks/reportdashboard/dashboard.php');
 $PAGE->navbar->add(get_string('dashboard', 'block_learnerscript'), $managereporturl);
 if (!$dashboardurl) {
     $PAGE->navbar->add(get_string('dashboard', 'block_reportdashboard'));
@@ -158,10 +160,7 @@ echo $OUTPUT->header();
 if (!empty($role) || is_siteadmin()) {
     $configuredinstances = $DB->count_records('block_instances', [
                                 'pagetypepattern' => $pagepattentype, 'subpagepattern' => $subpagepatterntype, ]);
-    $reports = $DB->get_records_sql("SELECT id
-    FROM {block_learnerscript}
-    WHERE visible = :visible AND global = :global",
-    ['visible' => 1, 'global' => 1]);
+    $reports = $DB->get_records('block_learnerscript', ['visible' => 1, 'global' => 1], '', 'id');
     if (!empty($reports)) {
         $editingon = false;
         if (is_siteadmin() && isset($USER->editing) && $USER->editing) {
@@ -221,8 +220,6 @@ if (!empty($role) || is_siteadmin()) {
         echo html_writer::start_tag('div', ['class' => 'width-container']);
         echo $OUTPUT->blocks('side-db-three', 'width-default width-12');
         echo html_writer::end_tag('div');
-        echo html_writer::div('', "reportslist", ['style' => "display:none;"]);
-        echo html_writer::div('', "statistics_reportslist", ['style' => "display:none;"]);
     } else {
         echo html_writer::div(get_string('reportsnotavailable', 'block_reportdashboard'), "alert alert-info",
                 []);

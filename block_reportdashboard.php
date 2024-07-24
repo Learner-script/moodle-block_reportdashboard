@@ -74,7 +74,7 @@ class block_reportdashboard extends block_base {
      * @return array page-type prefix => true/false.
      */
     public function applicable_formats() {
-        return ['all' => true];
+        return ['site' => true, 'my' => true];
     }
     /**
      * This function is called on your subclass right after an instance is loaded
@@ -226,6 +226,8 @@ class block_reportdashboard extends block_base {
                 }
             }
 
+            $report->name = !empty($blocktitle) ? $blocktitle : $report->name;
+
             $widgetheader = new \block_reportdashboard\output\widgetheader((object) ["methodname" => $methodnames,
                 "reportid" => $reportid,
                 "instanceid" => $instanceid, "reportvisible" => $report->visible,
@@ -258,11 +260,7 @@ class block_reportdashboard extends block_base {
             $this->content->text .= html_writer::tag('input', '', ['type' => 'hidden', 'id' => 'ls_courseid',
                                     'value' => " . $COURSE->id . ", ]);
         } else {
-            if (is_siteadmin()) {
-                $this->content->text .= get_string('configurationmessage', 'block_reportdashboard');
-            } else {
-                $this->content->text .= '';
-            }
+            $this->content->text .= get_string('configurationmessage', 'block_reportdashboard');
         }
         unset($filteropt); // Memory footprint.
         return $this->content;

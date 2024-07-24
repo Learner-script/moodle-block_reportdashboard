@@ -65,6 +65,61 @@ define(['jquery',
                     action: 'reportlist',
                     multiple: true
                 });
+
+                /** 
+                 * Custom report report help text
+                 */
+                $(document).on('click', ".customreporthelptext", function() {
+                    var reportid = $(this).data('reportid');
+                    report.block_statistics_help(reportid);
+                });
+
+                $(document).on('change', ".schuserroleslist", function(e) {
+                    var reportid = $(this).data('reportid');
+                    var reportinstance = $(this).data('reportinstance');
+                    schedule.rolewiseusers({reportid: reportid, reportinstance: reportinstance});
+                });
+
+                /**
+                 * Add schedule form users for widget
+                 */
+
+                $(document).on('change', ".schusers_data", function(e) {
+                    var reportid = $(this).data('reportid');
+                    var reportinstance = $(this).data('reportinstance');
+                    schedule.addschusers({reportid: reportid, reportinstance: reportinstance});
+                });
+                
+
+                $(document).on('change', "select[name='frequency']", function(e) {
+                    var reportid = $(this).data('reportid');
+                    var reportinstance = $(this).data('reportinstance');
+                    schedule.frequency_schedule({reportid: reportid, reportinstance: reportinstance});
+                });
+            
+                /**
+                 * Menu option for report widget on dashboard
+                 */
+                
+                $(document).on('click', ".report_schedule", function(e) {
+                    const reportSchedules = document.querySelectorAll('.report_schedule');
+                            var reportid = $(this).data('reportid');
+                            var instanceid = $(this).data('instanceid');
+                            var method = $(this).data('method');
+                            require(['block_reportdashboard/reportdashboard'], function(reportdashboard) {
+                                if (typeof reportdashboard[method] === 'function') {
+                                    reportdashboard[method]({
+                                        reportid: reportid,
+                                        instanceid: instanceid
+                                    });
+                                } else {
+                                    console.error(`Method ${method} does not exist on reportdashboard`);
+                                }
+                                e.preventDefault();
+                                e.stopImmediatePropagation();
+                                e.stopPropagation();
+                            });
+                });
                /**
                 * Filter area
                 */

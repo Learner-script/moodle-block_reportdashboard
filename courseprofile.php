@@ -29,7 +29,7 @@ $roleshortname = optional_param('role', '', PARAM_TEXT);
 use block_learnerscript\local\ls;
 use block_learnerscript\local\querylib;
 
-global $CFG, $SITE, $PAGE, $OUTPUT, $DB, $SESSION;
+global $CFG, $SITE, $PAGE, $OUTPUT, $DB, $SESSION, $USER;
 
 require_login();
 
@@ -47,7 +47,14 @@ $PAGE->requires->jquery_plugin('ui-css');
 $PAGE->requires->css('/blocks/learnerscript/css/select2/select2.min.css');
 $PAGE->requires->css('/blocks/learnerscript/css/datatables/jquery.dataTables.min.css');
 
+if (!is_siteadmin()) {
+    $coursecontext = context_course::instance($courseid);
+    $isenrolled = is_enrolled($coursecontext, $USER->id);
 
+    if (!$isenrolled) {
+        throw new moodle_exception(get_string('badpermissions', 'block_learnerscript'));
+    }
+}
 echo $OUTPUT->header();
 $SESSION->ls_contextlevel = $contextlevel;
 $SESSION->role = $roleshortname;
@@ -116,9 +123,20 @@ $avgtimespent = $DB->get_record_sql("SELECT AVG(timespent) AS timespent FROM {bl
 $avgtime = !empty($avgtimespent->timespent) ? (new ls)->strtime($avgtimespent->timespent) : 0;
 $courseinfo->avgtimespent = $avgtime;
 
-$groups = $DB->get_records('groups', ['courseid' => $courseid]);
-$courseinfo->groups = count($groups);
-
+switch ($courseinfo->groupmode) {
+    case SEPARATEGROUPS:
+        $groupmode = get_string('groupsseparate', 'group');
+        break;
+    case VISIBLEGROUPS:
+        $groupmode = get_string('groupsvisible', 'group');
+        break;
+    case NOGROUPS:
+        $groupmode = get_string('groupsnone', 'group');
+        break;
+    default:
+        break;
+}
+$courseinfo->groups = $groupmode ? $groupmode : '';
 // Course progress.
 $completionsql = "SELECT DISTINCT ue.userid
                 FROM {course} c
@@ -241,8 +259,7 @@ $courseinfo->scorminprogress = $n;
 $courseinfo->scormprogress = !empty($courseinfo->scormcount) ? round(($m / $courseinfo->scormcount) * 100) : 0;
 
 // Badges.
-$badgeslist = $DB->get_records_sql("SELECT b.id, b.name FROM {badge} b
-                    WHERE 1 = 1 AND b.courseid = :courseid", ['courseid' => $courseid]);
+$badgeslist = $DB->get_records('badge', ['courseid' => $courseid], '', 'id, name');
 $coursebadgesinfo = [];
 foreach ($badgeslist as $badge) {
     if ($badge->id > 0) {

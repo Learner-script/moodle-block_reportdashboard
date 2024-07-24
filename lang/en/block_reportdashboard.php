@@ -19,7 +19,7 @@
  *
  * @package   block_reportdashboard
  * @copyright 2023 Moodle India Information Solutions Private Limited
- * @license   http://www.gnu.org/copyleft/gpl.reportdashboard GNU GPL v3 or later
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['active'] = 'Active';
 $string['activitiescount'] = 'Number of activities';
@@ -45,6 +45,7 @@ $string['custom'] = 'Custom';
 $string['dashboard'] = 'Dashboard';
 $string['date'] = 'Date';
 $string['defaultrole'] = 'Default role';
+$string['delete'] = "Delete";
 $string['deleteconfimation'] = 'Are you sure to delete widget/report?';
 $string['deletewidget'] = 'Delete confirmation';
 $string['disableheader'] = 'Disable header';

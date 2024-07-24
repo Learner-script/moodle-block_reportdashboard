@@ -19,7 +19,7 @@
  *
  * @package    block_reportdashboard
  * @copyright  2023 Moodle India Information Solutions Private Limited
- * @license    http://www.gnu.org/copyleft/gpl.reportdashboard GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace block_reportdashboard\output;
 use renderable;
@@ -29,7 +29,9 @@ use stdClass;
 use block_learnerscript\local\ls as ls;
 use block_reportdashboard\local\reportdashboard as reportdashboard;
 
-/** Dashboard header */
+/**
+ * Dashboard header
+ */
 class dashboardheader implements renderable, templatable {
     /** @var $editingon */
     public $editingon;
@@ -85,12 +87,18 @@ class dashboardheader implements renderable, templatable {
                 JOIN {context} c ON c.id = ra.contextid
                 JOIN {role} r ON r.id = ra.roleid
                 WHERE 1 = 1 AND ra.userid = :userid AND (";
+            $userroleparams['userid'] = $USER->id;
+            $i = 0;
             foreach ($USER->access['ra'] as $key => $value) {
-                $userrolesql .= " c.path LIKE '".$key."' OR ";
+                $i++;
+                $statsql[] = $DB->sql_like('c.path', ":queryparam$i");
+                $userroleparams["queryparam$i"] = $key;
             }
-            $userrolesql .= " 1 = 1) GROUP BY ra.roleid, c.contextlevel, r.shortname";
+            $userrolesql .= implode(" OR ", $statsql);
 
-            $userrolescount = $DB->get_records_sql($userrolesql, ['userid' => $USER->id]);
+            $userrolesql .= ") GROUP BY ra.roleid, c.contextlevel, r.shortname";
+
+            $userrolescount = $DB->get_records_sql($userrolesql, $userroleparams, IGNORE_MULTIPLE);
             $dashboardlink = count($userrolescount) > 1 ? 1 : 0;
             $data['dashboardlink'] = $dashboardlink;
         } else {

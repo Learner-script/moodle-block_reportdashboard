@@ -94,8 +94,8 @@ switch ($action) {
         break;
     case 'sendemails':
         require_once($CFG->dirroot . '/blocks/reportdashboard/email_form.php');
-        $emailform = new block_reportdashboard_emailform($CFG->wwwroot . '/blocks/reportdashboard/dashboard.php',
-            ['reportid' => $reportid, 'AjaxForm' => true, 'instance' => $instance]);
+        $emailform = new block_reportdashboard_emailform(new moodle_url('/blocks/reportdashboard/dashboard.php',
+                ['reportid' => $reportid, 'AjaxForm' => true, 'instance' => $instance]));
         $return = $emailform->render();
         break;
     case 'dashboardtiles':

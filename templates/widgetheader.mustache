@@ -24,11 +24,9 @@
     }
 }}
 {{# reportnameheading}}<h4 class='reportdashboard_report_heading' title="{{reporttitle}}">{{reportnameheading}}
-{{# helpimgsql}}
-    <a href="#" onclick='(function(e){ require("block_learnerscript/report").block_statistics_help({{reportid}}) })(event)'>
+    <a href="#" class="customreporthelptext" data-reportid = {{reportid}}>
         {{#pix}} help, core, {{#str}} helptext, block_learnerscript {{/str}} {{/pix}}
     </a>
-{{/ helpimgsql}}
 </h4>
 {{/reportnameheading}}
 {{# report_option_innerstatus }}
@@ -37,23 +35,10 @@
     <span class="tooltiptext tooltip-top">{{# str}}menu, block_reportdashboard{{/ str}}</span>
     <i class="icon fa fa-ellipsis-v fa-fw dropdown pull-right"></i></a>
 <ul class="dropdown-menu dropdown-menu-right dropdown-content">
-    {{# designreportcap }}
-            <div id='delete_dialog{{reportinstance}}' style='display:none;'>
-                <p>{{# str}}deleteconfimation, block_reportdashboard, {{reportname}}{{/ str}}</p>
-				<div class='widgetdel'>
-					<a href="{{config.wwwroot}}/blocks/reportdashboard/dashboard.php?role={{dashboardrole}}&contextlevel={{dashboardcontextlevel}}&dashboardurl={{dashboardurl}}&reportid={{reportid}}&delete=1&sesskey={{sesskey}}&blockinstanceid={{instanceid}}&deletereport=0" class="btn btn-default">
-						{{# str}}widget, block_reportdashboard{{/ str}}
-					</a>
-					<a href="javascript:void(0);" onclick=" (function(e){ require(['jquery','jqueryui'], function($) { $('#delete_dialog{{reportinstance}}').dialog('close'); }) }) (event);" class="btn btn-default">
-						{{# str}}cancel{{/str}}
-					</a>
-				</div>
-            </div>
-    {{/ designreportcap }}
     {{#action}}
-        <li class="report_schedule dropdown-item menu-action" onclick='(function(e){ require(["block_reportdashboard/reportdashboard","jqueryui"],function(reportdashboard){reportdashboard.{{method}}({reportid: {{reportid}},instanceid:{{instanceid}}}); e.preventDefault();
-                            e.stopImmediatePropagation(); e.stopPropagation(); })})(event)'>
-            <span class ="report_action_icons dropbtn widgetheader custom_{{ title }}">{{ title }}</span>
+        <li class="report_schedule dropdown-item menu-action" id="report_schedule_{{reportid}}_{{instanceid}}"
+        data-reportid = {{reportid}} data-instanceid = {{instanceid}} data-method = {{method}}>
+            <span class="report_action_icons dropbtn widgetheader custom_{{ title }}">{{ title }}</span>
         </li>
     {{/ action}}
 </ul>
@@ -88,7 +73,7 @@
     <ul id="reportcontenttypes-area{{instanceid}}"
         class="dropdown-menu dropdown-menu-right dropdown-content">
         {{#reportcontenttypes}}
-            <li id='reporttype{{instanceid}}' class="reportcontenttype"  class="dropdown-item menu-action"
+            <li id='reporttype{{instanceid}}' class="dropdown-item reportcontenttype"  class="dropdown-item menu-action"
                 data-reportid={{reportid}} data-reporttype={{key}} data-blockinstance={{instanceid}}> {{ value }}</li>
         {{/reportcontenttypes}}
 
