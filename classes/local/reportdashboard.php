@@ -26,36 +26,6 @@ use context_system;
  * Report Dashboard
  */
 class reportdashboard {
-     /**
-      * This function delete the widgets from dashboard
-      * @param  int $deletereport Delete report confirmation
-      * @param  int $blockinstanceid Report block instance id
-      * @param  int $reportid Report ID
-      */
-    public function delete_widget($deletereport, $blockinstanceid, $reportid = false) {
-        global $DB, $SESSION;
-        $context = context_system::instance();
-        if ($deletereport == 1) {
-            $report = $DB->get_record('block_learnerscript',  ['id' => $reportid]);
-            if ($DB->delete_records('block_instances', ['blockname' => 'reportdashboard', 'id' => $blockinstanceid])) {
-                (new ls)->delete_report($report, $context);
-            }
-            if (empty($SESSION->role)) {
-                $redirecturl = new \moodle_url('/blocks/reportdashboard/dashboard.php');
-            } else {
-                $redirecturl = new \moodle_url('/blocks/reportdashboard/dashboard.php', ['role' => $SESSION->role]);
-            }
-            header("Location: $redirecturl");
-        } else if ($deletereport == 0) {
-            if (empty($SESSION->role)) {
-                $redirecturl = new \moodle_url('/blocks/reportdashboard/dashboard.php');
-            } else {
-                $redirecturl = new \moodle_url('/blocks/reportdashboard/dashboard.php', ['role' => $SESSION->role]);
-            }
-            header("Location: $redirecturl");
-        }
-        return true;
-    }
     /**
      * This function checks the report dashboard data
      * @param  int $dashboardid Dashboard id

@@ -37,41 +37,26 @@ class block_reportdashboard_edit_form extends block_edit_form {
         global $DB, $USER, $SESSION;
 
         if (!is_siteadmin()) {
-            $userrolesql = "SELECT CONCAT(ra.roleid, '_',c.contextlevel) AS rolecontext, r.shortname, c.contextlevel
-                    FROM {role_assignments} ra
-                    JOIN {context} c ON c.id = ra.contextid
-                    JOIN {role} r ON r.id = ra.roleid
-                    WHERE 1 = 1 AND ra.userid = :userid AND (";
-            $userroleparams['userid'] = $USER->id;
-            $i = 0;
-            foreach ($USER->access['ra'] as $key => $value) {
-                $i++;
-                $statsql[] = $DB->sql_like('c.path', ":queryparam$i");
-                $userroleparams["queryparam$i"] = $key;
-            }
-
-            $userrolesql .= implode(" OR ", $statsql);
-
-            $userrolesql .= ") GROUP BY ra.roleid, c.contextlevel, r.shortname";
-            $userroles = $DB->get_record_sql($userrolesql, $userroleparams, IGNORE_MISSING);
-            if (!empty($userroles)) {
-                $roleshortname = $userroles->shortname;
-                if ($roleshortname == 'editingteacher' && $userroles->contextlevel == 10) {
-                    $rolecontextlevel = 50;
-                } else {
-                    $rolecontextlevel = $userroles->contextlevel;
-                }
+            $enrolledcourses = enrol_get_users_courses($USER->id, true, ['id', 'shortname']);
+            if (!empty($enrolledcourses)) {
+                $context = context_course::instance(array_key_last($enrolledcourses));
             } else {
-                $roleshortname = 0;
-                $rolecontextlevel = 0;
+                $context = context_system::instance();
             }
+            $currentuserroleid = array_key_first($USER->access['ra'][$context->path]);
+            $getcontextlevels = get_role_contextlevels($currentuserroleid);
+            $currentcontextlevel = reset($getcontextlevels);
+            if ($currentcontextlevel == CONTEXT_SYSTEM || $currentcontextlevel == CONTEXT_MODULE) {
+                $rolecontextlevel = 0;
+            } else {
+                $rolecontextlevel = $currentcontextlevel;
+            }
+            $roleshortname = $DB->get_field('role', 'shortname', ['id' => $currentuserroleid]);
             $SESSION->role = $roleshortname;
             $SESSION->ls_contextlevel = $rolecontextlevel;
         }
 
         $this->page->requires->js('/blocks/reporttiles/js/jscolor.js', true);
-        // Fields for editing HTML block title and contents.
-        $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
         $reportlist = $DB->get_records_select_menu('block_learnerscript', "global=1 AND visible=1 AND type!='statistics'",
                                                         null, '', 'id, name');
@@ -83,30 +68,35 @@ class block_reportdashboard_edit_form extends block_edit_form {
         foreach ($rolereports as $report) {
             $reports[$report['id']] = $report['name'];
         }
+        if (count($reports) > 1) {
+            // Fields for editing HTML block title and contents.
+            $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
+            $mform->addElement('text', 'config_blocktitle', get_string('blocktitle', 'block_reportdashboard'));
+            $mform->setType('config_blocktitle', PARAM_TEXT);
 
-        $mform->addElement('text', 'config_blocktitle', get_string('blocktitle', 'block_reportdashboard'));
-        $mform->setType('config_blocktitle', PARAM_TEXT);
+            $mform->addElement('select', 'config_reportlist', get_string('listofreports', 'block_reportdashboard'), $reports);
+            $durations = ['all' => get_string('all', 'block_reportdashboard'),
+                        'week' => get_string('week', 'block_reportdashboard'),
+                        'month' => get_string('month', 'block_reportdashboard'),
+                        'year' => get_string('year', 'block_reportdashboard'), ];
+            $mform->addElement('select', 'config_reportduration', get_string('reportduration', 'block_reportdashboard'), $durations);
+            $mform->addElement('advcheckbox', 'config_disableheader', get_string('disableheader', 'block_reportdashboard'),
+                                get_string('disableheaderaction', 'block_reportdashboard'), ['group' => 1], [0, 1]);
+            $this->page->requires->yui_module('moodle-block_reportdashboard-reportselect', 'M.block_reportdashboard.init_reportselect',
+                                [['formid' => $mform->getAttribute('id')]]);
+            $mform->addElement('hidden', 'reportcontenttype');
+            $mform->setType('reportcontenttype', PARAM_TEXT);
 
-        $mform->addElement('select', 'config_reportlist', get_string('listofreports', 'block_reportdashboard'), $reports);
-        $durations = ['all' => get_string('all', 'block_reportdashboard'),
-                      'week' => get_string('week', 'block_reportdashboard'),
-                      'month' => get_string('month', 'block_reportdashboard'),
-                      'year' => get_string('year', 'block_reportdashboard'), ];
-        $mform->addElement('select', 'config_reportduration', get_string('reportduration', 'block_reportdashboard'), $durations);
-        $mform->addElement('advcheckbox', 'config_disableheader', get_string('disableheader', 'block_reportdashboard'),
-                            'Disable widget header and actions', ['group' => 1], [0, 1]);
-        $this->page->requires->yui_module('moodle-block_reportdashboard-reportselect', 'M.block_reportdashboard.init_reportselect',
-                            [['formid' => $mform->getAttribute('id')]]);
-        $mform->addElement('hidden', 'reportcontenttype');
-        $mform->setType('reportcontenttype', PARAM_TEXT);
+            $tilescolourpicker = get_string('tilesbackground', 'block_reporttiles');
+            $mform->addElement('text', 'config_tilescolourpicker', $tilescolourpicker,
+                ['data-class' => 'jscolor', 'value' => '12445f']);
+            $mform->setType('config_tilescolourpicker', PARAM_TEXT);
+            $mform->registerNoSubmitButton('updatereportselect');
 
-        $tilescolourpicker = get_string('tilesbackground', 'block_reporttiles');
-        $mform->addElement('text', 'config_tilescolourpicker', $tilescolourpicker,
-            ['data-class' => 'jscolor', 'value' => '12445f']);
-        $mform->setType('config_tilescolourpicker', PARAM_TEXT);
-        $mform->registerNoSubmitButton('updatereportselect');
-
-        $mform->addElement('submit', 'updatereportselect', get_string('updatereportselect', 'block_reportdashboard'));
+            $mform->addElement('submit', 'updatereportselect', get_string('updatereportselect', 'block_reportdashboard'));
+        } else {
+            $mform->addElement('header', 'config_noreports', get_string('noreportsavailable', 'block_reportdashboard'));
+        }
     }
     /**
      * Load in existing data as form defaults

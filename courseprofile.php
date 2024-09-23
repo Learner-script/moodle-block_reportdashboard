@@ -22,6 +22,8 @@
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/accesslib.php');
+require_once($CFG->libdir . '/badgeslib.php');
+
 $courseid = optional_param('filter_courses', SITEID, PARAM_INT);
 $contextlevel = optional_param('contextlevel', 10, PARAM_INT);
 $roleshortname = optional_param('role', '', PARAM_TEXT);
@@ -29,14 +31,13 @@ $roleshortname = optional_param('role', '', PARAM_TEXT);
 use block_learnerscript\local\ls;
 use block_learnerscript\local\querylib;
 
-global $CFG, $SITE, $PAGE, $OUTPUT, $DB, $SESSION, $USER;
+global $PAGE, $OUTPUT, $DB, $SESSION, $USER;
 
 require_login();
 
 $context = context_system::instance();
 $PAGE->set_pagetype('site-index');
 $PAGE->set_pagelayout('course');
-$context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url('/blocks/reportdashboard/courseprofile.php');
 $PAGE->set_title(get_string('courseprofile', 'block_learnerscript'));
@@ -44,25 +45,26 @@ $PAGE->set_title(get_string('courseprofile', 'block_learnerscript'));
 $PAGE->requires->css('/blocks/learnerscript/css/datatables/fixedHeader.dataTables.min.css');
 $PAGE->requires->css('/blocks/learnerscript/css/datatables/responsive.dataTables.min.css');
 $PAGE->requires->jquery_plugin('ui-css');
+$PAGE->requires->js_call_amd('block_reportdashboard/reportdashboard', 'profileuserfunction');
 $PAGE->requires->css('/blocks/learnerscript/css/select2/select2.min.css');
 $PAGE->requires->css('/blocks/learnerscript/css/datatables/jquery.dataTables.min.css');
 
-if (!is_siteadmin()) {
-    $coursecontext = context_course::instance($courseid);
-    $isenrolled = is_enrolled($coursecontext, $USER->id);
-
-    if (!$isenrolled) {
+$encourses = enrol_get_my_courses();
+$currentusercourse = array_key_last($encourses);
+$coursecontext = context_course::instance($currentusercourse);
+if(!is_siteadmin()) {
+    if (!has_capability('block/learnerscript:teacherreportsaccess', $coursecontext)) {
         throw new moodle_exception(get_string('badpermissions', 'block_learnerscript'));
     }
 }
 echo $OUTPUT->header();
 $SESSION->ls_contextlevel = $contextlevel;
 $SESSION->role = $roleshortname;
-$studentrole = ($roleshortname == 'student') ? $roleshortname : '';
-$siteadmin = is_siteadmin() || (new ls)->is_manager($USER->id, $SESSION->ls_contextlevel, $SESSION->role);
+$role = $SESSION->role;
+$siteadmin = is_siteadmin() || has_capability('block/learnerscript:managereports', $context);
 
 $data = [];
-$dashboardcourse = (is_siteadmin() || (new ls)->is_manager($USER->id, $SESSION->ls_contextlevel, $SESSION->role)) ?
+$dashboardcourse = (is_siteadmin() || has_capability('block/learnerscript:managereports', $context)) ?
         $DB->get_records_select('course' , 'id <> :id' , ['id' => SITEID] , '' ,
     'id,fullname') : (new querylib)->get_rolecourses($USER->id, $SESSION->role, $SESSION->ls_contextlevel,
     SITEID, '', '');
@@ -81,35 +83,18 @@ if (!empty($cpdashboard)) {
 $courseinfo = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
 
 // Course details.
-$enrolmentsql = "SELECT DISTINCT ue.userid
-                  FROM {course} c
-                  JOIN {enrol} e ON e.courseid = c.id AND e.status = 0
-                  JOIN {user_enrolments} ue on ue.enrolid = e.id AND ue.status = 0
-                  JOIN {role_assignments}  ra ON ra.userid = ue.userid
-                  JOIN {role} r ON r.id = ra.roleid
-                  JOIN {context} ctx ON ctx.instanceid = c.id
-                  JOIN {user} u ON u.id = ra.userid AND u.confirmed = 1 AND u.deleted = 0
-                  AND u.suspended = 0
-                  WHERE ra.contextid = ctx.id AND ctx.contextlevel = 50 AND c.visible = 1
-                  AND c.id = :courseid";
-$enrollmentscount = $DB->get_records_sql($enrolmentsql, ['courseid' => $courseid]);
-$courseinfo->enrollmentscount = count($enrollmentscount);
+$currentcoursecontext = context_course::instance($courseinfo->id);
 
-$studentcountsql = $enrolmentsql . " AND r.shortname = 'student'";
-$studentcount = $DB->get_records_sql($studentcountsql, ['courseid' => $courseid]);
-$courseinfo->studentcount = count($studentcount);
-
-$editingteachercountsql = $enrolmentsql . " AND r.shortname = 'editingteacher'";
-$editingteachercount = $DB->get_records_sql($editingteachercountsql, ['courseid' => $courseid]);
-$courseinfo->editingteachercount = count($editingteachercount);
+$courseinfo->enrollmentscount = count_enrolled_users($currentcoursecontext, '');
+$courseinfo->studentcount = count_enrolled_users($currentcoursecontext, 'block/learnerscript:learnerreportaccess');
+$courseinfo->editingteachercount = count_enrolled_users($currentcoursecontext, 'block/learnerscript:teacherreportsaccess');
 
 $courseinfo->otherenrolcount = $courseinfo->enrollmentscount -
                     ($courseinfo->studentcount + $courseinfo->editingteachercount);
 $courseinfo->otherenrolcount = ($courseinfo->otherenrolcount > 0) ? $courseinfo->otherenrolcount : 0;
 
-$activitiescount = $DB->count_records('course_modules', ['course' => $courseid, 'visible' => 1,
-                'deletioninprogress' => 0, ]);
-$courseinfo->activitiescount = $activitiescount;
+$courseactiivties = get_course_mods($courseinfo->id);
+$courseinfo->activitiescount = count(array_keys($courseactiivties));
 
 $totaltimespent = $DB->get_record_sql("SELECT SUM(timespent) AS timespent FROM {block_ls_coursetimestats}
                     WHERE 1 = 1 AND courseid = :courseid", ['courseid' => $courseid]);
@@ -138,17 +123,15 @@ switch ($courseinfo->groupmode) {
 }
 $courseinfo->groups = $groupmode ? $groupmode : '';
 // Course progress.
-$completionsql = "SELECT DISTINCT ue.userid
+$completionsql = "SELECT DISTINCT ra.userid
                 FROM {course} c
-                JOIN {enrol} e ON e.courseid = c.id AND e.status = 0
-                JOIN {user_enrolments} ue on ue.enrolid = e.id AND ue.status = 0
-                JOIN {role_assignments}  ra ON ra.userid = ue.userid
-                JOIN {role} r ON r.id = ra.roleid AND r.shortname = 'student'
                 JOIN {context} ctx ON ctx.instanceid = c.id
+                JOIN {role_assignments} ra ON ra.contextid = ctx.id
+                JOIN {role} r ON r.id = ra.roleid
                 JOIN {user} u ON u.id = ra.userid AND u.confirmed = 1 AND u.deleted = 0
                 AND u.suspended = 0
                 JOIN {course_completions} cc ON cc.course = c.id AND cc.userid = u.id
-                WHERE ra.contextid = ctx.id AND ctx.contextlevel = 50 AND c.visible = 1
+                WHERE ctx.contextlevel = 50 AND c.visible = 1
                 AND c.id = :courseid AND cc.timecompleted IS NOT NULL";
 $completioncount = $DB->get_records_sql($completionsql, ['courseid' => $courseid]);
 $courseinfo->completioncount = count($completioncount);
@@ -262,16 +245,9 @@ $courseinfo->scormprogress = !empty($courseinfo->scormcount) ? round(($m / $cour
 $badgeslist = $DB->get_records('badge', ['courseid' => $courseid], '', 'id, name');
 $coursebadgesinfo = [];
 foreach ($badgeslist as $badge) {
-    if ($badge->id > 0) {
-        $sql = "SELECT * FROM {files} WHERE itemid = :logo AND filearea = 'badgeimage' AND component = 'badges'
-                        AND filename != '.' ORDER BY id DESC";
-        $classimagerecord = $DB->get_record_sql($sql, ['logo' => $badge->id], 1);
-    }
-    $logourl = "";
-    if (!empty($classimagerecord)) {
-        $logourl = moodle_url::make_pluginfile_url($classimagerecord->contextid,
-                        'badges', 'badgeimage', $badge->id, '/', 'f3')->out(false);
-    }
+    $batchinstance = new badge($badge->id);
+    $badgecontext = $batchinstance->get_context();
+    $logourl = moodle_url::make_pluginfile_url($badgecontext->id, 'badges', 'badgeimage', $badge->id, '/', 'f3', false);
     $coursebadgesinfo[] = ['badgeid' => $badge->id, 'badgename' => $badge->name, 'badgeimage' => $logourl];
 }
 
@@ -351,5 +327,5 @@ echo $OUTPUT->render_from_template('block_reportdashboard/courseprofile/coursepr
                                                 'role' => $roleshortname,
                                                 'contextlevel' => $contextlevel,
                                             'issiteadmin' => $siteadmin,
-                                            'studentrole' => $studentrole, ]);
+                                            'studentrole' => ($roleshortname) ? get_config('block_learnerscript', 'role') : '', ]);
 echo $OUTPUT->footer();

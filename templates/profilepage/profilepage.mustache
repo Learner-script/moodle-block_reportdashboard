@@ -49,6 +49,7 @@
 			{{^issiteadmin}}
 				{{#dashboardlink}}
 					<div style="float:right;">
+					<a class="btn linkbtn btn-primary" href="{{config.wwwroot}}//blocks/learnerscript/reports.php?role={{role}}&contextlevel={{contextlevel}}">{{#str}} managereports, block_learnerscript {{/str}}</a>
 					<a class="btn linkbtn btn-primary" href="{{config.wwwroot}}/blocks/reportdashboard/dashboard.php?role={{role}}&contextlevel={{contextlevel}}">{{#str}} dashboard, block_reportdashboard {{/str}}</a>
 					</div>
 				{{/dashboardlink}}
@@ -89,15 +90,3 @@
 	</div>
 </div>
 {{/userinfo}}
-<script>
-    $(function(){
-      // bind change event to select
-      	$('#dashboardusers').on('change', function () {
-          	var url = $(this).val(); // get selected value
-          	if (url) { // require a URL
-            	window.location = 'profilepage.php?filter_users=' + url; // redirect
-          	}
-          	return false;
-      	});
-    });
-</script>

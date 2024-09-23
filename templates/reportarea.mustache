@@ -24,9 +24,7 @@
     }
 }}
 <div id="reportloading_{{reportinstance}}" style="display:none;">
-    {{#loading}}
-    <img src="{{loading}}" alt="{{#str}} loading, block_reportdashboard {{/str}}" title="{{#str}} loading, block_reportdashboard {{/str}}">
-    {{/loading}}
+    {{#pix}}loading, block_learnerscript, {{#str}} loading, block_reporttiles {{/str}}{{/pix}}
 </div>
 
 <div id="reportcontainer{{reportinstance}}" class="report_dashboard_container" data-reportid="{{reportid}}"

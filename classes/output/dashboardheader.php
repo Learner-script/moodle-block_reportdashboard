@@ -26,6 +26,7 @@ use renderable;
 use renderer_base;
 use templatable;
 use stdClass;
+use context_system;
 use block_learnerscript\local\ls as ls;
 use block_reportdashboard\local\reportdashboard as reportdashboard;
 
@@ -67,7 +68,7 @@ class dashboardheader implements renderable, templatable {
         $switchableroles = (new ls)->switchrole_options();
         $data['editingon'] = $this->editingon;
         $data['issiteadmin'] = is_siteadmin();
-        if ($SESSION->role == 'manager' && $SESSION->ls_contextlevel == CONTEXT_SYSTEM) {
+        if (has_capability('block/learnerscript:managereports', context_system::instance())) {
             $data['managerrole'] = get_string('manager', 'block_reportdashboard');
         }
         $data['dashboardurl'] = $this->dashboardurl;
@@ -82,24 +83,17 @@ class dashboardheader implements renderable, templatable {
         $data['role'] = $SESSION->role;
         $data['contextlevel'] = $SESSION->ls_contextlevel;
         if (!is_siteadmin()) {
-            $userrolesql = "SELECT CONCAT(ra.roleid, '_',c.contextlevel) AS rolecontext
-                FROM {role_assignments} ra
-                JOIN {context} c ON c.id = ra.contextid
-                JOIN {role} r ON r.id = ra.roleid
-                WHERE 1 = 1 AND ra.userid = :userid AND (";
-            $userroleparams['userid'] = $USER->id;
-            $i = 0;
-            foreach ($USER->access['ra'] as $key => $value) {
-                $i++;
-                $statsql[] = $DB->sql_like('c.path', ":queryparam$i");
-                $userroleparams["queryparam$i"] = $key;
+            $sitewideuserroles = get_user_roles_sitewide_accessdata($USER->id);
+            foreach($sitewideuserroles['ra'] as $key => $t) {
+                $contextrecord = $DB->get_field_sql("SELECT ra.roleid
+                            FROM {role_assignments} ra
+                            JOIN {context} c ON c.id = ra.contextid
+                            WHERE c.path = :path", ['path' => $key], IGNORE_MULTIPLE);
+                if (!empty($contextrecord)) {
+                    $userroles[] = $contextrecord;
+                }
             }
-            $userrolesql .= implode(" OR ", $statsql);
-
-            $userrolesql .= ") GROUP BY ra.roleid, c.contextlevel, r.shortname";
-
-            $userrolescount = $DB->get_records_sql($userrolesql, $userroleparams, IGNORE_MULTIPLE);
-            $dashboardlink = count($userrolescount) > 1 ? 1 : 0;
+            $dashboardlink = count(array_unique($userroles)) > 1 ? 1 : 0;
             $data['dashboardlink'] = $dashboardlink;
         } else {
             $data['dashboardlink'] = 0;
@@ -110,7 +104,7 @@ class dashboardheader implements renderable, templatable {
     /**
      * Get Dashboard reportscount
      */
-    public function get_dashboard_reportscount() {
+    private function get_dashboard_reportscount() {
         global $DB, $SESSION;
         $role = $SESSION->role;
         if (!empty($role) && !is_siteadmin()) {

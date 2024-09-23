@@ -31,11 +31,10 @@
 		{{#userstatus}}
 			<div class="user_status d-flex justify-content-end align-items-center"><span class="inactivenow"></span>{{# str}} inactive, block_reportdashboard{{/ str}}</div>
 		{{/userstatus}}
-		<div class="profileimg rounded-circle m-auto">
-			{{#profileimage}}
-			<img class="userpicture" src="{{profileimage}}" alt="userprofile">
-			{{/profileimage}}
+		{{#profileimage}}
+		<div class="profileimg rounded-circle m-auto" style='background-image: url("{{{profileimage}}}");'>
 		</div>
+		{{/profileimage}}
 		<div class="username mt-3 d-flex justify-content-center align-item-center">
 			{{#userfullname}}
 			<h4 class="font-weight-light">{{userfullname}}</h4>

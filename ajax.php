@@ -22,8 +22,7 @@
 define('AJAX_SCRIPT', true);
 require_once(__DIR__ . '/../../config.php');
 use block_learnerscript\local\reportbase;
-use block_learnerscript\local\ls as ls;
-global $CFG, $DB, $USER, $OUTPUT, $COURSE;
+global $CFG, $DB, $USER;
 $rawjson = file_get_contents('php://input');
 
 $requests = json_decode($rawjson, true);
@@ -41,29 +40,10 @@ $context = context_system::instance();
 $PAGE->set_context($context);
 
 switch ($action) {
-    case 'generatedreport':
-        $html = '';
-        $report = $DB->get_record('block_learnerscript', ['id' => $reportid]);
-        if (!$report) {
-            throw new moodle_exception('reportdoesnotexists', 'block_learnerscript');
-        }
-
-        if (!$report->global) {
-            $html .= "";
-        } else {
-            require_once($CFG->dirroot . '/blocks/learnerscript/reports/' . $report->type . '/report.class.php');
-            require_once($CFG->dirroot . '/blocks/learnerscript/locallib.php');
-            $reportclassname = 'block_learnerscript\lsreports\report_' . $report->type;
-            $reportclass = new $reportclassname($report);
-            $renderer = $PAGE->get_renderer('block_reportdashboard');
-            $html .= $renderer->generate_dashboardreport($reportclass, $reporttype, $blockinstanceid);
-        }
-        echo $html;
-        break;
     case 'userlist':
         $users = get_users(true, $usersearch);
         foreach ($users as $user) {
-            $data[] = ['id' => $user->id, 'text' => $user->firstname.' '.$user->lastname];
+            $data[] = ['id' => $user->id, 'text' => get_string('userfullname', 'learnerscript', $user)];
         }
         $return = ['total' => count($data), 'items' => $data];
         break;
@@ -97,11 +77,6 @@ switch ($action) {
         $emailform = new block_reportdashboard_emailform(new moodle_url('/blocks/reportdashboard/dashboard.php',
                 ['reportid' => $reportid, 'AjaxForm' => true, 'instance' => $instance]));
         $return = $emailform->render();
-        break;
-    case 'dashboardtiles':
-        $reportclass = (new ls)->create_reportclass($reportid);
-        $reportclass->create_report($blockinstanceid);
-        $return = $reportclass->finalreport->table;
         break;
 }
 echo json_encode($return);

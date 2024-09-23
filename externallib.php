@@ -77,17 +77,20 @@ class block_reportdashboard_external extends external_api {
         'action' => $action, 'userlist' => $userlist, 'reportid' => $reportid, 'maximumselectionlength' => $maximumselectionlength,
         'setminimuminputlength' => $setminimuminputlength, 'courses' => $courses, ]);
 
-        $params['firstname'] = '%' . $term . '%';
-        $params['lastname'] = '%' . $term . '%';
-        $params['username'] = '%' . $term . '%';
-        $params['email'] = '%' . $term . '%';
-        $users = $DB->get_records_sql("SELECT *
+        $fields = ['firstname', 'lastname', 'username', 'email'];
+        $likeClauses = [];
+        $params = [];
+
+        foreach ($fields as $field) {
+            $params[$field] = '%' . $term . '%';
+            $likeClauses[] = $DB->sql_like($field, ":$field", false);
+        }
+
+        $sql = "SELECT * 
                 FROM {user}
-                WHERE id > 2 AND deleted = 0 AND ("
-                . $DB->sql_like('firstname', ':firstname', false) .
-                " OR " . $DB->sql_like('lastname', ':lastname', false) .
-                " OR " . $DB->sql_like('username', ':username', false) .
-                " OR " . $DB->sql_like('email', ':email', false) . ")", $params);
+                WHERE id > 2 AND deleted = 0 AND (" . implode(' OR ', $likeClauses) . ")";
+
+        $users = $DB->get_records_sql($sql, $params);
         $reportclass = (new ls)->create_reportclass($reportid);
         $reportclass->courseid = $reportclass->config->courseid;
         if ($reportclass->config->courseid == SITEID) {
@@ -117,8 +120,7 @@ class block_reportdashboard_external extends external_api {
                     JOIN {context} ctx ON ctx.id  = lra.contextid
                     WHERE u.confirmed = 1 AND u.suspended = 0  AND u.deleted = 0 AND u.id = :userid
                     AND ctx.contextlevel $ctxsql AND r.id $rolesql";
-                    if (isset($role) && ($role == 'manager' || $role == 'editingteacher' || $role == 'teacher'
-                    || $role == 'student') && ($contextlevel == CONTEXT_COURSE)) {
+                    if (isset($role) && (has_capability('block/learnerscript:reportsaccess', $context)) && ($contextlevel == CONTEXT_COURSE)) {
                         if ($courses <> SITEID) {
                             $rolewiseusers .= " AND ctx.instanceid = :courses";
                         }
