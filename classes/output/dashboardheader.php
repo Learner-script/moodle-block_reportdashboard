@@ -84,16 +84,17 @@ class dashboardheader implements renderable, templatable {
         $data['contextlevel'] = $SESSION->ls_contextlevel;
         if (!is_siteadmin()) {
             $sitewideuserroles = get_user_roles_sitewide_accessdata($USER->id);
-            foreach($sitewideuserroles['ra'] as $key => $t) {
-                $contextrecord = $DB->get_field_sql("SELECT ra.roleid
+            $userroles = [];
+            foreach ($sitewideuserroles['ra'] as $key => $t) {
+                $contextrecord = $DB->get_field_sql("SELECT count(ra.roleid)
                             FROM {role_assignments} ra
-                            JOIN {context} c ON c.id = ra.contextid
+                            JOIN {context} c ON c.id = ra.contextid AND c.contextlevel = 50
                             WHERE c.path = :path", ['path' => $key], IGNORE_MULTIPLE);
                 if (!empty($contextrecord)) {
                     $userroles[] = $contextrecord;
                 }
             }
-            $dashboardlink = count(array_unique($userroles)) > 1 ? 1 : 0;
+            $dashboardlink = count($userroles) > 1 ? 1 : 0;
             $data['dashboardlink'] = $dashboardlink;
         } else {
             $data['dashboardlink'] = 0;

@@ -216,8 +216,8 @@ define(['jquery',
                             }
                         });
                         self.reportFilterFormModal(args);
-                         $('.filterform' + args.instanceid + ' .fitemtitle').hide();
-                          $('.filterform' + args.instanceid + ' .felement').attr('style', 'margin:0');
+                        $('.filterform' + args.instanceid + ' .fitemtitle').hide();
+                        $('.filterform' + args.instanceid + ' .felement').attr('style', 'margin:0');
                     });
                 } else {
                     self.reportFilterFormModal(args);

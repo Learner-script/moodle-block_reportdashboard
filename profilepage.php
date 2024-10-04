@@ -59,7 +59,7 @@ if (!empty($capabilityrole)) {
     $currentrole = current($capabilityrole)->shortname;
 }
 
-$userid =  ($roleshortname == $currentrole) ? $USER->id : $sessionuserid;
+$userid = ($roleshortname == $currentrole) ? $USER->id : $sessionuserid;
 
 $SESSION->ls_contextlevel = $contextlevel;
 $SESSION->role = $roleshortname;
@@ -74,16 +74,16 @@ if (!is_siteadmin()) {
         throw new moodle_exception(get_string('badpermissions', 'block_learnerscript'));
     }
     $sitewideuserroles = get_user_roles_sitewide_accessdata($USER->id);
-    foreach($sitewideuserroles['ra'] as $key => $t) {
-        $contextrecord = $DB->get_field_sql("SELECT ra.roleid
+    foreach ($sitewideuserroles['ra'] as $key => $t) {
+        $contextrecord = $DB->get_field_sql("SELECT count(ra.roleid)
                     FROM {role_assignments} ra
-                    JOIN {context} c ON c.id = ra.contextid
+                    JOIN {context} c ON c.id = ra.contextid AND c.contextlevel = 50
                     WHERE c.path = :path", ['path' => $key], IGNORE_MULTIPLE);
         if (!empty($contextrecord)) {
             $userroles[] = $contextrecord;
         }
     }
-    $dashboardlink = count(array_unique($userroles)) > 1 ? 1 : 0;
+    $dashboardlink = count($userroles) > 1 ? 1 : 0;
 } else {
     $dashboardlink = 0;
 }
@@ -105,9 +105,10 @@ if ($userid) {
             $courseslist[] = $selectedcourse->id;
         }
     }
-    
+
     $coursesql = ' ';
     $ucoursesql = '';
+    $joinsql = '';
     $params = [];
     if (!empty($courseslist)) {
         list($coursesql, $params) = $DB->get_in_or_equal($courseslist, SQL_PARAMS_NAMED);
@@ -163,7 +164,8 @@ if ($userid) {
         if ($badge->id > 0) {
             $batchinstance = new badge($badge->id);
             $badgecontext = $batchinstance->get_context();
-            $badgeimageurl = moodle_url::make_pluginfile_url($badgecontext->id, 'badges', 'badgeimage', $badge->id, '/', 'f3', false);
+            $badgeimageurl = moodle_url::make_pluginfile_url($badgecontext->id, 'badges', 'badgeimage',
+                            $badge->id, '/', 'f3', false);
         } else {
             $badgeimageurl = $OUTPUT->image_url('i/badge');
         }
@@ -193,19 +195,29 @@ if ($userid) {
     $usercourseinfo = [];
     if (!empty($enrolcourses)) {
         foreach ($enrolcourses as $k => $v) {
-            $courseslistarray[] = $v->fullname;
+            $courseslistarray[] = $v->id;
             $usercourseinfo[] = ['id' => $v->id, 'coursename' => $v->fullname];
         }
     }
+    $joinsql = " AND ((cm.availability IS NOT NULL AND cm.id IN (
+                SELECT cmd.id
+                FROM {course_modules} cmd
+                JOIN {groups} g ON g.courseid = cm.course
+                JOIN {groups_members} gm ON gm.groupid = g.id
+                WHERE gm.userid = :gmuserid
+                AND cmd.visible = 1
+                AND cmd.availability LIKE CONCAT('%\"type\":\"group\",\"id\":', g.id, '%')))
+                OR (cm.availability IS NULL)) ";
     if (!empty($enrolcourses)) {
         list($csql, $params) = $DB->get_in_or_equal($courseslistarray, SQL_PARAMS_NAMED);
         $params['cmvisible'] = 1;
         $params['deletioninprogress'] = 0;
+        $params['gmuserid'] = $userid;
         // Assignments.
         $assignmentscountsql = $DB->get_records_sql("SELECT cm.id FROM {course_modules} cm
                         JOIN {modules} m ON m.id = cm.module AND m.name = 'assign'
                         WHERE 1 = 1 AND cm.visible = :cmvisible AND
-                        cm.deletioninprogress = :deletioninprogress AND cm.course $csql ",
+                        cm.deletioninprogress = :deletioninprogress AND cm.course $csql $joinsql",
                         $params);
         $userinfo->assignmentscount = count($assignmentscountsql);
 
@@ -227,7 +239,7 @@ if ($userid) {
         $quizzescountsql = $DB->get_records_sql("SELECT cm.id FROM {course_modules} cm
                                 JOIN {modules} m ON m.id = cm.module AND m.name = 'quiz'
                                 WHERE 1 = 1 AND cm.visible = :cmvisible AND
-                                cm.deletioninprogress = :deletioninprogress AND cm.course $csql",
+                                cm.deletioninprogress = :deletioninprogress AND cm.course $csql $joinsql",
                                 $params);
         $userinfo->quizzescount = count($quizzescountsql);
         $a = 0;
@@ -249,7 +261,7 @@ if ($userid) {
         $scormcountsql = $DB->get_records_sql("SELECT cm.id FROM {course_modules} cm
                                 JOIN {modules} m ON m.id = cm.module AND m.name = 'scorm'
                                 WHERE 1 = 1 AND cm.visible = :cmvisible AND
-                                cm.deletioninprogress = :deletioninprogress AND cm.course $csql",
+                                cm.deletioninprogress = :deletioninprogress AND cm.course $csql $joinsql",
                                 $params);
         $userinfo->scormcount = count($scormcountsql);
         $m = 0;
@@ -283,30 +295,36 @@ if ($userid) {
 
     // User grades.
     if (!empty($enrolcourses)) {
+        $params['gmuserid'] = $userid;
         $params['userid'] = $userid;
+
         $avggrade = $DB->get_record_sql("SELECT AVG(gg.finalgrade) AS finalgrade
                                 FROM {grade_grades} gg
                                 JOIN {grade_items} gi ON gi.id = gg.itemid
+                                JOIN {course_modules} cm ON cm.course = gi.courseid
                                 WHERE gi.itemtype = 'course' AND gg.userid = :userid
-                                AND gi.courseid $csql", $params);
+                                AND gi.courseid $csql $joinsql", $params);
         $userinfo->avggrade = !empty($avggrade->finalgrade) ? round($avggrade->finalgrade, 2) : 0;
         $avggradeper = $DB->get_record_sql("SELECT (SUM(gg.finalgrade)/SUM(gi.grademax))*100 AS avgper
                                 FROM {grade_grades} gg
                                 JOIN {grade_items} gi ON gi.id = gg.itemid
+                                JOIN {course_modules} cm ON cm.course = gi.courseid
                                 WHERE gi.itemtype = 'course' AND gg.userid = :userid
-                                AND gi.courseid $csql GROUP BY gi.grademax", $params, IGNORE_MULTIPLE);
+                                AND gi.courseid $csql $joinsql GROUP BY gi.grademax", $params, IGNORE_MULTIPLE);
         $userinfo->avggradepercentage = !empty($avggradeper->avgper) ? round($avggradeper->avgper, 0) : 0;
         $highestgrade = $DB->get_record_sql("SELECT MAX(gg.finalgrade) AS finalgrade
                                     FROM {grade_grades} gg
                                     JOIN {grade_items} gi ON gi.id = gg.itemid
+                                    JOIN {course_modules} cm ON cm.course = gi.courseid
                                     WHERE gi.itemtype = 'course' AND gg.userid = :userid
-                                    AND gi.courseid $csql", $params);
+                                    AND gi.courseid $csql $joinsql", $params);
 
         $lowestgrade = $DB->get_record_sql("SELECT MIN(gg.finalgrade) AS finalgrade
                                 FROM {grade_grades} gg
                                 JOIN {grade_items} gi ON gi.id = gg.itemid
+                                JOIN {course_modules} cm ON cm.course = gi.courseid
                                 WHERE gi.itemtype = 'course' AND gg.userid = :userid
-                                AND gi.courseid $csql", $params);
+                                AND gi.courseid $csql $joinsql", $params);
         $userinfo->highestgrade = !empty($highestgrade->finalgrade) ? round($highestgrade->finalgrade, 2) : 0;
         $userinfo->lowestgrade = !empty($lowestgrade->finalgrade) ? round($lowestgrade->finalgrade, 2) : 0;
     } else {
@@ -339,21 +357,21 @@ if ($userid) {
     $moduleactivities = "SELECT recacc.cmid, m.name AS module,
                         CONCAT($activitynames) AS activityname, recacc.timeaccess
                         FROM {block_recentlyaccesseditems} recacc
-                        JOIN {course_modules} main ON main.id = recacc.cmid
-                        JOIN {modules} m ON main.module = m.id
-                        JOIN {course} c ON c.id = main.course
+                        JOIN {course_modules} cm ON cm.id = recacc.cmid
+                        JOIN {modules} m ON cm.module = m.id
+                        JOIN {course} c ON c.id = cm.course
                         JOIN {context} ctx ON ctx.instanceid = c.id
                         JOIN {role_assignments} ra ON ra.contextid = ctx.id
                         JOIN {user} u ON u.id = ra.userid AND recacc.userid = u.id
                         ";
     foreach ($aliases as $alias) {
-        $moduleactivities .= " LEFT JOIN {".$alias."} $alias ON $alias.id = main.instance AND m.name = '$alias'";
+        $moduleactivities .= " LEFT JOIN {".$alias."} $alias ON $alias.id = cm.instance AND m.name = '$alias'";
     }
-    $moduleactivities .= " WHERE u.id = :userid and main.visible = :cmvisible
-                            AND main.deletioninprogress = :deletioninprogress
+    $moduleactivities .= " WHERE u.id = :userid and cm.visible = :cmvisible
+                            AND cm.deletioninprogress = :deletioninprogress $joinsql
                             ORDER BY recacc.id DESC LIMIT 5";
     $recentactivities = $DB->get_records_sql($moduleactivities, ['userid' => $userid,
-                    'cmvisible' => 1, 'deletioninprogress' => 0, ]);
+                    'cmvisible' => 1, 'deletioninprogress' => 0, 'gmuserid' => $userid]);
 
     $recentactivitieslist = [];
     $i = 0;
@@ -451,6 +469,33 @@ if ($userid) {
     // User LMS access.
     $userlmsaccess = $DB->get_field('block_ls_userlmsaccess', 'logindata', ['userid' => $userid]);
     $lmsaccess = json_decode($userlmsaccess);
+
+    $daystimedata = (new ls)->get_daystimesslot();
+    for ($i = 0; $i < count($daystimedata['timeslots']); $i++) {
+        if (!empty($lmsaccess->data->$i)) {
+            $lmsaccess->data->$i->label = $lmsaccess->data->$i->label;
+            $lmsaccess->data->$i->data = $lmsaccess->data->$i->data;
+        } else {
+            $timelabels = new stdClass;
+            $timelabels->label = $daystimedata['timings'][$i];
+            $timelabels->data = [];
+            $lmsaccess->data->$i = $timelabels;
+        }
+        for ($q = 0; $q < count($daystimedata['weekdayslist']); $q++) {
+            if (is_object($lmsaccess->data->$i->data)) {
+                $lmsaccess->data->$i->data = (array)$lmsaccess->data->$i->data;
+            }
+            if (!empty($lmsaccess->data->$i->data[$q])) {
+                $lmsaccess->data->$i->data[$q] = $lmsaccess->data->$i->data[$q];
+            } else {
+                $lmsaccess->data->$i->data[$q] = 0;
+            }
+        }
+        ksort($lmsaccess->data->$i->data);
+    }
+    $lmsaccess->data = (array)$lmsaccess->data;
+    ksort($lmsaccess->data);
+
     echo $OUTPUT->render_from_template('block_reportdashboard/profilepage/profilepage',
                                             ['userinfo' => $userinfo,
                                                     'userbadgesinfo' => $userbadgesinfo,

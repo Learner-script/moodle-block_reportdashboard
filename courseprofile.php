@@ -52,7 +52,7 @@ $PAGE->requires->css('/blocks/learnerscript/css/datatables/jquery.dataTables.min
 $encourses = enrol_get_my_courses();
 $currentusercourse = array_key_last($encourses);
 $coursecontext = context_course::instance($currentusercourse);
-if(!is_siteadmin()) {
+if (!is_siteadmin()) {
     if (!has_capability('block/learnerscript:teacherreportsaccess', $coursecontext)) {
         throw new moodle_exception(get_string('badpermissions', 'block_learnerscript'));
     }

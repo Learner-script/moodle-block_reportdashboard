@@ -78,17 +78,17 @@ class block_reportdashboard_external extends external_api {
         'setminimuminputlength' => $setminimuminputlength, 'courses' => $courses, ]);
 
         $fields = ['firstname', 'lastname', 'username', 'email'];
-        $likeClauses = [];
+        $likeclauses = [];
         $params = [];
 
         foreach ($fields as $field) {
             $params[$field] = '%' . $term . '%';
-            $likeClauses[] = $DB->sql_like($field, ":$field", false);
+            $likeclauses[] = $DB->sql_like($field, ":$field", false);
         }
 
-        $sql = "SELECT * 
+        $sql = "SELECT *
                 FROM {user}
-                WHERE id > 2 AND deleted = 0 AND (" . implode(' OR ', $likeClauses) . ")";
+                WHERE id > 2 AND deleted = 0 AND (" . implode(' OR ', $likeclauses) . ")";
 
         $users = $DB->get_records_sql($sql, $params);
         $reportclass = (new ls)->create_reportclass($reportid);
@@ -120,7 +120,8 @@ class block_reportdashboard_external extends external_api {
                     JOIN {context} ctx ON ctx.id  = lra.contextid
                     WHERE u.confirmed = 1 AND u.suspended = 0  AND u.deleted = 0 AND u.id = :userid
                     AND ctx.contextlevel $ctxsql AND r.id $rolesql";
-                    if (isset($role) && (has_capability('block/learnerscript:reportsaccess', $context)) && ($contextlevel == CONTEXT_COURSE)) {
+                    if (isset($role) && (has_capability('block/learnerscript:reportsaccess', $context))
+                        && ($contextlevel == CONTEXT_COURSE)) {
                         if ($courses <> SITEID) {
                             $rolewiseusers .= " AND ctx.instanceid = :courses";
                         }

@@ -17,15 +17,10 @@
 use block_learnerscript\local\ls;
 
 /**
- * Form for editing HTML block instances.
+ * Form for editing report widget block.
  * @package    block_reportdashboard
  * @copyright  2023 Moodle India Information Solutions Private Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-/**
- * The definition of the fields to use.
- * @package    block_reportdashboard
- * @param MoodleQuickForm $mform
  */
 class block_reportdashboard_edit_form extends block_edit_form {
     /**
@@ -79,10 +74,12 @@ class block_reportdashboard_edit_form extends block_edit_form {
                         'week' => get_string('week', 'block_reportdashboard'),
                         'month' => get_string('month', 'block_reportdashboard'),
                         'year' => get_string('year', 'block_reportdashboard'), ];
-            $mform->addElement('select', 'config_reportduration', get_string('reportduration', 'block_reportdashboard'), $durations);
+            $mform->addElement('select', 'config_reportduration', get_string('reportduration', 'block_reportdashboard'),
+                        $durations);
             $mform->addElement('advcheckbox', 'config_disableheader', get_string('disableheader', 'block_reportdashboard'),
                                 get_string('disableheaderaction', 'block_reportdashboard'), ['group' => 1], [0, 1]);
-            $this->page->requires->yui_module('moodle-block_reportdashboard-reportselect', 'M.block_reportdashboard.init_reportselect',
+            $this->page->requires->yui_module('moodle-block_reportdashboard-reportselect',
+                                'M.block_reportdashboard.init_reportselect',
                                 [['formid' => $mform->getAttribute('id')]]);
             $mform->addElement('hidden', 'reportcontenttype');
             $mform->setType('reportcontenttype', PARAM_TEXT);
