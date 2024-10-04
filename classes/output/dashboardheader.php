@@ -94,7 +94,7 @@ class dashboardheader implements renderable, templatable {
                     $userroles[] = $contextrecord;
                 }
             }
-            $dashboardlink = count($userroles) > 1 ? 1 : 0;
+            $dashboardlink = count(array_unique($userroles)) > 1 ? 1 : 0;
             $data['dashboardlink'] = $dashboardlink;
         } else {
             $data['dashboardlink'] = 0;

@@ -19,7 +19,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/formslib.php');
 use moodleform;
 use block_learnerscript\local\ls as ls;
-use moodle_url;
 
 /**
  * Class email_form

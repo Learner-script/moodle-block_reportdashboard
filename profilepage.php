@@ -74,6 +74,7 @@ if (!is_siteadmin()) {
         throw new moodle_exception(get_string('badpermissions', 'block_learnerscript'));
     }
     $sitewideuserroles = get_user_roles_sitewide_accessdata($USER->id);
+    $userroles = [];
     foreach ($sitewideuserroles['ra'] as $key => $t) {
         $contextrecord = $DB->get_field_sql("SELECT count(ra.roleid)
                     FROM {role_assignments} ra
@@ -83,7 +84,7 @@ if (!is_siteadmin()) {
             $userroles[] = $contextrecord;
         }
     }
-    $dashboardlink = count($userroles) > 1 ? 1 : 0;
+    $dashboardlink = count(array_unique($userroles)) > 1 ? 1 : 0;
 } else {
     $dashboardlink = 0;
 }
