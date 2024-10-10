@@ -28,7 +28,9 @@
 	<ul class="timeline_list m-0 p-2">
 		{{#timelinerecordslist}}
 		<li class="timeline_item d-flex px-2 py-3 align-items-center">
-        <div class="timeline_img rounded-circle mr-2" style="background-image: url('{{config.wwwroot}}/mod/{{activitymodule}}/pix/monologo.svg');"></div>
+        <div class="timeline_img rounded-circle mr-2">
+            {{#pix}}monologo, mod_{{activitymodule}}, {{#str}}errorimage, block_learnerscript, {{activitymodule}}{{/str}}{{/pix}}
+        </div>
 			<div class="timeline_content">
 
 				<div class="timeline_info"><a href='{{config.wwwroot}}/mod/{{activitymodule}}/view.php?id={{cmid}}' target="_blank"><b>{{activityname}}</b></a></div>

@@ -24,11 +24,11 @@
     }
 }}
 <h5 class="mb-3 pl-2">{{# str}} lastaccess, block_reportdashboard{{/ str}}</h5>
-{{#testdata}}
-<div id ="testaccess" class="lmsaccess_card card ls-card">
-	<div class="p-2"  ></div>
-</div>
-{{/testdata}}
-{{^testdata}}
-<span class="alert alert-info">{{#str}} nodataavailable, block_learnerscript {{/str}}</span>
-{{/testdata}}
+{{#userlmsaccessdata}}
+    <div id ="testaccess" class="lmsaccess_card card ls-card">
+        <div class="p-2"  ></div>
+    </div>
+{{/userlmsaccessdata}}
+{{^userlmsaccessdata}}
+    <span class="alert alert-info">{{#str}} nodataavailable, block_learnerscript {{/str}}</span>
+{{/userlmsaccessdata}}

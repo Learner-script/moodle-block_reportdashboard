@@ -49,7 +49,6 @@ $lsreportconfigstatus = get_config('block_learnerscript', 'lsreportconfigstatus'
 
 if (!$lsreportconfigstatus) {
     redirect(new moodle_url('/blocks/learnerscript/lsconfig.php', ['import' => 1]));
-    exit;
 }
 
 if ($PAGE->user_allowed_editing() && $adminediting != -1) {
@@ -65,11 +64,12 @@ $rolecontexts = $DB->get_records_sql("SELECT DISTINCT CONCAT(r.id, '@', rcl.id),
                         JOIN {role_context_levels} rcl ON rcl.roleid = r.id AND rcl.contextlevel NOT IN (70)
                         WHERE 1 = 1
                         ORDER BY rcl.contextlevel ASC");
+$rcontext = [];
 foreach ($rolecontexts as $rc) {
-    if ($rc->contextlevel == 10 && ($rc->shortname == 'manager')) {
+    if (has_capability('block/learnerscript:managereports', $context)) {
         continue;
     }
-    $rcontext[] = $rc->shortname .'_'.$rc->contextlevel;
+    $rcontext[] = get_string('rolecontexts', 'block_learnerscript', $rc);
 }
 $SESSION->rolecontextlist = $rcontext;
 
@@ -87,15 +87,20 @@ if (!is_siteadmin()) {
 }
 
 $dashboardcourseid = SITEID;
-$seturl = !empty($role) ? '/blocks/reportdashboard/dashboard.php?role=' . $role : '/blocks/reportdashboard/dashboard.php';
+$seturl = new moodle_url('/blocks/reportdashboard/dashboard.php', !empty($role) ? ['role' => $role] : []);
 $pagepattentype = !empty($role) ? 'blocks-reportdashboard-dashboard-' . $role . '_' . $contextlevel :
 'blocks-reportdashboard-dashboard';
 if ($dashboardurl != '') {
-    $seturl = !empty($role) ? '/blocks/reportdashboard/dashboard.php?role=' . $role . '&contextlevel=' . $contextlevel .
-    '&dashboardurl=' . $dashboardurl . '' : '/blocks/reportdashboard/dashboard.php?dashboardurl=' . $dashboardurl. '';
+    $params = ['dashboardurl' => $dashboardurl];
+
+    if (!empty($role)) {
+        $params['role'] = $role;
+        $params['contextlevel'] = $contextlevel;
+    }
+    $seturl = new moodle_url('/blocks/reportdashboard/dashboard.php', $params);
 }
 if ($dashboardurl == ''  || $dashboardurl == 'Dashboard') {
-    $dashboardurl = 'Dashboard';
+    $dashboardurl = get_string('dashboard', 'block_reportdashboard');
 }
 $subpagepatterntype = $dashboardurl;
 
@@ -107,12 +112,12 @@ $PAGE->add_body_class('reportdashboard');
 $PAGE->navbar->ignore_active();
 $navdashboardurl = new moodle_url($seturl);
 
-$managereporturl = new moodle_url('/blocks/reportdashboard/dashboard.php');
+$managereporturl = new moodle_url('/my');
 $PAGE->navbar->add(get_string('dashboard', 'block_learnerscript'), $managereporturl);
 if (!$dashboardurl) {
-    $PAGE->navbar->add(get_string('dashboard', 'block_reportdashboard'));
+    $PAGE->navbar->add(get_string('learnerscriptdashboard', 'block_reportdashboard'));
 } else {
-    $PAGE->navbar->add($dashboardurl);
+    $PAGE->navbar->add(get_string('learnerscriptdashboard', 'block_reportdashboard'));
 }
 
 $PAGE->requires->jquery();
@@ -234,4 +239,3 @@ if (!empty($role) || is_siteadmin()) {
 }
 echo html_writer::end_tag('div');
 echo $OUTPUT->footer();
-exit;

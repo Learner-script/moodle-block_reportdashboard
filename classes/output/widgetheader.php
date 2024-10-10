@@ -25,13 +25,14 @@ use renderable;
 use renderer_base;
 use templatable;
 use stdClass;
+use moodle_url;
 
 /**
  * Widget header
  */
 class widgetheader implements renderable, templatable {
     /** @var string $sometext Some text to show how to pass data to a template. */
-    /** @var $methodname. */
+    /** @var object $methodname. */
     public $methodname = null;
     /** @var $reportid */
     public $reportid;
@@ -92,7 +93,7 @@ class widgetheader implements renderable, templatable {
      * @return array
      */
     public function export_for_template(renderer_base $output) {
-        global $OUTPUT, $USER, $PAGE, $CFG, $DB, $SESSION;
+        global $OUTPUT, $USER, $PAGE, $DB, $SESSION;
         $data = [];
         if (!empty($this->methodname)) {
             foreach ($this->methodname as $method) {
@@ -104,7 +105,6 @@ class widgetheader implements renderable, templatable {
         }
         $report = $DB->get_record('block_learnerscript', ['id' => $this->reportid]);
         $data['editicon'] = $OUTPUT->image_url('edit_icon', 'block_reportdashboard');
-        $data['edittitle'] = get_string('edit');
         $data['reportid'] = $this->reportid;
         $data['instanceid'] = $this->instanceid;
         $data['showhide'] = (!empty($this->reportvisible)) ? get_string('hide') : get_string('show');
@@ -118,7 +118,7 @@ class widgetheader implements renderable, templatable {
         $data['reportcontenttype'] = $this->reportcontenttype;
         $data['reportinstance'] = $this->instanceid ? $this->instanceid : $this->reportid;
         $data['report_option_innerstatus'] = $data['designreportcap'] || !empty($data['action']) ? true : false;
-        $hideurl = new \moodle_url($PAGE->url, ['sesskey' => sesskey(), 'bui_hideid' => $this->instanceid]);
+        $hideurl = new moodle_url($PAGE->url, ['sesskey' => sesskey(), 'bui_hideid' => $this->instanceid]);
         $data['hideactionurl'] = $hideurl;
         $data['reportnameheading'] = $this->reportnameheading;
         if (strlen($this->reportnameheading) != strlen($this->reporttitle)) {

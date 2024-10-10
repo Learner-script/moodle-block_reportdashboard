@@ -19,11 +19,11 @@
  *
  * @package    block_reportdashboard
  * @copyright  2023 Moodle India Information Solutions Private Limited
- * @license    http://www.gnu.org/copyleft/gpl.reportdashboard GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2021051712;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version = 2024100400;        // The current plugin version (Date: YYYYMMDDXX).
 $plugin->component = 'block_reportdashboard'; // Full name of the plugin (used for diagnostics).
 $plugin->release = 'v3.0';
 $plugin->requires = '2023041800'; // Requires this Moodle version.

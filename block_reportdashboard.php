@@ -52,6 +52,7 @@ class block_reportdashboard extends block_base {
             , [['reportid' => $reportslist, 'reporttype' => $reportcontenttype, 'instanceid' => $instance ]]);
         $this->page->requires->js_call_amd('block_learnerscript/smartfilter', 'SelectDuration');
         $this->page->requires->js_call_amd('block_learnerscript/smartfilter', 'ReportContenttypes');
+        $this->page->requires->js_call_amd('block_reportdashboard/reportdashboard', 'init');
     }
     /**
      * Subclasses should override this and return true if the

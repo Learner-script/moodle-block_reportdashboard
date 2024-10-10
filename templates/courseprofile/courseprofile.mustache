@@ -78,15 +78,3 @@
 		</div>
 	</div>
 </div>
-<script>
-    $(function(){
-      // bind change event to select
-      	$('#dashboardcourses').on('change', function () {
-          	var url = $(this).val(); // get selected value
-          	if (url) { // require a URL
-            	window.location = 'courseprofile.php?filter_courses=' + url; // redirect
-          	}
-          	return false;
-      	});
-    });
-</script>

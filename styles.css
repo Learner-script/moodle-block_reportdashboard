@@ -44,13 +44,17 @@ body.path-blocks-reportdashboard aside#block-region-side-post .block_reportdashb
     background-color: #fff;
 }
 
-body#page-my-index .block_reportdashboard .report_dashboard_container .co_report_header {
+body#page-my-index aside#block-region-content .block_reportdashboard .report_dashboard_container .co_report_header {
     max-width: 100%;
     min-width: 100%;
     margin: 0 -16px;
     display: flex;
     justify-content: space-between;
     background-color: #fff;
+}
+
+body#page-my-index aside#block-region-side-pre .block_reportdashboard .report_dashboard_container .co_report_header {
+    display: none;
 }
 
 body.path-blocks-reportdashboard .width-container.reports-act-graphs .block.block_reportdashboard
@@ -850,11 +854,17 @@ body.reportdashboard.path-blocks-reportdashboard .dialog_fixed {
     position: fixed;
 }
 
-body.reportdashboard.path-blocks-reportdashboard .block,
-body#page-my-index .block_reporttiles {
+body.reportdashboard.path-blocks-reportdashboard .block {
     float: left;
     width: 100%;
     border: 0 solid #e2e2e2;
+    background: #fff;
+}
+
+body#page-my-index .block_reporttiles {
+    float: left;
+    width: 100%;
+    border: 1px solid #e2e2e2;
     background: #fff;
 }
 
@@ -1238,7 +1248,6 @@ body.path-blocks-learnerscript .ui-dialog .ui-dialog-content .dataTables_wrapper
 body.reportdashboard.path-blocks-reportdashboard .ui-dialog .ui-dialog-titlebar .ui-button .ui-icon,
 body.reportdashboard.path-blocks-reportdashboard .ui-dialog .ui-dialog-titlebar button .ui-icon,
 body#page-my-index .block_reportdashboard .ui-dialog .ui-dialog-titlebar .ui-button .ui-icon {
-    background-image: url([[pix:block_reportdashboard|ui-icons_888888_256x240]]);
     position: absolute;
     top: 50%;
     left: 50%;
@@ -4628,6 +4637,16 @@ body#page-site-index #profile-page .badgesdetails_card .badges_card {
 
 body#page-site-index #profile-page .badgesdetails_card .badges_card h6 {
     font-size: 80%;
+}
+
+body#page-site-index #profile-page .badgesdetails_card .badges_card .badgeimage{
+    background-size: cover;
+    float: right;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+    max-width: 60px;
+    max-height: 60px;
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {

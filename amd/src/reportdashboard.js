@@ -54,9 +54,7 @@ define(['jquery',
                     });
 
                 $.ui.dialog.prototype._focusTabbable = $.noop;
-                var DheaderPosition = $("#dashboard-header").position();
                 $(".sidenav").offset({top: 0});
-                $("#internalbsm").offset({top: DheaderPosition.top});
                 /**
                  * Select2 Options
                  */
@@ -66,15 +64,18 @@ define(['jquery',
                     multiple: true
                 });
 
-                /** 
+                /**
                  * Custom report report help text
                  */
-                $(document).on('click', ".customreporthelptext", function() {
+                $(document).on('click', ".reportshelptext", function(e) {
                     var reportid = $(this).data('reportid');
                     report.block_statistics_help(reportid);
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    e.stopPropagation();
                 });
 
-                $(document).on('change', ".schuserroleslist", function(e) {
+                $(document).on('change', ".schuserroleslist", function() {
                     var reportid = $(this).data('reportid');
                     var reportinstance = $(this).data('reportinstance');
                     schedule.rolewiseusers({reportid: reportid, reportinstance: reportinstance});
@@ -84,42 +85,40 @@ define(['jquery',
                  * Add schedule form users for widget
                  */
 
-                $(document).on('change', ".schusers_data", function(e) {
+                $(document).on('change', ".schusers_data", function() {
                     var reportid = $(this).data('reportid');
                     var reportinstance = $(this).data('reportinstance');
                     schedule.addschusers({reportid: reportid, reportinstance: reportinstance});
                 });
-                
 
-                $(document).on('change', "select[name='frequency']", function(e) {
+                $(document).on('change', "select[name='frequency']", function() {
                     var reportid = $(this).data('reportid');
                     var reportinstance = $(this).data('reportinstance');
                     schedule.frequency_schedule({reportid: reportid, reportinstance: reportinstance});
                 });
-            
+
                 /**
                  * Menu option for report widget on dashboard
                  */
-                
-                $(document).on('click', ".report_schedule", function(e) {
-                    const reportSchedules = document.querySelectorAll('.report_schedule');
-                            var reportid = $(this).data('reportid');
-                            var instanceid = $(this).data('instanceid');
-                            var method = $(this).data('method');
-                            require(['block_reportdashboard/reportdashboard'], function(reportdashboard) {
-                                if (typeof reportdashboard[method] === 'function') {
-                                    reportdashboard[method]({
-                                        reportid: reportid,
-                                        instanceid: instanceid
-                                    });
-                                } else {
-                                    console.error(`Method ${method} does not exist on reportdashboard`);
-                                }
-                                e.preventDefault();
-                                e.stopImmediatePropagation();
-                                e.stopPropagation();
-                            });
+
+            $(document).on('click', ".report_schedule", function(e) {
+                var reportid = $(this).data('reportid');
+                var instanceid = $(this).data('instanceid');
+                var method = $(this).data('method');
+                require(['block_reportdashboard/reportdashboard'], function(reportdashboard) {
+                    if (typeof reportdashboard[method] === 'function') {
+                        reportdashboard[method]({
+                            reportid: reportid,
+                            instanceid: instanceid
+                        });
+                    }
                 });
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+                $('.menupopupdropdown').dropdown('hide');
+            });
+
                /**
                 * Filter area
                 */
@@ -217,8 +216,8 @@ define(['jquery',
                             }
                         });
                         self.reportFilterFormModal(args);
-                         $('.filterform' + args.instanceid + ' .fitemtitle').hide();
-                          $('.filterform' + args.instanceid + ' .felement').attr('style', 'margin:0');
+                        $('.filterform' + args.instanceid + ' .fitemtitle').hide();
+                        $('.filterform' + args.instanceid + ' .felement').attr('style', 'margin:0');
                     });
                 } else {
                     self.reportFilterFormModal(args);
@@ -291,36 +290,6 @@ define(['jquery',
                 });
             });
             },
-            DeleteWidget: function(args) {
-                Str.get_string('deletewidget', 'block_reportdashboard'
-                ).then(function(s) {
-                    $("#delete_dialog" + args.instanceid).dialog({
-                        resizable: true,
-                        autoOpen: true,
-                        width: 460,
-                        height: 210,
-                        title: s,
-                        modal: true,
-                        appendTo: "#inst" + args.instanceid,
-                        position: {
-                            my: "center",
-                            at: "center",
-                            of: "#inst" + args.instanceid,
-                            within: "#inst" + args.instanceid
-                        },
-                        open: function() {
-                            $(this).closest(".ui-dialog")
-                                .find(".ui-dialog-titlebar-close")
-                                .removeClass("ui-dialog-titlebar-close")
-                                .html("<span class='ui-button-icon-primary ui-icon ui-icon-closethick'></span>");
-                                var Closebutton = $('.ui-icon-closethick').parent();
-                                $(Closebutton).attr({
-                                    "title": "Close"
-                                });
-                        }
-                    });
-                });
-            },
             /**
              * Schedule report form in popup in dashboard
              * @param  {object} args reportid
@@ -335,6 +304,32 @@ define(['jquery',
                     args.courseid = $('[name="filter_courses"]').val();
                     var AjaxForms = require('block_learnerscript/ajaxforms');
                     AjaxForms.init(args, url);
+                });
+            },
+
+            profileuserfunction: function() {
+                /** User profile user on changes  function*/
+                $(document).on('change', "#dashboardusers", function() {
+                    let queryString = window.location.search;
+                    // Step 2: Create a URLSearchParams object
+                    let params = new URLSearchParams(queryString);
+
+                    // Step 3: Get specific parameter values
+                    let role = params.get('role');
+                    let contextlevel = params.get('contextlevel');
+                    var url = $(this).val(); // get selected value
+                    if (url) { // require a URL
+                        window.location = 'profilepage.php?filter_users=' + url
+                                    + '&role=' + role + '&contextlevel=' + contextlevel; // redirect
+                    }
+                    return false;
+                });
+                $(document).on('change', "#dashboardcourses", function() {
+                    var url = $(this).val(); // get selected value
+                    if (url) { // require a URL
+                        window.location = 'courseprofile.php?filter_courses=' + url; // redirect
+                    }
+                    return false;
                 });
             }
         };
