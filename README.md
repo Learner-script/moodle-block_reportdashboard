@@ -35,7 +35,7 @@ If you encounter any issues or have suggestions for improvement, please feel fre
 	5. After choosing the file click on continue till the Upgrade of the new version is successful.
 
 # Supported Moodle versions:
-	Moodle 4.3, 4.4
+	Moodle 4.3, 4.4, 4.5
 
 # Code repository name:
 	moodle-block_reportdashboard
