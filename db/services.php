@@ -22,21 +22,21 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
-'block_reportdashboard_userlist' => [
+    'block_reportdashboard_userlist' => [
         'classname' => 'block_reportdashboard_external',
         'methodname' => 'userlist',
         'classpath' => 'blocks/reportdashboard/externallib.php',
         'description' => 'case userlist',
         'ajax' => true,
-],
-'block_reportdashboard_reportlist' => [
+    ],
+    'block_reportdashboard_reportlist' => [
         'classname' => 'block_reportdashboard_external',
         'methodname' => 'reportlist',
         'classpath' => 'blocks/reportdashboard/externallib.php',
         'description' => 'case reportlist',
         'ajax' => true,
     ],
-'block_reportdashboard_sendemails' => [
+    'block_reportdashboard_sendemails' => [
         'classname' => 'block_reportdashboard_external',
         'methodname' => 'sendemails',
         'classpath' => 'blocks/reportdashboard/externallib.php',

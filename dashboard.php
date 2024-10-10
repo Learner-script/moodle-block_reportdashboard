@@ -100,7 +100,7 @@ if ($dashboardurl != '') {
     $seturl = new moodle_url('/blocks/reportdashboard/dashboard.php', $params);
 }
 if ($dashboardurl == ''  || $dashboardurl == 'Dashboard') {
-    $dashboardurl = 'Dashboard';
+    $dashboardurl = get_string('dashboard', 'block_reportdashboard');
 }
 $subpagepatterntype = $dashboardurl;
 

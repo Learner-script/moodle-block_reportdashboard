@@ -1248,7 +1248,6 @@ body.path-blocks-learnerscript .ui-dialog .ui-dialog-content .dataTables_wrapper
 body.reportdashboard.path-blocks-reportdashboard .ui-dialog .ui-dialog-titlebar .ui-button .ui-icon,
 body.reportdashboard.path-blocks-reportdashboard .ui-dialog .ui-dialog-titlebar button .ui-icon,
 body#page-my-index .block_reportdashboard .ui-dialog .ui-dialog-titlebar .ui-button .ui-icon {
-    background-image: url([[pix:block_reportdashboard|ui-icons_888888_256x240]]);
     position: absolute;
     top: 50%;
     left: 50%;

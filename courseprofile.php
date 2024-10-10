@@ -66,8 +66,8 @@ $siteadmin = is_siteadmin() || has_capability('block/learnerscript:managereports
 $data = [];
 $dashboardcourse = (is_siteadmin() || has_capability('block/learnerscript:managereports', $context)) ?
         $DB->get_records_select('course' , 'id <> :id' , ['id' => SITEID] , '' ,
-    'id,fullname') : (new querylib)->get_rolecourses($USER->id, $SESSION->role, $SESSION->ls_contextlevel,
-    SITEID, '', '');
+        'id,fullname') : (new querylib)->get_rolecourses($USER->id, $SESSION->role, $SESSION->ls_contextlevel,
+        SITEID, '', '');
 foreach ($dashboardcourse as $selectedcourse) {
     if ($selectedcourse->id == $courseid) {
         $cpdashboard[] = ['id' => $selectedcourse->id, 'fullname' => $selectedcourse->fullname, 'selectedcourse' => 'selected'];
@@ -311,21 +311,22 @@ foreach ($timelinerecords as $timelinerecord) {
 }
 echo $OUTPUT->render_from_template('block_reportdashboard/courseprofile/courseprofile',
                                         ['courseinfo' => $courseinfo,
-                                                'reportid' => $reportid,
-                                                'reporttype' => $reporttype,
-                                                'reportinstance' => $reportinstance,
-                                                'toplearnerreportid' => $toplearnerreportid,
-                                                'toplearnerreporttype' => $toplearnerreporttype,
-                                                'toplearnerreportinstance' => $toplearnerreportinstance,
-                                                'activitiesreportid' => $activitiesreportid,
-                                                'activitiesreporttype' => $activitiesreporttype,
-                                                'activitiesreportinstance' => $activitiesreportinstance,
-                                                'coursebadgesinfo' => $coursebadgesinfo,
-                                                'coursedata' => $data,
-                                                'courseid' => $courseid,
-                                                'timelinerecordslist' => $timelinerecordslist,
-                                                'role' => $roleshortname,
-                                                'contextlevel' => $contextlevel,
+                                            'reportid' => $reportid,
+                                            'reporttype' => $reporttype,
+                                            'reportinstance' => $reportinstance,
+                                            'toplearnerreportid' => $toplearnerreportid,
+                                            'toplearnerreporttype' => $toplearnerreporttype,
+                                            'toplearnerreportinstance' => $toplearnerreportinstance,
+                                            'activitiesreportid' => $activitiesreportid,
+                                            'activitiesreporttype' => $activitiesreporttype,
+                                            'activitiesreportinstance' => $activitiesreportinstance,
+                                            'coursebadgesinfo' => $coursebadgesinfo,
+                                            'coursedata' => $data,
+                                            'courseid' => $courseid,
+                                            'timelinerecordslist' => $timelinerecordslist,
+                                            'role' => $roleshortname,
+                                            'contextlevel' => $contextlevel,
                                             'issiteadmin' => $siteadmin,
-                                            'studentrole' => ($roleshortname) ? get_config('block_learnerscript', 'role') : '', ]);
+                                            'studentrole' => ($roleshortname) ? get_config('block_learnerscript', 'role') : ''
+                                        ]);
 echo $OUTPUT->footer();

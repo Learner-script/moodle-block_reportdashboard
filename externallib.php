@@ -239,8 +239,7 @@ class block_reportdashboard_external extends external_api {
         'pageurl' => $pageurl, ]);
 
         $pageurl = $pageurl ? $pageurl : new moodle_url('/blocks/reportdashboard/dashboard.php');
-        require_once($CFG->dirroot . '/blocks/reportdashboard/email_form.php');
-        $emailform = new block_reportdashboard_emailform($pageurl, ['reportid' => $reportid,
+        $emailform = new block_reportdashboard\form\email_form($pageurl, ['reportid' => $reportid,
                     'AjaxForm' => true, 'instance' => $instance, ]);
         $return = $emailform->render();
         $data = json_encode($return);

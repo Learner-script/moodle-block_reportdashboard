@@ -21,7 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die;
-use block_reportdashboard\local;
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configstoredfile('block_reportdashboard/bannerbackground',
      get_string('bannerbackground', 'block_reportdashboard'),

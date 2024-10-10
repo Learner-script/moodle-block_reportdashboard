@@ -93,7 +93,7 @@ class widgetheader implements renderable, templatable {
      * @return array
      */
     public function export_for_template(renderer_base $output) {
-        global $OUTPUT, $USER, $PAGE, $CFG, $DB, $SESSION;
+        global $OUTPUT, $USER, $PAGE, $DB, $SESSION;
         $data = [];
         if (!empty($this->methodname)) {
             foreach ($this->methodname as $method) {
