@@ -470,33 +470,33 @@ if ($userid) {
     // User LMS access.
     $userlmsaccess = $DB->get_field('block_ls_userlmsaccess', 'logindata', ['userid' => $userid]);
     $lmsaccess = json_decode($userlmsaccess);
-
-    $daystimedata = (new ls)->get_daystimesslot();
-    for ($i = 0; $i < count($daystimedata['timeslots']); $i++) {
-        if (!empty($lmsaccess->data->$i)) {
-            $lmsaccess->data->$i->label = $lmsaccess->data->$i->label;
-            $lmsaccess->data->$i->data = $lmsaccess->data->$i->data;
-        } else {
-            $timelabels = new stdClass;
-            $timelabels->label = $daystimedata['timings'][$i];
-            $timelabels->data = [];
-            $lmsaccess->data->$i = $timelabels;
-        }
-        for ($q = 0; $q < count($daystimedata['weekdayslist']); $q++) {
-            if (is_object($lmsaccess->data->$i->data)) {
-                $lmsaccess->data->$i->data = (array)$lmsaccess->data->$i->data;
-            }
-            if (!empty($lmsaccess->data->$i->data[$q])) {
-                $lmsaccess->data->$i->data[$q] = $lmsaccess->data->$i->data[$q];
+    if (!empty($lmsaccess)) {
+        $daystimedata = (new ls)->get_daystimesslot();
+        for ($i = 0; $i < count($daystimedata['timeslots']); $i++) {
+            if (!empty($lmsaccess->data->$i)) {
+                $lmsaccess->data->$i->label = $lmsaccess->data->$i->label;
+                $lmsaccess->data->$i->data = $lmsaccess->data->$i->data;
             } else {
-                $lmsaccess->data->$i->data[$q] = 0;
+                $timelabels = new stdClass;
+                $timelabels->label = $daystimedata['timings'][$i];
+                $timelabels->data = [];
+                $lmsaccess->data->$i = $timelabels;
             }
+            for ($q = 0; $q < count($daystimedata['weekdayslist']); $q++) {
+                if (is_object($lmsaccess->data->$i->data)) {
+                    $lmsaccess->data->$i->data = (array)$lmsaccess->data->$i->data;
+                }
+                if (!empty($lmsaccess->data->$i->data[$q])) {
+                    $lmsaccess->data->$i->data[$q] = $lmsaccess->data->$i->data[$q];
+                } else {
+                    $lmsaccess->data->$i->data[$q] = 0;
+                }
+            }
+            ksort($lmsaccess->data->$i->data);
         }
-        ksort($lmsaccess->data->$i->data);
+        $lmsaccess->data = (array)$lmsaccess->data;
+        ksort($lmsaccess->data);
     }
-    $lmsaccess->data = (array)$lmsaccess->data;
-    ksort($lmsaccess->data);
-
     echo $OUTPUT->render_from_template('block_reportdashboard/profilepage/profilepage',
                                             ['userinfo' => $userinfo,
                                                     'userbadgesinfo' => $userbadgesinfo,
